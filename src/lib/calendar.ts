@@ -15,7 +15,7 @@ function fold(s: string) {
     line = "",
     bytes = 0;
   for (const ch of s) {
-    const len = Buffer.byteLength(ch);
+    const len = new TextEncoder().encode(ch).length;
     if (bytes + len > 74) {
       lines += line + "\r\n";
       line = " ";

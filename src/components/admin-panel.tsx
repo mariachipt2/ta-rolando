@@ -1,4 +1,5 @@
 "use client";
+import {request,navigate} from "@/lib/transport";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -62,7 +63,7 @@ export function AdminPanel({
       return;
     setBusy(true);
     try {
-      const r = await fetch("/api/admin/events", {
+      const r = await request("/api/admin/events", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: e.id }),
@@ -87,7 +88,7 @@ export function AdminPanel({
         <button
           className="button secondary"
           onClick={async () => {
-            await fetch("/api/admin/login", { method: "DELETE" });
+            await request("/api/admin/login", { method: "DELETE" });
             location.reload();
           }}
         >
@@ -256,7 +257,7 @@ export function AdminPanel({
                 setBusy(true);
                 const f = new FormData(e.currentTarget);
                 try {
-                  const r = await fetch("/api/admin/categories", {
+                  const r = await request("/api/admin/categories", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({

@@ -1,5 +1,7 @@
 # Tá Rolando
 
+**GitHub Pages agora é suportado.** Use `npm run build:pages` e siga [o guia do Pages](docs/GITHUB-PAGES.md). A versão Next.js abaixo permanece disponível para Vercel.
+
 Plataforma de eventos de Ipatinga, com Next.js App Router, TypeScript, Tailwind CSS, Lucide, Supabase Auth/PostgreSQL/Storage, React Hook Form e Zod. Desenvolvida localmente; não publicada.
 
 ## Executar no Windows

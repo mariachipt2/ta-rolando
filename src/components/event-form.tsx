@@ -1,4 +1,5 @@
 "use client";
+import {request,navigate} from "@/lib/transport";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -64,7 +65,7 @@ export function EventForm({
       for (const file of Array.from(files)) {
         const f = new FormData();
         f.set("file", file);
-        const r = await fetch("/api/admin/upload", { method: "POST", body: f });
+        const r = await request("/api/admin/upload", { method: "POST", body: f });
         const d = await r.json();
         if (!r.ok) throw Error(d.error);
         urls.push(d.url);
@@ -125,7 +126,7 @@ export function EventForm({
         setBusy(true);
         setError("");
         try {
-          const r = await fetch("/api/admin/events", {
+          const r = await request("/api/admin/events", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ ...data, id: e.id }),

@@ -1,4 +1,5 @@
 "use client";
+import Link from 'next/link';
 import { useMemo, useState } from "react";
 import {
   Search,
@@ -325,9 +326,9 @@ export function Discover({
                 <h2>Curtiu? Marca “Eu vou!”.</h2>
                 <p>Seu rolê salvo na agenda, sem cadastro e sem complicação.</p>
               </div>
-              <a href="/agenda" className="button lime-button">
+              <Link href="/agenda" className="button lime-button">
                 Minha agenda <ArrowUpRight size={18} />
-              </a>
+              </Link>
             </div>
             {section(
               "Eventos gratuitos",

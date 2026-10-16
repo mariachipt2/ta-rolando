@@ -1,4 +1,5 @@
 "use client";
+import {request,navigate} from "@/lib/transport";
 import { useEffect, useState } from "react";
 import { Copy, MessageCircle, ExternalLink } from "lucide-react";
 export function Share({
@@ -14,7 +15,7 @@ export function Share({
     [url, setUrl] = useState("");
   useEffect(() => {
     setUrl(location.href);
-    fetch("/api/metrics", {
+    request("/api/metrics", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ event_id: id, kind: "view" }),
@@ -29,7 +30,7 @@ export function Share({
           rel="noopener noreferrer"
           className="button primary"
           onClick={() => {
-            fetch("/api/metrics", {
+            request("/api/metrics", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ event_id: id, kind: "ticket" }),

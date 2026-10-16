@@ -4,8 +4,9 @@ export default function Page() {
     <article className="shell page prose">
       <h1>Sua agenda, sua privacidade.</h1>
       <p>
-        Para marcar “Eu vou!”, usamos um identificador aleatório em um cookie
-        essencial do navegador, válido por até 180 dias. Não pedimos nome,
+        Para marcar “Eu vou!”, usamos um identificador aleatório no armazenamento
+        essencial do navegador, válido por até 180 dias. Dependendo da versão do site,
+        ele fica em um cookie ou no armazenamento local. Não pedimos nome,
         telefone ou e-mail. O banco guarda somente uma versão criptograficamente
         derivada desse identificador, associada aos eventos escolhidos.
       </p>
@@ -18,7 +19,7 @@ export default function Page() {
       <p>
         Você pode retirar cada marcação na Minha Agenda. Marcações de eventos
         encerrados há mais de 180 dias são removidas pela rotina de manutenção.
-        Estatísticas diárias agregadas são preservadas. Apagar o cookie impede
+        Estatísticas diárias agregadas são preservadas. Apagar os dados do site impede
         que este navegador recupere as marcações anteriores.
       </p>
       <h2>Serviços utilizados</h2>

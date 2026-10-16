@@ -1,4 +1,5 @@
 "use client";
+import {request,navigate} from "@/lib/transport";
 import { useEffect, useState, useRef } from "react";
 import Script from "next/script";
 import { Check, Plus, Users } from "lucide-react";
@@ -42,7 +43,7 @@ export function Attendance({
   };
   useEffect(() => {
     let active = true;
-    fetch("/api/attendance", { cache: "no-store" })
+    request("/api/attendance", { cache: "no-store" })
       .then((r) => {
         if (!r.ok) throw Error();
         return r.json();
@@ -72,7 +73,7 @@ export function Attendance({
     setBusy(true);
     setError("");
     try {
-      const r = await fetch("/api/attendance", {
+      const r = await request("/api/attendance", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ event_id: id, attending: !going, token }),

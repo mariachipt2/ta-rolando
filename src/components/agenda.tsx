@@ -1,15 +1,17 @@
 "use client";
+import {request,navigate} from "@/lib/transport";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { Event } from "@/lib/types";
 import { EventCard } from "./event-card";
 import { Attendance } from "./attendance";
+import {CalendarDownload} from "./calendar-download";
 import { upcoming } from "@/lib/dates";
 export function Agenda({ events }: { events: Event[] }) {
   const [ids, setIds] = useState<string[] | null>(null),
     [error, setError] = useState("");
   useEffect(() => {
-    fetch("/api/attendance", { cache: "no-store" })
+    request("/api/attendance", { cache: "no-store" })
       .then((r) => {
         if (!r.ok) throw Error();
         return r.json();
@@ -47,9 +49,7 @@ export function Agenda({ events }: { events: Event[] }) {
                     if (!going) setIds(ids!.filter((id) => id !== e.id));
                   }}
                 />
-                <a className="text-link" href={"/api/calendar/" + e.id}>
-                  Adicionar ao calendário
-                </a>
+                <CalendarDownload id={e.id}/>
               </div>
             </div>
           ))}
