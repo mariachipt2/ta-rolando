@@ -1,0 +1,72 @@
+import type { Metadata, Viewport } from "next";
+import Link from "next/link";
+import { MapPin, ArrowUpRight, CalendarDays, Radio } from "lucide-react";
+import { Pwa } from "@/components/pwa";
+import "./globals.css";
+export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
+  ),
+  title: {
+    default: "Tá Rolando — Seu próximo rolê em Ipatinga",
+    template: "%s | Tá Rolando",
+  },
+  description:
+    "Não fique de fora. Saiba o que tá rolando! Shows, cultura, gastronomia e encontros em Ipatinga.",
+  manifest: "/manifest.webmanifest",
+  icons: {icon:'/icons/icon-192.png',apple:'/icons/icon-192.png'},
+  openGraph: {title:'Tá Rolando — Ipatinga',description:'Não fique de fora. Saiba o que tá rolando!',images:['/icons/icon-512.png'],locale:'pt_BR',type:'website'},
+  appleWebApp: {
+    capable: true,
+    title: "Tá Rolando",
+    statusBarStyle: "black-translucent",
+  },
+};
+export const viewport: Viewport = { themeColor: "#0B0B12" };
+export default function Layout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="pt-BR">
+      <body>
+        <a href="#main" className="skip">
+          Pular para o conteúdo
+        </a>
+        <header>
+          <div className="shell nav">
+            <Link href="/" className="logo" aria-label="Tá Rolando, início">
+              <Radio size={27} /> tá rolando<span>?</span>
+            </Link>
+            <span className="location">
+              <MapPin size={14} /> Ipatinga, MG
+            </span>
+            <nav aria-label="Navegação principal">
+              <Link href="/#explorar">
+                Explorar <ArrowUpRight size={15} />
+              </Link>
+              <Link href="/#categorias" className="desktop-link">
+                Categorias
+              </Link>
+              <Link href="/agenda" className="agenda-link">
+                <CalendarDays size={17} />
+                <span>Minha agenda</span>
+              </Link>
+            </nav>
+          </div>
+        </header>
+        <main id="main">{children}</main>
+        <footer className="shell">
+          <Link className="logo" href="/">
+            tá rolando<span>?</span>
+          </Link>
+          <p>
+            Feito para quem vive a cidade.
+            <br />
+            Ipatinga · Vale do Aço · MG
+          </p>
+          <Link href="/privacidade">Privacidade</Link>
+          <span>Não fique de fora. ♡</span>
+        </footer>
+        <Pwa />
+      </body>
+    </html>
+  );
+}

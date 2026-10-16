@@ -1,0 +1,36 @@
+export type Category = {
+  id: string;
+  name: string;
+  icon: string;
+  active: boolean;
+};
+export type Event = {
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  category_id: string;
+  starts_at: string;
+  ends_at: string | null;
+  venue_name: string;
+  address: string;
+  neighborhood: string;
+  city: string;
+  state: string;
+  organizer: string;
+  is_free: boolean;
+  price: string;
+  ticket_url: string;
+  age_rating: string;
+  cover_url: string;
+  gallery: string[];
+  additional_info: string;
+  status: "draft" | "published" | "scheduled" | "cancelled";
+  publish_at: string | null;
+  featured: boolean;
+  created_at: string;
+  categories?: Category;
+  interest_count: number;
+  views?: number;
+  ticket_clicks?: number;
+};
