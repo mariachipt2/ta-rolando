@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { Radio, MapPin, CalendarDays, ArrowLeft } from "lucide-react";
 import { Discover } from "@/components/discover";
 import { Agenda } from "@/components/agenda";
+import {EventTimeline} from '@/components/event-timeline';
 import { AdminLogin } from "@/components/admin-login";
 import { AdminPanel } from "@/components/admin-panel";
 import { Attendance } from "@/components/attendance";
@@ -225,6 +226,8 @@ function App() {
       ? event.title + " | Tá Rolando"
       : path === "/admin"
         ? "Administração | Tá Rolando"
+        : path === '/linha-do-tempo'
+          ? 'Linha do tempo | Tá Rolando'
         : "Tá Rolando — Ipatinga";
   }, [path, event]);
   return (
@@ -248,6 +251,7 @@ function App() {
             <a href="#/agenda" className="agenda-link">
               <CalendarDays size={17} /> Minha agenda
             </a>
+            <a href="#/linha-do-tempo" aria-current={path==='/linha-do-tempo'?'page':undefined}>Linha do tempo</a>
           </nav>
         </div>
       </header>
@@ -289,6 +293,8 @@ function App() {
             </p>
             <Agenda events={data?.events || []} />
           </div>
+        ) : path === '/linha-do-tempo' ? (
+          <EventTimeline events={data?.events||[]} error={data?.error}/>
         ) : path === "/privacidade" ? (
           <Privacy />
         ) : path.startsWith("/evento/") ? (

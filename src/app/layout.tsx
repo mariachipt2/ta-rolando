@@ -49,6 +49,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 <CalendarDays size={17} />
                 <span>Minha agenda</span>
               </Link>
+              <Link href="/linha-do-tempo">Linha do tempo</Link>
             </nav>
           </div>
         </header>
