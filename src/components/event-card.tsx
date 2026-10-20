@@ -1,19 +1,20 @@
 import Link from "next/link";
-import Image from "next/image";
 import { MapPin, ArrowUpRight, Users, CalendarDays } from "lucide-react";
 import type { Event } from "@/lib/types";
 import { displayDate } from "@/lib/dates";
 import {EventNotice} from "./event-notice";
+import {InstagramLink} from './instagram-link';
 export function EventCard({ event: e, rank }: { event: Event; rank?: number }) {
+  const cover=e.cover_url||e.gallery?.[0];
   return (
     <article className="event-card">
       <Link href={"/evento/" + e.slug} className="cover">
-        {e.cover_url ? (
-          <Image
-            src={e.cover_url}
+        {cover ? (
+          <img
+            src={cover}
             alt={e.title}
-            fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1000px) 50vw, 33vw"
+            loading="eager"
+            decoding="async"
           />
         ) : (
           <div className="cover-placeholder">
@@ -45,14 +46,17 @@ export function EventCard({ event: e, rank }: { event: Event; rank?: number }) {
           {e.venue_name} · {e.neighborhood || e.city}
         </p>
         <div className="card-bottom">
-          <span>
+          {e.interest_count>0&&<span>
             <Users size={15} />
             {e.interest_count}{" "}
             {e.interest_count === 1 ? "pessoa vai" : "pessoas vão"}
-          </span>
+          </span>}
+          <div className="card-links">
+          <InstagramLink url={e.instagram_url} compact/>
           <Link href={"/evento/" + e.slug}>
             Ver evento <ArrowUpRight size={18} />
           </Link>
+          </div>
         </div>
       </div>
     </article>

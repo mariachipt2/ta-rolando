@@ -521,15 +521,19 @@ header {
 .cover {
   display: block;
   position: relative;
-  aspect-ratio: 1.65;
+  aspect-ratio: 4 / 3;
+  background: #111019;
   overflow: hidden;
 }
 .cover img {
-  object-fit: cover;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
   transition: transform 0.3s;
 }
 .event-card:hover .cover img {
-  transform: scale(1.03);
+  transform: none;
 }
 .cover-placeholder {
   height: 100%;
@@ -608,6 +612,9 @@ header {
   color: var(--lime);
   font-weight: 650;
 }
+.card-links{display:flex;align-items:center;gap:12px;margin-left:auto}
+.card-links .instagram-card-link{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border:1px solid var(--border);border-radius:10px;color:var(--text)}
+.card-links .instagram-card-link:hover{border-color:var(--purple);color:var(--purple)}
 .count-pill {
   border: 1px solid var(--border);
   color: var(--muted);

@@ -98,10 +98,10 @@ export function Attendance({
   }
   return (
     <div className="attendance">
-      <p>
+      {total>0&&<p>
         <Users size={17} />
         {total} {total === 1 ? "pessoa marcou" : "pessoas marcaram"} “Eu vou!”
-      </p>
+      </p>}
       <button
         className={"button " + (going ? "secondary" : "lime-button")}
         disabled={
