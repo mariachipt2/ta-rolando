@@ -21,3 +21,10 @@
 - Avaliação de desempenho com imagens e volume real. Não foi atribuída pontuação Lighthouse.
 
 Não houve publicação na internet, criação de credenciais externas ou inserção de eventos fictícios na base do usuário.
+
+## Ativacao em 20/10/2026
+- public-events publicada no Supabase; preflight CORS 204 e consulta de agenda 200.
+- Turnstile configurado; tentativa sem token rejeitada com 403.
+- Chave publica configurada no GitHub Actions e publicacao concluida sem commit/push.
+- Teste real na interface: marcar, contador 1, agenda apos recarregar e retirada bem-sucedida. A marcacao de teste foi removida.
+

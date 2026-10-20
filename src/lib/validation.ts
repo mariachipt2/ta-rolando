@@ -1,4 +1,6 @@
 import { z } from "zod";
+import {instagramProfile} from './instagram';
+export const instagramUrl=z.string().trim().max(2048).refine(v=>instagramProfile(v)!==null,'Use o link HTTPS do perfil, como https://www.instagram.com/organizador/.').transform(v=>instagramProfile(v)!);
 export const safeUrl = z
   .string()
   .max(2048)
@@ -27,6 +29,7 @@ export const eventSchema = z
     city: z.string().min(2).max(100),
     state: z.string().length(2),
     organizer: z.string().max(160),
+    instagram_url: instagramUrl,
     is_free: z.boolean(),
     price: z.string().max(100),
     ticket_url: safeUrl,

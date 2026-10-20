@@ -13,6 +13,7 @@ import { publicData } from "@/lib/data";
 import { displayDate, upcoming } from "@/lib/dates";
 import { Attendance } from "@/components/attendance";
 import { Share } from "@/components/share";
+import {InstagramLink} from '@/components/instagram-link';
 export const dynamic = "force-dynamic";
 export async function generateMetadata({
   params,
@@ -129,6 +130,7 @@ export default async function Detail({
               Organização: {e.organizer || "Não informada"}
             </p>
           </div>
+          <InstagramLink url={e.instagram_url}/>
           <h2>Sobre esse rolê</h2>
           <p className="description">{e.description}</p>
           {e.additional_info && (

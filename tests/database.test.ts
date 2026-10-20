@@ -10,12 +10,17 @@ test("PostgreSQL: RLS, visibilidade, unicidade, métricas e remoção idempotent
     );
     await db.exec(readFileSync("supabase/migrations/001_initial.sql", "utf8"));
     await db.exec(readFileSync("supabase/migrations/003_admin_totals.sql", "utf8"));
+    await db.exec(readFileSync("supabase/migrations/004_event_instagram.sql", "utf8"));
+    await db.exec(readFileSync("supabase/migrations/004_event_instagram.sql", "utf8"));
     await db.exec(`create schema storage;create table storage.buckets(id text primary key,name text,public boolean,file_size_limit bigint,allowed_mime_types text[]);create table storage.objects(id uuid default gen_random_uuid(),bucket_id text,name text);alter table storage.objects enable row level security;grant usage on schema storage to anon,authenticated;grant select,insert,update,delete on storage.objects to anon,authenticated;`);
     await db.exec(readFileSync("supabase/migrations/002_storage.sql", "utf8"));
     const result = await db.query<{ id: string }>(
       `insert into events(slug,title,description,category_id,starts_at,venue_name,address,status) select 'teste','Evento de teste','Descrição longa',id,now()+interval '2 days','Local','Rua','published' from categories limit 1 returning id`,
     );
     const id = result.rows[0].id;
+    await db.query('update events set instagram_url=$1 where id=$2',['https://www.instagram.com/organizador/',id]);
+    assert.equal((await db.query<{instagram_url:string}>('select instagram_url from public_events where id=$1',[id])).rows[0].instagram_url,'https://www.instagram.com/organizador/');
+    await assert.rejects(()=>db.query('update events set instagram_url=$1 where id=$2',['https://evil.test/perfil/',id]));
     await db.exec(
       `insert into events(slug,title,description,category_id,starts_at,venue_name,address,status) select 'privado','Rascunho','Descrição',id,now()+interval '2 days','Local','Rua','draft' from categories limit 1;`,
     );

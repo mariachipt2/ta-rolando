@@ -8,6 +8,7 @@ import { AdminPanel } from "@/components/admin-panel";
 import { Attendance } from "@/components/attendance";
 import { Share } from "@/components/share";
 import { CalendarDownload } from "@/components/calendar-download";
+import {InstagramLink} from '@/components/instagram-link';
 import Privacy from "@/app/privacidade/page";
 import { configureTransport } from "@/lib/transport";
 import { displayDate, upcoming } from "@/lib/dates";
@@ -65,6 +66,7 @@ function Detail({ event: e }: { event: Event }) {
             </p>
             <p>Organização: {e.organizer || "Não informada"}</p>
           </div>
+          <InstagramLink url={e.instagram_url}/>
           <h2>Sobre esse rolê</h2>
           <p className="description">{e.description}</p>
           {e.additional_info && (

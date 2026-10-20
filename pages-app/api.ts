@@ -91,7 +91,7 @@ function visitor() {
   try {
     entry = stored ? JSON.parse(stored) : null;
   } catch {}
-  if (!entry || entry.expires < Date.now()) {
+  if (!entry || typeof entry.value !== 'string' || !/^[a-f0-9]{64}$/.test(entry.value) || typeof entry.expires !== 'number' || entry.expires < Date.now()) {
     entry = {
       value: Array.from(crypto.getRandomValues(new Uint8Array(32)), (n) =>
         n.toString(16).padStart(2, "0"),
@@ -104,7 +104,7 @@ function visitor() {
 }
 async function edge(action: string, payload: Record<string, unknown> = {}) {
   if (!db) return json({ error: "O Supabase ainda não foi configurado." }, 503);
-  return fetch(__SUPABASE_URL__ + "/functions/v1/public-events", {
+  const response = await fetch(__SUPABASE_URL__ + "/functions/v1/public-events", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -113,6 +113,8 @@ async function edge(action: string, payload: Record<string, unknown> = {}) {
     body: JSON.stringify({ action, visitor: visitor(), ...payload }),
     signal: AbortSignal.timeout(20000),
   });
+  if(response.status===404)return json({error:'As marcações estão temporariamente indisponíveis. Tente novamente mais tarde.'},503);
+  return response;
 }
 export async function transport(
   path: string,
@@ -123,9 +125,9 @@ export async function transport(
     if (path === "/api/attendance") {
       if (!configured && (!init.method || init.method === "GET"))
         return json({ ids: [] });
-      return edge(init.method === "POST" ? "attendance" : "agenda", body);
+      return await edge(init.method === "POST" ? "attendance" : "agenda", body);
     }
-    if (path === "/api/metrics") return edge("metric", body);
+    if (path === "/api/metrics") return await edge("metric", body);
     if (path.startsWith("/api/calendar/")) {
       const { events } = await loadPublic();
       const e = events.find((e) => e.id === path.split("/").at(-1));

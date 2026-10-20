@@ -18,6 +18,7 @@ export type Event = {
   city: string;
   state: string;
   organizer: string;
+  instagram_url?: string;
   is_free: boolean;
   price: string;
   ticket_url: string;

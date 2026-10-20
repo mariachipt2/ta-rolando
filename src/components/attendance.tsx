@@ -28,6 +28,7 @@ export function Attendance({
     [ready, setReady] = useState(false),
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
+    [attempt, setAttempt] = useState(0),
     [token, setToken] = useState("");
   const box = useRef<HTMLDivElement>(null),
     widget = useRef<string | null>(null);
@@ -43,10 +44,13 @@ export function Attendance({
   };
   useEffect(() => {
     let active = true;
+    setReady(false);
+    setError('');
     request("/api/attendance", { cache: "no-store" })
-      .then((r) => {
-        if (!r.ok) throw Error();
-        return r.json();
+      .then(async (r) => {
+        const data=await r.json();
+        if (!r.ok) throw Error(data.error || 'Não foi possível consultar sua marcação. Tente novamente.');
+        return data;
       })
       .then((d) => {
         if (active) {
@@ -54,10 +58,10 @@ export function Attendance({
           setReady(true);
         }
       })
-      .catch(() => {
+      .catch((e) => {
         if (active)
           setError(
-            "Não foi possível consultar sua marcação. Recarregue a página.",
+            e instanceof Error && e.message ? e.message : "Não foi possível consultar sua marcação. Tente novamente.",
           );
       });
     render();
@@ -68,7 +72,7 @@ export function Attendance({
         widget.current = null;
       }
     };
-  }, [id]);
+  }, [id, attempt]);
   async function toggle() {
     setBusy(true);
     setError("");
@@ -132,6 +136,7 @@ export function Attendance({
           {error}
         </p>
       )}
+      {error && !ready && <button className="button secondary" onClick={()=>setAttempt(n=>n+1)}>Tentar novamente</button>}
       <small>
         Marcações de interesse, não ingressos ou presenças confirmadas.
       </small>

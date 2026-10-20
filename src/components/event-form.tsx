@@ -7,6 +7,7 @@ import { z } from "zod";
 import type { Event, Category } from "@/lib/types";
 import { eventSchema } from "@/lib/validation";
 import { localInput, toISO, displayDate } from "@/lib/dates";
+import {InstagramLink} from './instagram-link';
 type Values = z.infer<typeof eventSchema>;
 export function EventForm({
   event: e,
@@ -43,6 +44,7 @@ export function EventForm({
       city: e.city || "Ipatinga",
       state: e.state || "MG",
       organizer: e.organizer || "",
+      instagram_url: e.instagram_url || '',
       is_free: e.is_free ?? true,
       price: e.price || "",
       ticket_url: e.ticket_url || "",
@@ -175,6 +177,11 @@ export function EventForm({
         {field("city", "Cidade", true)}
         {field("state", "Estado (UF)", true)}
         {field("organizer", "Organizador")}
+        <label>Instagram do evento/organizador
+          <input type="url" {...register('instagram_url')} placeholder="https://www.instagram.com/organizador/" autoCapitalize="none" autoCorrect="off"/>
+          <small>Opcional. O perfil aparecerá na página do evento.</small>
+          {errors.instagram_url&&<small className="error-text">{errors.instagram_url.message}</small>}
+        </label>
         <label className="check">
           <input type="checkbox" {...register("is_free")} /> Entrada gratuita
         </label>
@@ -286,6 +293,7 @@ export function EventForm({
           </p>
           <p>{v.is_free ? "Gratuito" : v.price}</p>
           <p className="description">{v.description}</p>
+          <InstagramLink url={v.instagram_url}/>
         </section>
       )}
     </form>

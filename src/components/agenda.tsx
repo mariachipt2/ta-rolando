@@ -9,22 +9,26 @@ import {CalendarDownload} from "./calendar-download";
 import { upcoming } from "@/lib/dates";
 export function Agenda({ events }: { events: Event[] }) {
   const [ids, setIds] = useState<string[] | null>(null),
-    [error, setError] = useState("");
+    [error, setError] = useState(""),
+    [attempt, setAttempt] = useState(0);
   useEffect(() => {
+    let active=true;
+    setError('');
     request("/api/attendance", { cache: "no-store" })
-      .then((r) => {
-        if (!r.ok) throw Error();
-        return r.json();
+      .then(async (r) => {
+        const data=await r.json();
+        if (!r.ok) throw Error(data.error || 'Não foi possível carregar sua agenda. Tente novamente.');
+        return data;
       })
-      .then((d) => setIds(d.ids))
-      .catch(() =>
-        setError("Não foi possível carregar sua agenda. Tente recarregar."),
-      );
-  }, []);
+      .then((d) => {if(active)setIds(d.ids)})
+      .catch((e) => {if(active)setError(e instanceof Error && e.message ? e.message : 'Não foi possível carregar sua agenda. Tente novamente.')});
+    return ()=>{active=false};
+  }, [attempt]);
   const selected = events.filter((e) => ids?.includes(e.id));
   return (
     <>
       <p role="status">{error || (!ids ? "Carregando seus planos…" : "")}</p>
+      {error && <button className="button secondary" onClick={()=>setAttempt(n=>n+1)}>Tentar novamente</button>}
       {ids && selected.length === 0 ? (
         <div className="empty">
           <div>
