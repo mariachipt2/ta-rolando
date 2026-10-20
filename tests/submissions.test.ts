@@ -1,0 +1,36 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {PGlite} from '@electric-sql/pglite';
+import {readFileSync} from 'node:fs';
+import {validateSubmission} from '../supabase/functions/_shared/submissions';
+const sample={title:'Evento sugerido',description:'Descrição completa do evento',category_id:'00000000-0000-4000-8000-000000000001',starts_at:'2030-10-22T20:00:00-03:00',ends_at:null,venue_name:'Local de teste',address:'Rua de teste, 10',neighborhood:'Centro',organizer:'Organizador',instagram_url:'https://instagram.com/organizador/?igsh=x',is_free:true,price:'',ticket_url:'',age_rating:'Livre',additional_info:''};
+test('Sugestões exigem data futura, links seguros e ignoram campos administrativos',()=>{
+ const parsed=validateSubmission({...sample,status:'published',featured:true,city:'Outra cidade'},0);assert.equal(parsed.city,'Ipatinga');assert.equal(parsed.instagram_url,'https://www.instagram.com/organizador/');assert.equal('status' in parsed,false);
+ assert.throws(()=>validateSubmission({...sample,starts_at:'2000-01-01T20:00:00Z'}));
+ assert.throws(()=>validateSubmission({...sample,ticket_url:'javascript:alert(1)'},0));
+ assert.throws(()=>validateSubmission({...sample,ends_at:'2029-01-01T20:00:00Z'},0));
+});
+test('Moderação privada e transacional; aprovação idempotente e datas confirmadas pelo banco',async()=>{const db=new PGlite();try{
+ await db.exec(`create role anon;create role authenticated;create role service_role bypassrls;create schema auth;create table auth.users(id uuid primary key);create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;grant usage on schema public,auth to anon,authenticated,service_role;`);
+ for(const migration of ['001_initial.sql','003_admin_totals.sql','004_event_instagram.sql','005_submissions_save_confirmation.sql','006_private_save_permissions.sql'])await db.exec(readFileSync('supabase/migrations/'+migration,'utf8'));
+ const category=(await db.query<{id:string}>('select id from categories limit 1')).rows[0].id;
+ const id='00000000-0000-4000-8000-000000000010',other='00000000-0000-4000-8000-000000000011',user='00000000-0000-4000-8000-000000000012';
+ const payload={...validateSubmission({...sample,category_id:category},0),cover_url:'',gallery:[],status:'published',publish_at:null,featured:false};
+ await db.exec('set role anon');await assert.rejects(()=>db.query('select * from event_submissions'));await assert.rejects(()=>db.query("insert into event_submissions(id,visitor_hash,event_data) values(gen_random_uuid(),'x','{}')"));await assert.rejects(()=>db.query('select review_submission($1,$2,null)',[id,'rejected']));await db.exec('reset role');
+ await db.exec('set role service_role');for(const value of [id,other])await db.query('insert into event_submissions(id,visitor_hash,event_data) values($1,$2,$3)',[value,'private-visitor',JSON.stringify(payload)]);await db.exec('reset role');
+ assert.equal((await db.query('select * from public_events')).rows.length,0);
+ await db.exec('set role authenticated');assert.equal((await db.query('select * from event_submissions')).rows.length,0);await assert.rejects(()=>db.query('select review_submission($1,$2,null)',[id,'rejected']));await db.exec('reset role');
+ await db.exec(`insert into auth.users values('${user}');insert into admin_profiles values('${user}',true);select set_config('request.jwt.claim.sub','${user}',false);set role authenticated;`);
+ await assert.rejects(()=>db.query('select review_submission($1,$2,$3)',[id,'approved',JSON.stringify({...payload,category_id:null})]));
+ assert.equal((await db.query<{status:string}>('select status from event_submissions where id=$1',[id])).rows[0].status,'pending');assert.equal((await db.query('select * from events')).rows.length,0);
+ const approved=(await db.query<{result:{saved_at:string;event_id:string}}>('select review_submission($1,$2,$3) result',[id,'approved',JSON.stringify(payload)])).rows[0].result;
+ assert.ok(Number.isFinite(Date.parse(approved.saved_at)));assert.ok(approved.event_id);
+ await db.query('select review_submission($1,$2,$3)',[id,'approved',JSON.stringify(payload)]);assert.equal((await db.query('select * from events')).rows.length,1);
+ await db.query('select review_submission($1,$2,null)',[other,'rejected']);assert.equal((await db.query('select * from public_events')).rows.length,1);
+ await assert.rejects(()=>db.query('select review_submission($1,$2,null)',[id,'rejected']));
+ const stored=(await db.query<{updated_at:Date}>('update events set title=$1 where id=$2 returning updated_at',['Título atualizado',approved.event_id])).rows[0].updated_at;
+ assert.ok(Number.isFinite(new Date(stored).getTime()));
+ const receipt=(await db.query<{entity:string;record_id:string;saved_at:Date}>('select * from admin_save_state')).rows[0];assert.equal(receipt.entity,'events');assert.equal(receipt.record_id,approved.event_id);assert.ok(new Date(receipt.saved_at)>=new Date(stored));
+ await assert.rejects(()=>db.query("update admin_save_state set saved_at='2099-01-01'"));
+ await db.query('update categories set name=$1 where id=$2',['Categoria atualizada',category]);assert.equal((await db.query<{entity:string}>('select entity from admin_save_state')).rows[0].entity,'categories');
+ }finally{await db.close()}});

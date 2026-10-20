@@ -28,3 +28,11 @@ Não houve publicação na internet, criação de credenciais externas ou inser�
 - Chave publica configurada no GitHub Actions e publicacao concluida sem commit/push.
 - Teste real na interface: marcar, contador 1, agenda apos recarregar e retirada bem-sucedida. A marcacao de teste foi removida.
 
+
+## Sugestoes e confirmacao de gravacao - 20/10/2026
+- 10 testes aprovados, incluindo permissao administrativa, rejeicao, aprovacao atomica/idempotente, rollback em falha e recibo do banco.
+- Migrations 005 e 006 aplicadas ao Supabase real; acesso publico as duas tabelas privadas bloqueado (401).
+- Edge Function atualizada; envio sem Turnstile rejeitado (403).
+- Formulario publico inspecionado no navegador local; nao foram criados eventos ou sugestoes ficticios no banco de producao.
+- Compilacoes Pages e Next aprovadas; interface aguarda publicacao pelo aplicativo do usuario.
+

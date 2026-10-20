@@ -1,5 +1,5 @@
 "use client";
-import {request,navigate} from "@/lib/transport";
+import { request, navigate } from "@/lib/transport";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -11,9 +11,11 @@ import {
   Eye,
   BarChart3,
 } from "lucide-react";
-import type { Event, Category } from "@/lib/types";
+import type { Event, Category, EventSubmission, SaveState } from "@/lib/types";
 import { displayDate, upcoming, day } from "@/lib/dates";
 import { EventForm } from "./event-form";
+import { SubmissionList } from "./submission-list";
+import { SaveConfirmation, savedTime } from "./save-confirmation";
 type Metric = {
   event_id: string;
   day: string;
@@ -26,10 +28,14 @@ export function AdminPanel({
   events,
   categories,
   metrics,
+  submissions,
+  saveState,
 }: {
   events: Event[];
   categories: Category[];
   metrics: Metric[];
+  submissions: EventSubmission[];
+  saveState: SaveState;
 }) {
   const router = useRouter();
   const [edit, setEdit] = useState<Partial<Event> | null>(null),
@@ -38,9 +44,14 @@ export function AdminPanel({
     [busy, setBusy] = useState(false),
     [filter, setFilter] = useState(""),
     [category, setCategory] = useState<Partial<Category> | null>(null),
-    [stats, setStats] = useState<string | null>(null);
-  const refresh = () => {
+    [stats, setStats] = useState<string | null>(null),
+    [reviewId, setReviewId] = useState<string | undefined>(),
+    [receipt, setReceipt] = useState(saveState.saved_at),
+    [dirty,setDirty]=useState(false);
+  const refresh = (savedAt: string) => {
+    setReceipt(savedAt);
     setEdit(null);
+    setReviewId(undefined);
     router.refresh();
   };
   const total = events.reduce((n, e) => n + e.interest_count, 0);
@@ -68,7 +79,9 @@ export function AdminPanel({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: e.id }),
       });
-      if (!r.ok) throw Error("Falha ao excluir.");
+      const result=await r.json();
+      if (!r.ok||!result.saved_at) throw Error("Não foi possível confirmar a exclusão no Supabase.");
+      setReceipt(result.saved_at);
       router.refresh();
     } catch (e) {
       setError(String(e));
@@ -96,6 +109,12 @@ export function AdminPanel({
         </button>
       </div>
       <div className="stats-grid">
+        <div className="full">
+          <SaveConfirmation at={receipt} />
+          <p className="muted">
+            Data retornada pelo banco, após uma gravação confirmada.
+          </p>
+        </div>
         {[
           ["Eventos cadastrados", events.length],
           ["Futuros", events.filter((e) => upcoming(e)).length],
@@ -123,11 +142,15 @@ export function AdminPanel({
         {[
           ["events", "Eventos"],
           ["categories", "Categorias"],
+          [
+            "submissions",
+            `Sugestões (${submissions.filter((s) => s.status === "pending").length})`,
+          ],
           ["stats", "Estatísticas"],
         ].map(([v, t]) => (
           <button
             className={tab === v ? "active" : ""}
-            onClick={() => setTab(v)}
+            onClick={() => {if(dirty&&!confirm('Há alterações não salvas. Sair sem salvar?'))return;setEdit(null);setReviewId(undefined);setTab(v)}}
             key={v}
           >
             {t}
@@ -144,7 +167,14 @@ export function AdminPanel({
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
             />
-            <button className="button lime-button" onClick={() => setEdit({})}>
+            <button
+              className="button lime-button"
+              disabled={!!edit}
+              onClick={() => {
+                setReviewId(undefined);
+                setEdit({});
+              }}
+            >
               <Plus size={17} /> Novo evento
             </button>
           </div>
@@ -155,6 +185,8 @@ export function AdminPanel({
               categories={categories}
               onClose={() => setEdit(null)}
               onSaved={refresh}
+              submissionId={reviewId}
+              onDirtyChange={setDirty}
             />
           ) : (
             <div className="admin-list">
@@ -177,6 +209,11 @@ export function AdminPanel({
                       </span>
                       <h3>{e.title}</h3>
                       <p>
+                        {e.updated_at
+                          ? "Salvo no Supabase em " + savedTime(e.updated_at)
+                          : "Data de salvamento não disponível."}
+                      </p>
+                      <p>
                         {displayDate(e.starts_at)} · {e.interest_count}{" "}
                         marcações
                       </p>
@@ -185,7 +222,10 @@ export function AdminPanel({
                       <button
                         title="Editar"
                         aria-label={"Editar " + e.title}
-                        onClick={() => setEdit(e)}
+                        onClick={() => {
+                          setReviewId(undefined);
+                          setEdit(e);
+                        }}
                       >
                         <Pencil size={18} />
                       </button>
@@ -199,6 +239,7 @@ export function AdminPanel({
                             slug: undefined,
                             title: e.title + " (cópia)",
                             status: "draft",
+                            updated_at: undefined,
                           })
                         }
                       >
@@ -269,6 +310,11 @@ export function AdminPanel({
                   });
                   const d = await r.json();
                   if (!r.ok) throw Error(d.error);
+                  if (!d.saved_at)
+                    throw Error(
+                      "Não recebemos a confirmação do Supabase. Verifique antes de tentar novamente.",
+                    );
+                  setReceipt(d.saved_at);
                   setCategory(null);
                   router.refresh();
                 } catch (e) {
@@ -328,6 +374,7 @@ export function AdminPanel({
             {categories.map((c) => (
               <div className="admin-row" key={c.id}>
                 <strong>{c.name}</strong>
+                {c.updated_at&&<small>Salvo em {savedTime(c.updated_at)}</small>}
                 <span>{c.active ? "Ativa" : "Inativa"}</span>
                 <button
                   className="button secondary"
@@ -339,6 +386,17 @@ export function AdminPanel({
             ))}
           </div>
         </>
+      )}
+      {tab === "submissions" && (
+        <SubmissionList
+          items={submissions}
+          onReview={(item) => {
+            setReviewId(item.id);
+            setEdit({ ...item.event_data, status: "published" });
+            setTab("events");
+          }}
+          onSaved={refresh}
+        />
       )}
       {tab === "stats" && (
         <>

@@ -23,6 +23,7 @@ export default function Page() {
         que este navegador recupere as marcações anteriores.
       </p>
       <h2>Serviços utilizados</h2>
+      <p>Sugestões de eventos são recebidas em uma fila privada para análise administrativa. Se aceitas, as informações do evento são publicadas. Não inclua dados pessoais desnecessários. As sugestões são removidas pela rotina de manutenção após 180 dias.</p>
       <p>
         Supabase hospeda dados e autenticação administrativa. A hospedagem e a
         verificação antiautomação podem processar dados técnicos segundo suas

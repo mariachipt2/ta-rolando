@@ -1,24 +1,29 @@
 "use client";
-import {request,navigate} from "@/lib/transport";
-import { useState } from "react";
+import { request, navigate } from "@/lib/transport";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import type { Event, Category } from "@/lib/types";
 import { eventSchema } from "@/lib/validation";
 import { localInput, toISO, displayDate } from "@/lib/dates";
-import {InstagramLink} from './instagram-link';
+import { InstagramLink } from "./instagram-link";
+import { SaveConfirmation } from "./save-confirmation";
 type Values = z.infer<typeof eventSchema>;
 export function EventForm({
   event: e,
   categories,
   onClose,
   onSaved,
+  submissionId,
+  onDirtyChange,
 }: {
   event: Partial<Event>;
   categories: Category[];
   onClose: () => void;
-  onSaved: () => void;
+  onSaved: (savedAt: string) => void;
+  submissionId?: string;
+  onDirtyChange?:(dirty:boolean)=>void;
 }) {
   const [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
@@ -29,7 +34,7 @@ export function EventForm({
     handleSubmit,
     watch,
     setValue,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm<Values>({
     resolver: zodResolver(eventSchema),
     defaultValues: {
@@ -44,7 +49,7 @@ export function EventForm({
       city: e.city || "Ipatinga",
       state: e.state || "MG",
       organizer: e.organizer || "",
-      instagram_url: e.instagram_url || '',
+      instagram_url: e.instagram_url || "",
       is_free: e.is_free ?? true,
       price: e.price || "",
       ticket_url: e.ticket_url || "",
@@ -58,6 +63,25 @@ export function EventForm({
     },
   });
   const v = watch();
+  useEffect(()=>{onDirtyChange?.(isDirty);return()=>onDirtyChange?.(false)},[isDirty,onDirtyChange]);
+  useEffect(() => {
+    if (!isDirty) return;
+    const guard = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    const navigation=(e:MouseEvent)=>{const a=(e.target as Element).closest<HTMLAnchorElement>('a');if(!a||a.target==='_blank'||a.getAttribute('href')?.startsWith('#main'))return;if(!confirm('Existem alterações não salvas. Deseja sair sem salvar?')){e.preventDefault();e.stopPropagation()}};
+    window.addEventListener("beforeunload", guard);
+    document.addEventListener('click',navigation,true);
+    return () => {window.removeEventListener("beforeunload", guard);document.removeEventListener('click',navigation,true)};
+  }, [isDirty]);
+  const close = () => {
+    if (
+      !isDirty ||
+      confirm("Existem alterações não salvas. Deseja sair sem salvar?")
+    )
+      onClose();
+  };
   async function upload(files: FileList | null, gallery = false) {
     if (!files) return;
     setUploading(true);
@@ -67,13 +91,19 @@ export function EventForm({
       for (const file of Array.from(files)) {
         const f = new FormData();
         f.set("file", file);
-        const r = await request("/api/admin/upload", { method: "POST", body: f });
+        const r = await request("/api/admin/upload", {
+          method: "POST",
+          body: f,
+        });
         const d = await r.json();
         if (!r.ok) throw Error(d.error);
         urls.push(d.url);
       }
-      if (gallery) setValue("gallery", [...v.gallery, ...urls].slice(0, 10));
-      else setValue("cover_url", urls[0]);
+      if (gallery)
+        setValue("gallery", [...v.gallery, ...urls].slice(0, 10), {
+          shouldDirty: true,
+        });
+      else setValue("cover_url", urls[0], { shouldDirty: true });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Falha no upload.");
     } finally {
@@ -112,7 +142,7 @@ export function EventForm({
               : name === "starts_at"
                 ? ""
                 : null,
-            { shouldValidate: true },
+            { shouldValidate: true, shouldDirty: true },
           )
         }
       />
@@ -128,14 +158,25 @@ export function EventForm({
         setBusy(true);
         setError("");
         try {
-          const r = await request("/api/admin/events", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ ...data, id: e.id }),
-          });
+          const r = await request(
+            submissionId ? "/api/admin/submissions" : "/api/admin/events",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(
+                submissionId
+                  ? { id: submissionId, decision: "approved", event: data }
+                  : { ...data, id: e.id },
+              ),
+            },
+          );
           const d = await r.json();
           if (!r.ok) throw Error(d.error);
-          onSaved();
+          if (!d.saved_at || !Number.isFinite(Date.parse(d.saved_at)))
+            throw Error(
+              "Não recebemos a confirmação do Supabase. Confira a lista antes de tentar novamente.",
+            );
+          onSaved(d.saved_at);
         } catch (e) {
           setError(e instanceof Error ? e.message : "Falha ao salvar.");
         } finally {
@@ -144,12 +185,24 @@ export function EventForm({
       })}
     >
       <div className="section-heading">
-        <h2>{e.id ? "Editar evento" : "Novo evento"}</h2>
-        <button type="button" className="button secondary" onClick={onClose}>
+        <h2>
+          {submissionId
+            ? "Revisar sugestão"
+            : e.id
+              ? "Editar evento"
+              : "Novo evento"}
+        </h2>
+        <button
+          type="button"
+          disabled={busy}
+          className="button secondary"
+          onClick={close}
+        >
           Fechar
         </button>
       </div>
       <p>Horários de Brasília. Campos com * são obrigatórios.</p>
+      <SaveConfirmation at={e.updated_at} dirty={isDirty} busy={busy} />
       <div className="form-grid">
         {field("title", "Título", true)}
         <label>
@@ -177,10 +230,19 @@ export function EventForm({
         {field("city", "Cidade", true)}
         {field("state", "Estado (UF)", true)}
         {field("organizer", "Organizador")}
-        <label>Instagram do evento/organizador
-          <input type="url" {...register('instagram_url')} placeholder="https://www.instagram.com/organizador/" autoCapitalize="none" autoCorrect="off"/>
+        <label>
+          Instagram do evento/organizador
+          <input
+            type="url"
+            {...register("instagram_url")}
+            placeholder="https://www.instagram.com/organizador/"
+            autoCapitalize="none"
+            autoCorrect="off"
+          />
           <small>Opcional. O perfil aparecerá na página do evento.</small>
-          {errors.instagram_url&&<small className="error-text">{errors.instagram_url.message}</small>}
+          {errors.instagram_url && (
+            <small className="error-text">{errors.instagram_url.message}</small>
+          )}
         </label>
         <label className="check">
           <input type="checkbox" {...register("is_free")} /> Entrada gratuita
@@ -210,7 +272,10 @@ export function EventForm({
         {v.cover_url && (
           <div className="image-edit">
             <img src={v.cover_url} alt="Capa selecionada" />
-            <button type="button" onClick={() => setValue("cover_url", "")}>
+            <button
+              type="button"
+              onClick={() => setValue("cover_url", "", { shouldDirty: true })}
+            >
               Remover capa
             </button>
           </div>
@@ -224,6 +289,7 @@ export function EventForm({
                 setValue(
                   "gallery",
                   v.gallery.filter((x) => x !== src),
+                  { shouldDirty: true },
                 )
               }
             >
@@ -266,7 +332,11 @@ export function EventForm({
       {uploading && <p role="status">Enviando imagens…</p>}
       <div className="share-buttons">
         <button className="button lime-button" disabled={busy || uploading}>
-          {busy ? "Salvando…" : "Salvar evento"}
+          {busy
+            ? "Salvando e aguardando confirmação…"
+            : submissionId
+              ? "Aceitar e salvar evento"
+              : "Salvar evento"}
         </button>
         <button
           type="button"
@@ -275,7 +345,12 @@ export function EventForm({
         >
           Pré-visualizar
         </button>
-        <button type="button" className="button secondary" onClick={onClose}>
+        <button
+          type="button"
+          disabled={busy}
+          className="button secondary"
+          onClick={close}
+        >
           Cancelar
         </button>
       </div>
@@ -293,7 +368,7 @@ export function EventForm({
           </p>
           <p>{v.is_free ? "Gratuito" : v.price}</p>
           <p className="description">{v.description}</p>
-          <InstagramLink url={v.instagram_url}/>
+          <InstagramLink url={v.instagram_url} />
         </section>
       )}
     </form>

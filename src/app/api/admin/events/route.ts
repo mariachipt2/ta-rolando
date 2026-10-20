@@ -35,7 +35,7 @@ export async function POST(req: Request) {
           .from("events")
           .update(value)
           .eq("id", id.data)
-          .select("id")
+          .select("id,updated_at")
           .single()
       : await db
           .from("events")
@@ -43,10 +43,10 @@ export async function POST(req: Request) {
             ...value,
             slug: slugify(value.title) + "-" + crypto.randomUUID().slice(0, 8),
           })
-          .select("id")
+          .select("id,updated_at")
           .single();
     if (result.error) throw result.error;
-    return Response.json({ ok: true, id: result.data.id });
+    return Response.json({ ok: true, id: result.data.id, saved_at:result.data.updated_at });
   } catch {
     return Response.json(
       { error: "Não foi possível salvar o evento." },
@@ -61,9 +61,10 @@ export async function DELETE(req: Request) {
     if (!db) return new Response(null, { status: 401 });
     const p = z.object({ id: z.string().uuid() }).safeParse(await req.json());
     if (!p.success) return new Response(null, { status: 400 });
-    const { error } = await db.from("events").delete().eq("id", p.data.id);
+    const { error } = await db.from("events").delete().eq("id", p.data.id).select('id').single();
     if (error) throw error;
-    return Response.json({ ok: true });
+    const state=await db.from('admin_save_state').select('saved_at').eq('singleton',true).single();if(state.error)throw state.error;
+    return Response.json({ ok: true,saved_at:state.data.saved_at });
   } catch {
     return Response.json(
       { error: "Não foi possível excluir." },

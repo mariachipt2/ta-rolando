@@ -3,6 +3,7 @@ export type Category = {
   name: string;
   icon: string;
   active: boolean;
+  updated_at?: string|null;
 };
 export type Event = {
   id: string;
@@ -30,8 +31,11 @@ export type Event = {
   publish_at: string | null;
   featured: boolean;
   created_at: string;
+  updated_at?: string;
   categories?: Category;
   interest_count: number;
   views?: number;
   ticket_clicks?: number;
 };
+export type EventSubmission={id:string;event_data:Partial<Event>;status:'pending'|'approved'|'rejected';submitted_at:string;updated_at:string;reviewed_at:string|null;approved_event_id:string|null};
+export type SaveState={saved_at:string|null;entity:string|null;record_id?:string|null;operation?:string|null};

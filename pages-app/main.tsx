@@ -9,6 +9,7 @@ import { Attendance } from "@/components/attendance";
 import { Share } from "@/components/share";
 import { CalendarDownload } from "@/components/calendar-download";
 import {InstagramLink} from '@/components/instagram-link';
+import {SubmitEvent} from '@/components/submit-event';
 import Privacy from "@/app/privacidade/page";
 import { configureTransport } from "@/lib/transport";
 import { displayDate, upcoming } from "@/lib/dates";
@@ -296,7 +297,7 @@ function App() {
             </div>
           )
         ) : (
-          <Discover {...data!} />
+          <><Discover {...data!} /><SubmitEvent categories={data?.categories||[]}/></>
         )}
       </main>
       <footer className="shell">
