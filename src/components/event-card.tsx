@@ -16,7 +16,7 @@ export function EventCard({ event: e, rank }: { event: Event; rank?: number }) {
           />
         ) : (
           <div className="cover-placeholder">
-            <span>tá rolando?</span>
+            <span>tá rolando</span>
             <CalendarDays size={54} />
           </div>
         )}

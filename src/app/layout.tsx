@@ -33,7 +33,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <header>
           <div className="shell nav">
             <Link href="/" className="logo" aria-label="Tá Rolando, início">
-              <Radio size={27} /> tá rolando<span>?</span>
+              <Radio size={27} /> tá rolando
             </Link>
             <span className="location">
               <MapPin size={14} /> Ipatinga, MG
@@ -55,7 +55,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <main id="main">{children}</main>
         <footer className="shell">
           <Link className="logo" href="/">
-            tá rolando<span>?</span>
+            tá rolando
           </Link>
           <p>
             Feito para quem vive a cidade.

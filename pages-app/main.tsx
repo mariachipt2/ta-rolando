@@ -31,7 +31,7 @@ function Detail({ event: e }: { event: Event }) {
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
         ) : (
-          <div className="cover-placeholder">tá rolando?</div>
+          <div className="cover-placeholder">tá rolando</div>
         )}
       </div>
       <div className="detail-grid">
@@ -226,7 +226,7 @@ function App() {
       <header>
         <div className="shell nav">
           <a className="logo" href="#/" aria-label="Tá Rolando, início">
-            <Radio size={27} /> tá rolando<span>?</span>
+            <Radio size={27} /> tá rolando
           </a>
           <span className="location">
             <MapPin size={14} /> Ipatinga, MG
@@ -299,7 +299,7 @@ function App() {
       </main>
       <footer className="shell">
         <a href="#/" className="logo">
-          tá rolando<span>?</span>
+          tá rolando
         </a>
         <p>
           Feito para quem vive a cidade.

@@ -1,4 +1,4 @@
-const VERSION = "ta-rolando-static-v1";
+const VERSION = "ta-rolando-static-v2";
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches

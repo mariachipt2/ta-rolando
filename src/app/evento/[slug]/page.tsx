@@ -90,7 +90,7 @@ export default async function Detail({
           <Image src={e.cover_url} alt={e.title} fill priority sizes="100vw" />
         ) : (
           <div className="cover-placeholder">
-            <span>tá rolando?</span>
+            <span>tá rolando</span>
           </div>
         )}
       </div>
