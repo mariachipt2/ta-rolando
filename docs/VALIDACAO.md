@@ -45,3 +45,12 @@ Não houve publicação na internet, criação de credenciais externas ou inser�
 - Acesso anônimo às três novas tabelas bloqueado (401). Aviso e sugestão com foto sem Turnstile válido bloqueados (403).
 - Interface pública inspecionada no navegador. Administrador conferido em uma prévia local com dados fictícios, sem autenticar nem alterar eventos reais.
 - Fluxo positivo completo com foto, Turnstile e aprovação precisa ser conferido após a publicação com uma sugestão real. Não foi simulado sucesso de envio na produção.
+
+## Descoberta e cartaz — 20/10/2026
+
+- 18 testes aprovados, incluindo seleção infantil explícita, recomendações públicas da mesma categoria, pendências e conteúdo do cartaz.
+- Cartaz PNG 1080 x 1560 gerado e inspecionado visualmente, com foto, dados, URL e QR Code. Não houve envio para contatos no WhatsApp.
+- Filtro infantil e eventos semelhantes conferidos na prévia local usando eventos existentes. Nenhum cadastro foi modificado.
+- Pendências e atalho para completar cadastro conferidos em prévia administrativa com dados fictícios locais.
+- Sem alterações de esquema ou variáveis no Supabase. Publicação da interface fica a cargo do aplicativo usado pela administradora.
+

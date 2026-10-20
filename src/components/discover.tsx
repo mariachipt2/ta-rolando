@@ -15,6 +15,7 @@ import {
 import type { Event, Category } from "@/lib/types";
 import { upcoming, inPeriod, day } from "@/lib/dates";
 import { EventCard } from "./event-card";
+import {forChildren} from '@/lib/event-discovery';
 import { CategoryIcon } from "./category-icon";
 export function Discover({
   events,
@@ -31,9 +32,11 @@ export function Discover({
     [price, setPrice] = useState("all"),
     [place, setPlace] = useState(""),
     [date, setDate] = useState(""),
+    [childrenOnly,setChildrenOnly]=useState(false),
     [filters, setFilters] = useState(false),
     [limits, setLimits] = useState<Record<string, number>>({});
   const active = !!(
+    childrenOnly ||
     query ||
     category ||
     period !== "all" ||
@@ -51,6 +54,7 @@ export function Discover({
         e.title
           .toLocaleLowerCase("pt-BR")
           .includes(query.toLocaleLowerCase("pt-BR"))) &&
+      (!childrenOnly || forChildren(e)) &&
       (!category || e.category_id === category) &&
       (period === "all" || inPeriod(e.starts_at, e.ends_at, period)) &&
       (price === "all" || e.is_free === (price === "free")) &&
@@ -69,6 +73,7 @@ export function Discover({
     )
     .filter((e) => e.interest_count > 0);
   const clear = () => {
+    setChildrenOnly(false);
     setQuery("");
     setCategory("");
     setPeriod("all");
@@ -253,6 +258,7 @@ export function Discover({
             ✦ Gratuitos
           </button>
         </div>
+        <div className="family-filter"><button className={'button secondary '+(childrenOnly?'selected':'')} aria-pressed={childrenOnly} onClick={()=>setChildrenOnly(!childrenOnly)}>Para crianças</button>{childrenOnly&&<small>Somente eventos informados como adequados para crianças. Confira também a classificação indicativa.</small>}</div>
         {filters && (
           <div className="filter-panel">
             <label>

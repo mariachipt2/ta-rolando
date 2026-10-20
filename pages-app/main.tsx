@@ -3,6 +3,8 @@ import { createRoot } from "react-dom/client";
 import { Radio, MapPin, CalendarDays, ArrowLeft } from "lucide-react";
 import { Discover } from "@/components/discover";
 import { Agenda } from "@/components/agenda";
+import {SimilarEvents} from '@/components/similar-events';
+import {SharePoster} from '@/components/share-poster';
 import {EventTimeline} from '@/components/event-timeline';
 import { AdminLogin } from "@/components/admin-login";
 import { AdminPanel } from "@/components/admin-panel";
@@ -22,7 +24,7 @@ import { transport, loadPublic, loadAdmin, configured } from "./api";
 import "@/app/globals.css";
 configureTransport(transport);
 const route = () => location.hash.slice(1).split("?")[0] || "/";
-function Detail({ event: e }: { event: Event }) {
+function Detail({ event: e,events }: { event: Event;events:Event[] }) {
   const address = `${e.address}, ${e.neighborhood}, ${e.city} - ${e.state}`;
   return (
     <div className="shell detail">
@@ -130,9 +132,11 @@ function Detail({ event: e }: { event: Event }) {
           />
           <CalendarDownload id={e.id} />
           <Share title={e.title} id={e.id} ticket={e.ticket_url} />
+          <SharePoster key={e.updated_at||e.id} event={e}/>
           <ReportEvent id={e.id}/>
         </aside>
       </div>
+      <SimilarEvents event={e} events={events}/>
     </div>
   );
 }
@@ -299,7 +303,7 @@ function App() {
           <Privacy />
         ) : path.startsWith("/evento/") ? (
           event ? (
-            <Detail key={event.id} event={event} />
+            <Detail key={event.id} event={event} events={data?.events||[]} />
           ) : (
             <div className="shell page">
               <h1>Esse rolê não está por aqui.</h1>

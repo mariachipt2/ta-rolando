@@ -12,6 +12,8 @@ import {
 import { publicData } from "@/lib/data";
 import { displayDate, upcoming } from "@/lib/dates";
 import { Attendance } from "@/components/attendance";
+import {SimilarEvents} from '@/components/similar-events';
+import {SharePoster} from '@/components/share-poster';
 import { Share } from "@/components/share";
 import {EventNotice} from '@/components/event-notice';
 import {ReportEvent} from '@/components/report-event';
@@ -197,9 +199,11 @@ export default async function Detail({
             <CalendarDays size={17} /> Adicionar ao calendário
           </a>
           <Share title={e.title} id={e.id} ticket={e.ticket_url} />
+          <SharePoster key={e.updated_at||e.id} event={e}/>
           <ReportEvent id={e.id}/>
         </aside>
       </div>
+      <SimilarEvents event={e} events={events}/>
     </div>
   );
 }

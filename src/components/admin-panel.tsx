@@ -18,6 +18,8 @@ import { SubmissionList } from "./submission-list";
 import { SaveConfirmation, savedTime } from "./save-confirmation";
 import {EventHistory} from './event-history';
 import {EventTrash} from './event-trash';
+import {AdminPending} from './admin-pending';
+import {eventIssues} from '@/lib/event-discovery';
 import {AdminReports} from './admin-reports';
 type Metric = {
   event_id: string;
@@ -62,6 +64,8 @@ export function AdminPanel({
     setReviewId(undefined);
     router.refresh();
   };
+  const pendingEvents=events.filter(e=>eventIssues(e).length),pendingSuggestions=submissions.filter(s=>s.status==='pending').length;
+  const openPending=(event?:Event)=>{if(dirty&&!confirm('Há alterações não salvas. Sair sem salvar?'))return;setReviewId(undefined);setEdit(event||null);setTab(event?'events':'pending')};
   const total = events.reduce((n, e) => n + e.interest_count, 0);
   const metricList = metrics.filter((m) => !stats || m.event_id === stats);
   const days = Array.from({ length: 14 }, (_, i) =>
@@ -117,6 +121,7 @@ export function AdminPanel({
         </button>
       </div>
       <SaveConfirmation at={receipt} />
+      {(pendingEvents.length>0||pendingSuggestions>0)&&<div className="pending-summary"><p><strong>Para revisar:</strong> {pendingEvents.length} {pendingEvents.length===1?'evento com dados pendentes':'eventos com dados pendentes'} · {pendingSuggestions} {pendingSuggestions===1?'sugestão aguardando análise':'sugestões aguardando análise'}.</p><button className="button secondary" onClick={()=>openPending()}>Ver pendências</button></div>}
       <div className="stats-grid">
         {[
           ["Eventos cadastrados", events.length],
@@ -145,6 +150,7 @@ export function AdminPanel({
         {[
           ["events", "Eventos"],
           ["categories", "Categorias"],
+          ["pending", `Pendências (${pendingEvents.length+pendingSuggestions})`],
           [
             "submissions",
             `Sugestões (${submissions.filter((s) => s.status === "pending").length})`,
@@ -164,6 +170,7 @@ export function AdminPanel({
       </div>
       {error && <p role="alert">{error}</p>}
       {historyEvent&&<EventHistory key={historyEvent.id} event={historyEvent} onClose={()=>setHistoryEvent(null)} onSaved={refresh}/>}
+      {tab==='pending'&&<AdminPending events={events} submissions={submissions} onEdit={event=>openPending(event)} onSubmissions={()=>setTab('submissions')}/>}
       {tab==='trash'&&<EventTrash events={allEvents.filter(e=>!!e.deleted_at)} onSaved={refresh} onHistory={setHistoryEvent}/>}
       {tab==='reports'&&<AdminReports reports={reports} events={allEvents} onSaved={refresh} onEdit={e=>{setReviewId(undefined);setEdit(e);setTab('events')}}/>}
       {tab === "events" && (
@@ -217,6 +224,7 @@ export function AdminPanel({
                         }
                       </span>
                       <h3>{e.title}</h3>
+                      {eventIssues(e).length>0&&<ul className="pending-reasons">{eventIssues(e).map(issue=><li key={issue.type}>{issue.label}</li>)}</ul>}
                       <p>
                         {e.updated_at
                           ? "Salvo no Supabase em " + savedTime(e.updated_at)
