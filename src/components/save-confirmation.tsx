@@ -19,20 +19,21 @@ export function SaveConfirmation({
     <div
       className={"save-confirmation " + (dirty ? "unsaved" : "")}
       role="status"
+      title="Confirmação e horário retornados pelo Supabase após a gravação"
     >
       <strong>
         {busy
-          ? "Salvando no Supabase…"
+          ? "Salvando…"
           : dirty
-            ? "Há alterações ainda não salvas."
+            ? "Alterações não salvas"
             : at
-              ? "Gravação confirmada no Supabase"
-              : "Nenhuma gravação confirmada ainda."}
+              ? "Salvo"
+              : "Aguardando primeira gravação"}
       </strong>
       {at && (
         <span>
-          Último salvamento: <time dateTime={at}>{savedTime(at)}</time> ·
-          horário de Brasília
+          <time dateTime={at}>{savedTime(at)}</time> ·
+          Brasília
         </span>
       )}
     </div>

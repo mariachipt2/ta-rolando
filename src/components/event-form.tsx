@@ -1,6 +1,6 @@
 "use client";
 import { request, navigate } from "@/lib/transport";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -9,6 +9,7 @@ import { eventSchema } from "@/lib/validation";
 import { localInput, toISO, displayDate } from "@/lib/dates";
 import { InstagramLink } from "./instagram-link";
 import { SaveConfirmation } from "./save-confirmation";
+import {AGE_OPTIONS} from '@/lib/age-options';
 type Values = z.infer<typeof eventSchema>;
 export function EventForm({
   event: e,
@@ -16,6 +17,7 @@ export function EventForm({
   onClose,
   onSaved,
   submissionId,
+  submissionPhoto,
   onDirtyChange,
 }: {
   event: Partial<Event>;
@@ -23,6 +25,7 @@ export function EventForm({
   onClose: () => void;
   onSaved: (savedAt: string) => void;
   submissionId?: string;
+  submissionPhoto?:string;
   onDirtyChange?:(dirty:boolean)=>void;
 }) {
   const [busy, setBusy] = useState(false),
@@ -53,7 +56,9 @@ export function EventForm({
       is_free: e.is_free ?? true,
       price: e.price || "",
       ticket_url: e.ticket_url || "",
-      age_rating: e.age_rating || "Livre",
+      age_rating: e.age_rating || "Não informada",
+      family_friendly:e.family_friendly??null,
+      change_notice:e.change_notice||"",
       cover_url: e.cover_url || "",
       gallery: e.gallery || [],
       additional_info: e.additional_info || "",
@@ -62,10 +67,13 @@ export function EventForm({
       featured: e.featured || false,
     },
   });
+  const [frequency,setFrequency]=useState('none'),[count,setCount]=useState(4),[usePhoto,setUsePhoto]=useState(!!submissionPhoto),[extraDirty,setExtraDirty]=useState(false);
+  const requestId=useRef<{id:string;payload:string}|null>(null);
   const v = watch();
-  useEffect(()=>{onDirtyChange?.(isDirty);return()=>onDirtyChange?.(false)},[isDirty,onDirtyChange]);
+  const dirty=isDirty||extraDirty;
+  useEffect(()=>{onDirtyChange?.(dirty);return()=>onDirtyChange?.(false)},[dirty,onDirtyChange]);
   useEffect(() => {
-    if (!isDirty) return;
+    if (!dirty) return;
     const guard = (e: BeforeUnloadEvent) => {
       e.preventDefault();
       e.returnValue = "";
@@ -74,10 +82,10 @@ export function EventForm({
     window.addEventListener("beforeunload", guard);
     document.addEventListener('click',navigation,true);
     return () => {window.removeEventListener("beforeunload", guard);document.removeEventListener('click',navigation,true)};
-  }, [isDirty]);
+  }, [dirty]);
   const close = () => {
     if (
-      !isDirty ||
+      !dirty ||
       confirm("Existem alterações não salvas. Deseja sair sem salvar?")
     )
       onClose();
@@ -103,7 +111,7 @@ export function EventForm({
         setValue("gallery", [...v.gallery, ...urls].slice(0, 10), {
           shouldDirty: true,
         });
-      else setValue("cover_url", urls[0], { shouldDirty: true });
+      else {setUsePhoto(false);setValue("cover_url", urls[0], { shouldDirty: true });}
     } catch (e) {
       setError(e instanceof Error ? e.message : "Falha no upload.");
     } finally {
@@ -158,6 +166,9 @@ export function EventForm({
         setBusy(true);
         setError("");
         try {
+          const recurrence={frequency,count:frequency==='none'?1:count};
+          const payload=JSON.stringify({data,recurrence});
+          if(!requestId.current||requestId.current.payload!==payload)requestId.current={id:crypto.randomUUID(),payload};
           const r = await request(
             submissionId ? "/api/admin/submissions" : "/api/admin/events",
             {
@@ -165,8 +176,8 @@ export function EventForm({
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(
                 submissionId
-                  ? { id: submissionId, decision: "approved", event: data }
-                  : { ...data, id: e.id },
+                  ? { id: submissionId, decision: "approved", event: data, use_photo:usePhoto }
+                  : { ...data, id: e.id, request_id:requestId.current.id,recurrence },
               ),
             },
           );
@@ -202,7 +213,7 @@ export function EventForm({
         </button>
       </div>
       <p>Horários de Brasília. Campos com * são obrigatórios.</p>
-      <SaveConfirmation at={e.updated_at} dirty={isDirty} busy={busy} />
+      <SaveConfirmation at={e.updated_at} dirty={dirty} busy={busy} />
       <div className="form-grid">
         {field("title", "Título", true)}
         <label>
@@ -249,7 +260,11 @@ export function EventForm({
         </label>
         {field("price", "Preço ou faixa de preço")}
         {field("ticket_url", "Link HTTPS dos ingressos", false, "url")}
-        {field("age_rating", "Classificação indicativa")}
+        <label>Classificação indicativa<select {...register('age_rating')}>{!AGE_OPTIONS.includes(v.age_rating)&&<option>{v.age_rating}</option>}{AGE_OPTIONS.map(a=><option key={a}>{a}</option>)}</select></label>
+        <label>Adequado para crianças?<select value={v.family_friendly===null?'':String(v.family_friendly)} onChange={ev=>setValue('family_friendly',ev.target.value===''?null:ev.target.value==='true',{shouldDirty:true})}><option value="">Não informado / consultar organizador</option><option value="true">Sim, adequado para crianças</option><option value="false">Não recomendado para crianças</option></select></label>
+        {!e.id&&!submissionId&&<fieldset className="full recurrence-fields"><legend>Repetir evento</legend><div className="form-grid"><label>Frequência<select value={frequency} onChange={ev=>{setFrequency(ev.target.value);setExtraDirty(true)}}><option value="none">Somente esta data</option><option value="weekly">Toda semana</option><option value="fortnightly">A cada 2 semanas (14 dias)</option><option value="monthly">Todo mês</option></select></label>{frequency!=='none'&&<label>Quantidade de edições (incluindo a primeira)<input type="number" min={2} max={24} value={count} onChange={ev=>{setCount(Number(ev.target.value));setExtraDirty(true)}} required /></label>}</div><small>Cria até 24 edições, cada uma com sua própria data. Depois, você pode editar ou cancelar cada edição separadamente. Nos meses mais curtos, usa o último dia disponível.</small></fieldset>}
+        {e.recurrence_group&&<p className="full muted">Esta edição faz parte de uma série. Alterações aqui afetam somente esta data.</p>}
+        {submissionPhoto&&<div className="full suggestion-photo"><img src={submissionPhoto} alt="Foto enviada na sugestão"/><label className="check"><input type="checkbox" checked={usePhoto} onChange={ev=>{setUsePhoto(ev.target.checked);setExtraDirty(true)}}/>Usar esta foto como capa</label></div>}
         <label>
           Imagem de capa (JPG, PNG ou WebP, até 5 MB)
           <input
@@ -301,6 +316,7 @@ export function EventForm({
           Informações adicionais
           <textarea {...register("additional_info")} rows={3} />
         </label>
+        <label className="full">Aviso de alteração para visitantes<textarea {...register('change_notice')} maxLength={1000} rows={2}/><small>Alterações de data, local e outros dados importantes geram um aviso automaticamente. Você pode escrever uma orientação mais específica aqui.</small></label>
         <label>
           Status
           <select {...register("status")}>

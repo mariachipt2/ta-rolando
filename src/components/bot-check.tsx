@@ -35,7 +35,7 @@ export function BotCheck({ onToken }: { onToken: (token: string) => void }) {
     </>
   ) : (
     <p className="notice">
-      O envio de sugestões está temporariamente indisponível.
+      O envio está temporariamente indisponível.
     </p>
   );
 }

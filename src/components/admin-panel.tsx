@@ -11,11 +11,14 @@ import {
   Eye,
   BarChart3,
 } from "lucide-react";
-import type { Event, Category, EventSubmission, SaveState } from "@/lib/types";
+import type { Event, Category, EventSubmission, SaveState, EventReport } from "@/lib/types";
 import { displayDate, upcoming, day } from "@/lib/dates";
 import { EventForm } from "./event-form";
 import { SubmissionList } from "./submission-list";
 import { SaveConfirmation, savedTime } from "./save-confirmation";
+import {EventHistory} from './event-history';
+import {EventTrash} from './event-trash';
+import {AdminReports} from './admin-reports';
 type Metric = {
   event_id: string;
   day: string;
@@ -25,18 +28,22 @@ type Metric = {
   interests_removed: number;
 };
 export function AdminPanel({
-  events,
+  events:allEvents,
+  reports,
   categories,
   metrics,
   submissions,
   saveState,
 }: {
   events: Event[];
+  reports: EventReport[];
   categories: Category[];
   metrics: Metric[];
   submissions: EventSubmission[];
   saveState: SaveState;
 }) {
+  const events=allEvents.filter(e=>!e.deleted_at);
+  const [historyEvent,setHistoryEvent]=useState<Event|null>(null);
   const router = useRouter();
   const [edit, setEdit] = useState<Partial<Event> | null>(null),
     [tab, setTab] = useState("events"),
@@ -50,6 +57,7 @@ export function AdminPanel({
     [dirty,setDirty]=useState(false);
   const refresh = (savedAt: string) => {
     setReceipt(savedAt);
+    setHistoryEvent(null);
     setEdit(null);
     setReviewId(undefined);
     router.refresh();
@@ -68,7 +76,7 @@ export function AdminPanel({
   async function remove(e: Event) {
     if (
       !confirm(
-        `Excluir definitivamente “${e.title}” e suas marcações? Esta ação não pode ser desfeita.`,
+        `Mover “${e.title}” para a lixeira? Você poderá restaurá-lo depois, com as marcações preservadas.`,
       )
     )
       return;
@@ -108,13 +116,8 @@ export function AdminPanel({
           <LogOut size={17} /> Sair
         </button>
       </div>
+      <SaveConfirmation at={receipt} />
       <div className="stats-grid">
-        <div className="full">
-          <SaveConfirmation at={receipt} />
-          <p className="muted">
-            Data retornada pelo banco, após uma gravação confirmada.
-          </p>
-        </div>
         {[
           ["Eventos cadastrados", events.length],
           ["Futuros", events.filter((e) => upcoming(e)).length],
@@ -146,6 +149,8 @@ export function AdminPanel({
             "submissions",
             `Sugestões (${submissions.filter((s) => s.status === "pending").length})`,
           ],
+          ["reports", `Problemas (${reports.filter(r=>r.status==='pending').length})`],
+          ["trash", `Lixeira (${allEvents.filter(e=>e.deleted_at).length})`],
           ["stats", "Estatísticas"],
         ].map(([v, t]) => (
           <button
@@ -158,6 +163,9 @@ export function AdminPanel({
         ))}
       </div>
       {error && <p role="alert">{error}</p>}
+      {historyEvent&&<EventHistory key={historyEvent.id} event={historyEvent} onClose={()=>setHistoryEvent(null)} onSaved={refresh}/>}
+      {tab==='trash'&&<EventTrash events={allEvents.filter(e=>!!e.deleted_at)} onSaved={refresh} onHistory={setHistoryEvent}/>}
+      {tab==='reports'&&<AdminReports reports={reports} events={allEvents} onSaved={refresh} onEdit={e=>{setReviewId(undefined);setEdit(e);setTab('events')}}/>}
       {tab === "events" && (
         <>
           <div className="search-row">
@@ -186,6 +194,7 @@ export function AdminPanel({
               onClose={() => setEdit(null)}
               onSaved={refresh}
               submissionId={reviewId}
+              submissionPhoto={submissions.find(s=>s.id===reviewId)?.photo_url}
               onDirtyChange={setDirty}
             />
           ) : (
@@ -240,6 +249,7 @@ export function AdminPanel({
                             title: e.title + " (cópia)",
                             status: "draft",
                             updated_at: undefined,
+                            recurrence_group:undefined,change_notice:"",change_at:undefined,
                           })
                         }
                       >
@@ -264,12 +274,13 @@ export function AdminPanel({
                       </button>
                       <button
                         disabled={busy}
-                        title="Excluir"
-                        aria-label={"Excluir " + e.title}
+                        title="Mover para a lixeira"
+                        aria-label={"Mover para a lixeira: " + e.title}
                         onClick={() => remove(e)}
                       >
                         <Trash2 size={18} />
                       </button>
+                      <button title="Histórico de alterações" aria-label={"Histórico de "+e.title} onClick={()=>setHistoryEvent(e)}>Histórico</button>
                     </div>
                   </article>
                 ))}

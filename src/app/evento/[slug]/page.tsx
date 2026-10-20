@@ -13,6 +13,9 @@ import { publicData } from "@/lib/data";
 import { displayDate, upcoming } from "@/lib/dates";
 import { Attendance } from "@/components/attendance";
 import { Share } from "@/components/share";
+import {EventNotice} from '@/components/event-notice';
+import {ReportEvent} from '@/components/report-event';
+import {childrenLabel} from '@/lib/age-options';
 import {InstagramLink} from '@/components/instagram-link';
 export const dynamic = "force-dynamic";
 export async function generateMetadata({
@@ -123,13 +126,15 @@ export default async function Detail({
               {e.is_free
                 ? "Entrada gratuita"
                 : e.price || "Consulte o organizador"}{" "}
-              · Classificação: {e.age_rating}
+              · Classificação: {e.age_rating || "Não informada"}
             </p>
             <p>
               <UserRound />
               Organização: {e.organizer || "Não informada"}
             </p>
           </div>
+          <p className="family-info">{childrenLabel(e.family_friendly)}</p>
+          <EventNotice event={e}/>
           <InstagramLink url={e.instagram_url}/>
           <h2>Sobre esse rolê</h2>
           <p className="description">{e.description}</p>
@@ -192,6 +197,7 @@ export default async function Detail({
             <CalendarDays size={17} /> Adicionar ao calendário
           </a>
           <Share title={e.title} id={e.id} ticket={e.ticket_url} />
+          <ReportEvent id={e.id}/>
         </aside>
       </div>
     </div>

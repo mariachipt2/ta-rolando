@@ -19,6 +19,12 @@ export type Event = {
   city: string;
   state: string;
   organizer: string;
+  family_friendly?:boolean|null;
+  deleted_at?:string|null;
+  change_notice?:string;
+  change_at?:string|null;
+  recurrence_group?:string|null;
+  recurrence_index?:number|null;
   instagram_url?: string;
   is_free: boolean;
   price: string;
@@ -37,5 +43,7 @@ export type Event = {
   views?: number;
   ticket_clicks?: number;
 };
-export type EventSubmission={id:string;event_data:Partial<Event>;status:'pending'|'approved'|'rejected';submitted_at:string;updated_at:string;reviewed_at:string|null;approved_event_id:string|null};
+export type EventSubmission={id:string;event_data:Partial<Event>;status:'pending'|'approved'|'rejected';submitted_at:string;updated_at:string;reviewed_at:string|null;approved_event_id:string|null;photo_path?:string|null;photo_url?:string};
+export type EventVersion={id:string;event_id:string;snapshot:Partial<Event>;changes:Record<string,{before:unknown;after:unknown}>;action:string;created_at:string};
+export type EventReport={id:string;event_id:string;kind:string;details:string;status:'pending'|'resolved'|'dismissed';created_at:string;updated_at:string};
 export type SaveState={saved_at:string|null;entity:string|null;record_id?:string|null;operation?:string|null};

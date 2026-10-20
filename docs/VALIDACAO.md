@@ -36,3 +36,12 @@ Não houve publicação na internet, criação de credenciais externas ou inser�
 - Formulario publico inspecionado no navegador local; nao foram criados eventos ou sugestoes ficticios no banco de producao.
 - Compilacoes Pages e Next aprovadas; interface aguarda publicacao pelo aplicativo do usuario.
 
+
+## Gestão de eventos — 20/10/2026
+
+- 12 testes passaram, incluindo recorrência idempotente, meses curtos, duração, proteção de fotos, avisos, histórico, lixeira e restauração sem perder marcações.
+- Compilação Next.js e GitHub Pages concluídas; assets e ausência de segredos privados conferidos.
+- Migrations 007 e 008 aplicadas no projeto real; bucket de sugestões confirmado como privado. Função public-events atualizada.
+- Acesso anônimo às três novas tabelas bloqueado (401). Aviso e sugestão com foto sem Turnstile válido bloqueados (403).
+- Interface pública inspecionada no navegador. Administrador conferido em uma prévia local com dados fictícios, sem autenticar nem alterar eventos reais.
+- Fluxo positivo completo com foto, Turnstile e aprovação precisa ser conferido após a publicação com uma sugestão real. Não foi simulado sucesso de envio na produção.

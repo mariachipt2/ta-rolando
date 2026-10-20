@@ -15,6 +15,7 @@ export type SubmissionData = {
   price: string;
   ticket_url: string;
   age_rating: string;
+  family_friendly:boolean|null;
   additional_info: string;
 };
 export function validateSubmission(
@@ -24,6 +25,7 @@ export function validateSubmission(
   if (!input || typeof input !== "object")
     throw Error("Preencha os dados do evento.");
   const v = input as Record<string, unknown>;
+  if(v.family_friendly!==undefined&&v.family_friendly!==null&&typeof v.family_friendly!=='boolean')throw Error('Escolha uma opção válida sobre crianças.');
   const labels:Record<string,string>={title:'nome do evento',description:'descrição',category_id:'categoria',starts_at:'início',ends_at:'encerramento',venue_name:'local',address:'endereço',neighborhood:'bairro',organizer:'organizador',price:'preço',ticket_url:'ingressos',instagram_url:'Instagram',age_rating:'classificação indicativa',additional_info:'informações adicionais'};
   const text = (key: string, min: number, max: number) => {
     const value = typeof v[key] === "string" ? (v[key] as string).trim() : "";
@@ -110,6 +112,7 @@ export function validateSubmission(
     price: text("price", 0, 100),
     ticket_url,
     age_rating: text("age_rating", 0, 40) || "Livre",
+    family_friendly:typeof v.family_friendly==='boolean'?v.family_friendly:null,
     additional_info: text("additional_info", 0, 3000),
   };
 }

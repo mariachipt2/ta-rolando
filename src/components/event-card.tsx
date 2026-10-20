@@ -3,6 +3,7 @@ import Image from "next/image";
 import { MapPin, ArrowUpRight, Users, CalendarDays } from "lucide-react";
 import type { Event } from "@/lib/types";
 import { displayDate } from "@/lib/dates";
+import {EventNotice} from "./event-notice";
 export function EventCard({ event: e, rank }: { event: Event; rank?: number }) {
   return (
     <article className="event-card">
@@ -30,6 +31,7 @@ export function EventCard({ event: e, rank }: { event: Event; rank?: number }) {
         {rank && <b className="rank">#{rank}</b>}
       </Link>
       <div className="card-body">
+        <EventNotice event={e} compact/>
         <span className="eyebrow">{e.categories?.name || "Evento"}</span>
         <Link href={"/evento/" + e.slug}>
           <h3>{e.title}</h3>

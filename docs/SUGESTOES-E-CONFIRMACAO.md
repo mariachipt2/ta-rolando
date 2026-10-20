@@ -2,9 +2,9 @@
 
 No fim da página inicial, **Sugerir um evento** abre o formulário público. As sugestões exigem data futura e Turnstile. O envio só é confirmado depois de o Supabase devolver um identificador e a data de recebimento. Envios repetidos com o mesmo identificador não criam registros duplicados. Não são solicitados telefone, e-mail ou cadastro do visitante.
 
-No painel, **Sugestões** separa pendentes, aceitas e recusadas. **Revisar e aceitar** abre o cadastro completo, permitindo corrigir dados e adicionar capa. O status começa como Publicado; se a administradora escolher Rascunho, o evento fica salvo para publicação posterior. A aprovação cria o evento e finaliza a sugestão em uma única transação. Repetir a mesma aprovação não cria outro evento. Recusar mantém o registro privado para consulta.
+No painel, **Sugestões** separa pendentes, aceitas e recusadas. **Revisar e aceitar** abre o cadastro completo, permitindo corrigir dados, usar a foto enviada ou adicionar outra capa. O status começa como Publicado; se a administradora escolher Rascunho, o evento fica salvo para publicação posterior. A aprovação cria o evento e finaliza a sugestão em uma única transação. Repetir a mesma aprovação não cria outro evento. Recusar mantém o registro privado para consulta.
 
-O painel mostra **Gravação confirmada no Supabase** com a data e a hora do banco em Brasília. Cada evento também mostra seu último salvamento. Durante a edição, alterações pendentes são sinalizadas; se o salvamento falhar, os campos permanecem preenchidos. Sair ou trocar de aba com mudanças pendentes pede confirmação. O aviso não é um backup: somente uma resposta de sucesso do banco confirma a gravação.
+O painel mostra um indicador discreto **Salvo** com a data e a hora do banco em Brasília. Cada evento também mostra seu último salvamento. Durante a edição, alterações pendentes são sinalizadas; se o salvamento falhar, os campos permanecem preenchidos. Sair ou trocar de aba com mudanças pendentes pede confirmação. O aviso não é um backup: somente uma resposta de sucesso do banco confirma a gravação.
 
 ## Mudanças necessárias no Supabase
 

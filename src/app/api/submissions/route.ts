@@ -1,11 +1,15 @@
 import { service } from "@/lib/supabase";
 import { visitor, sameOrigin, verifyBot, limit } from "@/lib/visitor";
 import { validateSubmission } from "@/lib/submission-validation";
+import {photoType} from '../../../../supabase/functions/_shared/photos';
 export async function POST(req: Request) {
   try {
     if (!sameOrigin(req))
       return Response.json({ error: "Origem inválida." }, { status: 403 });
-    const body = await req.json();
+    const multipart=req.headers.get('content-type')?.includes('multipart/form-data');
+    if(Number(req.headers.get('content-length')||0)>6291456)return Response.json({error:'Arquivo muito grande.'},{status:413});
+    let photo:File|null=null;let body;
+    if(multipart){const form=await req.formData();body=JSON.parse(String(form.get('payload')||''));const file=form.get('photo');if(file instanceof File&&file.size)photo=file}else body=await req.json();
     if (
       typeof body.request_id !== "string" ||
       !/^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/i.test(body.request_id)
@@ -35,10 +39,13 @@ export async function POST(req: Request) {
         { error: "Escolha uma categoria ativa." },
         { status: 400 },
       );
+    const existing=await db.from('event_submissions').select('id,visitor_hash,submitted_at').eq('id',body.request_id).maybeSingle();if(existing.error)throw existing.error;if(existing.data){if(existing.data.visitor_hash!==hash)throw Error('Envio inválido.');return Response.json({id:existing.data.id,saved_at:existing.data.submitted_at})}
+    let photo_path:string|null=null;
+    if(photo){const bytes=new Uint8Array(await photo.arrayBuffer()),type=photoType(bytes);photo_path=body.request_id+'/cover.'+type.ext;const uploaded=await db.storage.from('submission-images').upload(photo_path,bytes,{contentType:type.mime,upsert:true});if(uploaded.error)throw uploaded.error}
     const { error } = await db
       .from("event_submissions")
       .upsert(
-        { id: body.request_id, visitor_hash: hash, event_data: event },
+        { id: body.request_id, visitor_hash: hash, event_data: event,photo_path },
         { onConflict: "id", ignoreDuplicates: true },
       );
     if (error) throw error;

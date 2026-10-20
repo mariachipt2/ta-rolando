@@ -1,8 +1,9 @@
+import {saveEvent,trashEvent,reviewSuggestion,reviewReport,getVersions,restoreVersion,signedSubmissions} from '@/lib/admin-actions';
 import { createClient } from "@supabase/supabase-js";
 import { readAll } from "@/lib/pagination";
 import { eventSchema, slugify } from "@/lib/validation";
 import { calendar } from "@/lib/calendar";
-import type { Category, Event, EventSubmission, SaveState } from "@/lib/types";
+import type { Category, Event, EventSubmission, SaveState, EventReport } from "@/lib/types";
 export const configured = !!(__SUPABASE_URL__ && __SUPABASE_PUBLIC_KEY__);
 export const db = configured
   ? createClient(__SUPABASE_URL__, __SUPABASE_PUBLIC_KEY__)
@@ -55,7 +56,7 @@ export async function isAdmin() {
 }
 export async function loadAdmin() {
   if (!db || !(await isAdmin())) return null;
-  const [events, categories, metrics, submissions, saveState] =
+  const [events, categories, metrics, submissions, saveState, reports] =
     await Promise.all([
       readAll<Event>((a, b) =>
         db!
@@ -87,7 +88,7 @@ export async function loadAdmin() {
         db!
           .from("event_submissions")
           .select(
-            "id,event_data,status,submitted_at,updated_at,reviewed_at,approved_event_id",
+            "id,event_data,status,submitted_at,updated_at,reviewed_at,approved_event_id,photo_path",
           )
           .order("submitted_at", { ascending: false })
           .order("id")
@@ -98,13 +99,15 @@ export async function loadAdmin() {
         .select("saved_at,entity,record_id,operation")
         .eq("singleton", true)
         .single(),
+      readAll<EventReport>((a,b)=>db!.from('event_reports').select('id,event_id,kind,details,status,created_at,updated_at').order('created_at',{ascending:false}).order('id').range(a,b)),
     ]);
   if (saveState.error) throw saveState.error;
   return {
     events,
     categories,
     metrics,
-    submissions,
+    submissions:await signedSubmissions(db,submissions),
+    reports,
     saveState: saveState.data as SaveState,
   };
 }
@@ -155,6 +158,7 @@ async function edge(action: string, payload: Record<string, unknown> = {}) {
     );
   return response;
 }
+async function edgePhoto(form:FormData){const payload=JSON.parse(String(form.get('payload')||'{}'));form.set('payload',JSON.stringify({...payload,action:'submission',visitor:visitor()}));return fetch(__SUPABASE_URL__+'/functions/v1/public-events',{method:'POST',headers:{apikey:__SUPABASE_PUBLIC_KEY__},body:form,signal:AbortSignal.timeout(60000)});}
 export async function transport(
   path: string,
   init: RequestInit = {},
@@ -167,7 +171,8 @@ export async function transport(
       return await edge(init.method === "POST" ? "attendance" : "agenda", body);
     }
     if (path === "/api/metrics") return await edge("metric", body);
-    if (path === "/api/submissions") return await edge("submission", body);
+    if (path === '/api/submissions') return init.body instanceof FormData?await edgePhoto(init.body):await edge('submission',body);
+    if(path==='/api/reports')return await edge('report',body);
     if (path.startsWith("/api/calendar/")) {
       const { events } = await loadPublic();
       const e = events.find((e) => e.id === path.split("/").at(-1));
@@ -199,57 +204,12 @@ export async function transport(
       return json({ ok: true });
     }
     if (!(await isAdmin())) return json({ error: "Acesso negado." }, 401);
-    if (path === "/api/admin/submissions") {
-      if (!["approved", "rejected"].includes(body.decision))
-        return json({ error: "Decisão inválida." }, 400);
-      const event =
-        body.decision === "approved" ? eventSchema.parse(body.event) : null;
-      const { data, error } = await db.rpc("review_submission", {
-        p_id: body.id,
-        p_decision: body.decision,
-        p_event: event,
-      });
-      if (error) throw error;
-      return json(data);
-    }
-    if (path === "/api/admin/events") {
-      if (init.method === "DELETE") {
-        const { error } = await db.from("events").delete().eq("id", body.id).select('id').single();
-        if (error) throw error;
-        const state=await db.from('admin_save_state').select('saved_at').eq('singleton',true).single();if(state.error)throw state.error;
-        return json({ ok: true,saved_at:state.data.saved_at });
-      }
-      const parsed = eventSchema.safeParse(body);
-      if (!parsed.success)
-        return json(
-          { error: parsed.error.issues.map((i) => i.message).join(" ") },
-          400,
-        );
-      const result = body.id
-        ? await db
-            .from("events")
-            .update(parsed.data)
-            .eq("id", body.id)
-            .select("id,updated_at")
-            .single()
-        : await db
-            .from("events")
-            .insert({
-              ...parsed.data,
-              slug:
-                slugify(parsed.data.title) +
-                "-" +
-                crypto.randomUUID().slice(0, 8),
-            })
-            .select("id,updated_at")
-            .single();
-      if (result.error) throw result.error;
-      return json({
-        ok: true,
-        id: result.data.id,
-        saved_at: result.data.updated_at,
-      });
-    }
+    if(path.startsWith('/api/admin/history?'))return json({versions:await getVersions(db,new URL(path,'https://local').searchParams.get('event_id')||'')});
+    if(path==='/api/admin/history')return json(await restoreVersion(db,body.version_id));
+    if(path==='/api/admin/reports')return json(await reviewReport(db,body));
+    if(path==='/api/admin/trash')return json(await trashEvent(db,body.id,body.deleted===true));
+    if(path==='/api/admin/submissions')return json(await reviewSuggestion(db,body));
+    if(path==='/api/admin/events')return json(init.method==='DELETE'?await trashEvent(db,body.id,true):await saveEvent(db,body));
     if (path === "/api/admin/categories") {
       const { id, ...value } = body;
       const { data, error } = id

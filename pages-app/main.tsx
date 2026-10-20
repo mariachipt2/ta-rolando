@@ -8,6 +8,9 @@ import { AdminPanel } from "@/components/admin-panel";
 import { Attendance } from "@/components/attendance";
 import { Share } from "@/components/share";
 import { CalendarDownload } from "@/components/calendar-download";
+import {EventNotice} from '@/components/event-notice';
+import {ReportEvent} from '@/components/report-event';
+import {childrenLabel} from '@/lib/age-options';
 import {InstagramLink} from '@/components/instagram-link';
 import {SubmitEvent} from '@/components/submit-event';
 import Privacy from "@/app/privacidade/page";
@@ -63,10 +66,12 @@ function Detail({ event: e }: { event: Event }) {
               {e.is_free
                 ? "Entrada gratuita"
                 : e.price || "Consulte o organizador"}{" "}
-              · Classificação: {e.age_rating}
+              · Classificação: {e.age_rating || "Não informada"}
             </p>
             <p>Organização: {e.organizer || "Não informada"}</p>
           </div>
+          <p className="family-info">{childrenLabel(e.family_friendly)}</p>
+          <EventNotice event={e}/>
           <InstagramLink url={e.instagram_url}/>
           <h2>Sobre esse rolê</h2>
           <p className="description">{e.description}</p>
@@ -124,6 +129,7 @@ function Detail({ event: e }: { event: Event }) {
           />
           <CalendarDownload id={e.id} />
           <Share title={e.title} id={e.id} ticket={e.ticket_url} />
+          <ReportEvent id={e.id}/>
         </aside>
       </div>
     </div>

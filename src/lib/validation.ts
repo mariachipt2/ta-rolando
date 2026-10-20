@@ -29,6 +29,8 @@ export const eventSchema = z
     city: z.string().min(2).max(100),
     state: z.string().length(2),
     organizer: z.string().max(160),
+    family_friendly:z.boolean().nullable(),
+    change_notice:z.string().trim().max(1000),
     instagram_url: instagramUrl,
     is_free: z.boolean(),
     price: z.string().max(100),

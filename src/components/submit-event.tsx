@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Send } from "lucide-react";
 import type { Category } from "@/lib/types";
 import { request } from "@/lib/transport";
@@ -7,6 +7,8 @@ import { toISO } from "@/lib/dates";
 import { validateSubmission } from "@/lib/submission-validation";
 import { BotCheck } from "./bot-check";
 import { savedTime } from "./save-confirmation";
+import {AGE_OPTIONS} from '@/lib/age-options';
+import {photoType} from '../../supabase/functions/_shared/photos';
 export function SubmitEvent({ categories }: { categories: Category[] }) {
   const [open, setOpen] = useState(false),
     [busy, setBusy] = useState(false),
@@ -14,6 +16,9 @@ export function SubmitEvent({ categories }: { categories: Category[] }) {
     [saved, setSaved] = useState(""),
     [token, setToken] = useState(""),
     [botVersion, setBotVersion] = useState(0);
+  const [photo,setPhoto]=useState<File|null>(null),[photoPreview,setPhotoPreview]=useState('');
+  useEffect(()=>{if(!photo){setPhotoPreview('');return}const url=URL.createObjectURL(photo);setPhotoPreview(url);return()=>URL.revokeObjectURL(url)},[photo]);
+  const photoInput=useRef<HTMLInputElement>(null);
   const requestId = useRef<{id:string;payload:string} | null>(null);
   const field = (
     name: string,
@@ -58,7 +63,7 @@ export function SubmitEvent({ categories }: { categories: Category[] }) {
               <button
                 className="button secondary"
                 onClick={() => {
-                  setSaved("");
+                  setSaved("");setPhoto(null);
                   requestId.current = null;
                 }}
               >
@@ -82,17 +87,15 @@ export function SubmitEvent({ categories }: { categories: Category[] }) {
                       ? toISO(String(values.ends_at))
                       : null,
                     is_free: values.is_free === "free",
+                    family_friendly:values.family_friendly===''?null:values.family_friendly==='true',
                   });
-                  const payload=JSON.stringify(event);
+                  if(photo)photoType(new Uint8Array(await photo.arrayBuffer()));
+                  const payload=JSON.stringify({event,photo:photo?[photo.name,photo.size,photo.lastModified]:null});
                   if(!requestId.current||requestId.current.payload!==payload)requestId.current={id:crypto.randomUUID(),payload};
+                  const form=new FormData();form.set('payload',JSON.stringify({request_id:requestId.current.id,event,token}));if(photo)form.set('photo',photo);
                   const r = await request("/api/submissions", {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                      request_id: requestId.current.id,
-                      event,
-                      token,
-                    }),
+                    body: form,
                   });
                   const data = await r.json();
                   if (!r.ok)
@@ -173,7 +176,10 @@ export function SubmitEvent({ categories }: { categories: Category[] }) {
                   false,
                   "url",
                 )}
-                {field("age_rating", "Classificação indicativa")}
+                <label>Classificação indicativa<select name="age_rating">{AGE_OPTIONS.map(a=><option key={a}>{a}</option>)}</select></label>
+                <label>Adequado para crianças?<select name="family_friendly"><option value="">Não sei / consultar organizador</option><option value="true">Sim, adequado para crianças</option><option value="false">Não recomendado para crianças</option></select></label>
+                <label className="full">Foto do evento (opcional)<input type="file" ref={photoInput} accept="image/jpeg,image/png,image/webp" onChange={async e=>{const file=e.target.files?.[0];setError('');if(!file){setPhoto(null);return}try{if(file.size>5242880)throw Error('Use uma foto de até 5 MB.');photoType(new Uint8Array(await file.arrayBuffer()));setPhoto(file)}catch(err){setPhoto(null);e.target.value='';setError(err instanceof Error?err.message:'Foto inválida.')}}}/><small>JPG, PNG ou WebP, até 5 MB. Envie uma imagem que você tem autorização para usar. Ela ficará privada até a análise.</small></label>
+                {photoPreview&&<div className="full suggestion-photo"><img src={photoPreview} alt="Prévia da foto da sugestão"/><button type="button" className="button secondary" onClick={()=>{setPhoto(null);if(photoInput.current)photoInput.current.value=''}}>Remover foto</button></div>}
                 <label className="full">
                   Informações adicionais
                   <textarea name="additional_info" rows={2} maxLength={3000} />

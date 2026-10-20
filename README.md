@@ -24,7 +24,7 @@ Sem Supabase configurado, o site abre vazio e o login fica desabilitado. Isso pe
 - Detalhes públicos com metadados, Schema.org, imagens otimizadas, mapas, Waze, WhatsApp, link, calendário ICS e informações completas.
 - Agenda anônima, cookie aleatório assinado e HttpOnly, identificador derivado por HMAC no banco. Unicidade e operação idempotente no PostgreSQL. Sem IP na base da aplicação.
 - Login administrativo Supabase; verificação de usuário e permissão no servidor; RLS e bucket com escrita administrativa.
-- Eventos: edição, cópia como rascunho, exclusão confirmada, cancelamento, despublicação para rascunho, destaque, agendamento de publicação, imagens e prévia.
+- Eventos: edição, cópia como rascunho, lixeira com restauração, cancelamento, despublicação para rascunho, destaque, agendamento de publicação, imagens e prévia.
 - Categorias editáveis e ativáveis. Estatísticas reais por evento e gráfico de 14 dias. Métricas de visualização e ingresso com deduplicação horária por navegador.
 - PWA com ícones, manifest, cache somente de arquivos estáticos e página offline. Dados do administrador, agenda e APIs não são armazenados no service worker. Consulta e marcações dependem da rede.
 - SQL versionado, retenção por manutenção diária, sitemap e robots.
@@ -64,6 +64,10 @@ npm.cmd run build
 ```
 
 Os testes usam PostgreSQL embutido via PGlite, com papéis equivalentes a anon/authenticated/service_role e a migration real. Não substituem a homologação do serviço Supabase Auth/Storage. Não há dados demonstrativos em produção nem seed automático.
+
+## Novos recursos de gestão
+
+Fotos privadas nas sugestões, avisos de alteração/cancelamento, problemas informados pelos visitantes, lixeira, versões restauráveis, recorrência e seleção de adequação para crianças: veja [docs/RECURSOS-EVENTOS.md](docs/RECURSOS-EVENTOS.md). As migrations 007 e 008 já foram aplicadas ao Supabase deste projeto; publique somente os arquivos locais pelo aplicativo habitual.
 
 ## Publicação posterior na Vercel
 
