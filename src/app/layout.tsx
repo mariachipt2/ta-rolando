@@ -50,6 +50,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 <span>Minha agenda</span>
               </Link>
               <Link href="/linha-do-tempo">Linha do tempo</Link>
+              <Link href="/organizadores">Organizadores</Link>
+              <Link href="/fim-de-semana">Fim de semana</Link>
             </nav>
           </div>
         </header>

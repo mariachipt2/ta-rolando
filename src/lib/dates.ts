@@ -34,9 +34,9 @@ export function inPeriod(
   if (period === "week") hi = plus(6);
   if (period === "weekend") {
     const w = base.getUTCDay();
-    const n = w === 0 || w === 6 ? 0 : 6 - w;
+    const n = w === 0 ? -2 : 5 - w;
     lo = plus(n);
-    hi = plus(n + (w === 0 ? 0 : 1));
+    hi = plus(n + 2);
   }
   return day(start) <= hi && day(end || start) >= lo;
 }

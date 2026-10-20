@@ -18,6 +18,7 @@ import { SubmissionList } from "./submission-list";
 import { SaveConfirmation, savedTime } from "./save-confirmation";
 import {EventHistory} from './event-history';
 import {EventTrash} from './event-trash';
+import {AdminExport} from './admin-export';
 import {AdminPending} from './admin-pending';
 import {eventIssues} from '@/lib/event-discovery';
 import {AdminReports} from './admin-reports';
@@ -158,6 +159,7 @@ export function AdminPanel({
           ["reports", `Problemas (${reports.filter(r=>r.status==='pending').length})`],
           ["trash", `Lixeira (${allEvents.filter(e=>e.deleted_at).length})`],
           ["stats", "Estatísticas"],
+          ["export", "Exportar cadastros"],
         ].map(([v, t]) => (
           <button
             className={tab === v ? "active" : ""}
@@ -170,6 +172,7 @@ export function AdminPanel({
       </div>
       {error && <p role="alert">{error}</p>}
       {historyEvent&&<EventHistory key={historyEvent.id} event={historyEvent} onClose={()=>setHistoryEvent(null)} onSaved={refresh}/>}
+      {tab==='export'&&<AdminExport/>}
       {tab==='pending'&&<AdminPending events={events} submissions={submissions} onEdit={event=>openPending(event)} onSubmissions={()=>setTab('submissions')}/>}
       {tab==='trash'&&<EventTrash events={allEvents.filter(e=>!!e.deleted_at)} onSaved={refresh} onHistory={setHistoryEvent}/>}
       {tab==='reports'&&<AdminReports reports={reports} events={allEvents} onSaved={refresh} onEdit={e=>{setReviewId(undefined);setEdit(e);setTab('events')}}/>}

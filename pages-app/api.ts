@@ -1,3 +1,4 @@
+import {loadRegistryExport} from '@/lib/admin-export';
 import {saveEvent,trashEvent,reviewSuggestion,reviewReport,getVersions,restoreVersion,signedSubmissions} from '@/lib/admin-actions';
 import { createClient } from "@supabase/supabase-js";
 import { readAll } from "@/lib/pagination";
@@ -204,6 +205,7 @@ export async function transport(
       return json({ ok: true });
     }
     if (!(await isAdmin())) return json({ error: "Acesso negado." }, 401);
+    if(path==='/api/admin/export')return json(await loadRegistryExport(db));
     if(path.startsWith('/api/admin/history?'))return json({versions:await getVersions(db,new URL(path,'https://local').searchParams.get('event_id')||'')});
     if(path==='/api/admin/history')return json(await restoreVersion(db,body.version_id));
     if(path==='/api/admin/reports')return json(await reviewReport(db,body));

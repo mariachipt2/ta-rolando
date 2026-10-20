@@ -3,6 +3,9 @@ import { createRoot } from "react-dom/client";
 import { Radio, MapPin, CalendarDays, ArrowLeft } from "lucide-react";
 import { Discover } from "@/components/discover";
 import { Agenda } from "@/components/agenda";
+import {OrganizerHub} from '@/components/organizer-hub';
+import {WeekendSummary} from '@/components/weekend-summary';
+import {FollowOrganizer} from '@/components/follow-organizer';
 import {SimilarEvents} from '@/components/similar-events';
 import {SharePoster} from '@/components/share-poster';
 import {EventTimeline} from '@/components/event-timeline';
@@ -76,6 +79,7 @@ function Detail({ event: e,events }: { event: Event;events:Event[] }) {
           <p className="family-info">{childrenLabel(e.family_friendly)}</p>
           <EventNotice event={e}/>
           <InstagramLink url={e.instagram_url}/>
+          <FollowOrganizer event={e}/>
           <h2>Sobre esse rolê</h2>
           <p className="description">{e.description}</p>
           {e.additional_info && (
@@ -230,6 +234,8 @@ function App() {
       ? event.title + " | Tá Rolando"
       : path === "/admin"
         ? "Administração | Tá Rolando"
+        : path === '/organizadores' ? 'Organizadores | Tá Rolando'
+        : path === '/fim-de-semana' ? 'Resumo do fim de semana | Tá Rolando'
         : path === '/linha-do-tempo'
           ? 'Linha do tempo | Tá Rolando'
         : "Tá Rolando — Ipatinga";
@@ -256,6 +262,8 @@ function App() {
               <CalendarDays size={17} /> Minha agenda
             </a>
             <a href="#/linha-do-tempo" aria-current={path==='/linha-do-tempo'?'page':undefined}>Linha do tempo</a>
+            <a href="#/organizadores" aria-current={path==='/organizadores'?'page':undefined}>Organizadores</a>
+            <a href="#/fim-de-semana" aria-current={path==='/fim-de-semana'?'page':undefined}>Fim de semana</a>
           </nav>
         </div>
       </header>
@@ -297,6 +305,10 @@ function App() {
             </p>
             <Agenda events={data?.events || []} />
           </div>
+        ) : path === '/organizadores' ? (
+          <OrganizerHub events={data?.events||[]} error={data?.error}/>
+        ) : path === '/fim-de-semana' ? (
+          <WeekendSummary key={revision} events={data?.events||[]} error={data?.error} initialStart={new URLSearchParams(location.hash.split('?')[1]||'').get('inicio')}/>
         ) : path === '/linha-do-tempo' ? (
           <EventTimeline events={data?.events||[]} error={data?.error}/>
         ) : path === "/privacidade" ? (

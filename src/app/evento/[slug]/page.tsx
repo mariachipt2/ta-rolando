@@ -12,6 +12,7 @@ import {
 import { publicData } from "@/lib/data";
 import { displayDate, upcoming } from "@/lib/dates";
 import { Attendance } from "@/components/attendance";
+import {FollowOrganizer} from '@/components/follow-organizer';
 import {SimilarEvents} from '@/components/similar-events';
 import {SharePoster} from '@/components/share-poster';
 import { Share } from "@/components/share";
@@ -138,6 +139,7 @@ export default async function Detail({
           <p className="family-info">{childrenLabel(e.family_friendly)}</p>
           <EventNotice event={e}/>
           <InstagramLink url={e.instagram_url}/>
+          <FollowOrganizer event={e}/>
           <h2>Sobre esse rolê</h2>
           <p className="description">{e.description}</p>
           {e.additional_info && (
