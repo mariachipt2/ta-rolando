@@ -3,6 +3,10 @@ import { createRoot } from "react-dom/client";
 import { Radio, MapPin, CalendarDays, ArrowLeft } from "lucide-react";
 import { Discover } from "@/components/discover";
 import { Agenda } from "@/components/agenda";
+import {CompareTray,CompareButton} from '@/components/compare-selection';
+import {CompareEvents} from '@/components/compare-events';
+import {ProgramBuilder} from '@/components/program-builder';
+import {SharedProgram} from '@/components/shared-program';
 import {OrganizerHub} from '@/components/organizer-hub';
 import {WeekendSummary} from '@/components/weekend-summary';
 import {FollowOrganizer} from '@/components/follow-organizer';
@@ -80,6 +84,7 @@ function Detail({ event: e,events }: { event: Event;events:Event[] }) {
           <EventNotice event={e}/>
           <InstagramLink url={e.instagram_url}/>
           <FollowOrganizer event={e}/>
+          <CompareButton id={e.id} title={e.title}/>
           <h2>Sobre esse rolê</h2>
           <p className="description">{e.description}</p>
           {e.additional_info && (
@@ -234,6 +239,9 @@ function App() {
       ? event.title + " | Tá Rolando"
       : path === "/admin"
         ? "Administração | Tá Rolando"
+        : path === '/comparar' ? 'Comparar rolês | Tá Rolando'
+        : path === '/programacao' ? 'Minha programação | Tá Rolando'
+        : path === '/programacao-compartilhada' ? 'Programação compartilhada | Tá Rolando'
         : path === '/organizadores' ? 'Organizadores | Tá Rolando'
         : path === '/fim-de-semana' ? 'Resumo do fim de semana | Tá Rolando'
         : path === '/linha-do-tempo'
@@ -264,6 +272,8 @@ function App() {
             <a href="#/linha-do-tempo" aria-current={path==='/linha-do-tempo'?'page':undefined}>Linha do tempo</a>
             <a href="#/organizadores" aria-current={path==='/organizadores'?'page':undefined}>Organizadores</a>
             <a href="#/fim-de-semana" aria-current={path==='/fim-de-semana'?'page':undefined}>Fim de semana</a>
+            <a href="#/comparar" aria-current={path==='/comparar'?'page':undefined}>Comparar</a>
+            <a href="#/programacao" aria-current={path==='/programacao'?'page':undefined}>Programação</a>
           </nav>
         </div>
       </header>
@@ -305,6 +315,12 @@ function App() {
             </p>
             <Agenda events={data?.events || []} />
           </div>
+        ) : path === '/comparar' ? (
+          <CompareEvents events={data?.events||[]} error={data?.error}/>
+        ) : path === '/programacao' ? (
+          <ProgramBuilder events={data?.events||[]} error={data?.error}/>
+        ) : path === '/programacao-compartilhada' ? (
+          <SharedProgram events={data?.events||[]} error={data?.error} ids={new URLSearchParams(location.hash.split('?')[1]||'').get('eventos')} title={new URLSearchParams(location.hash.split('?')[1]||'').get('titulo')}/>
         ) : path === '/organizadores' ? (
           <OrganizerHub events={data?.events||[]} error={data?.error}/>
         ) : path === '/fim-de-semana' ? (
@@ -340,6 +356,7 @@ function App() {
         <a href="#/privacidade">Privacidade</a>
         <span>Não fique de fora. ♡</span>
       </footer>
+      <CompareTray hidden={path==='/admin'||path==='/comparar'}/>
     </>
   );
 }

@@ -199,7 +199,7 @@ export function Discover({
             <Flame size={17} /> Tá bombando <ArrowUpRight size={16} />
           </a>
         </div>
-        <div className="discovery-shortcuts"><Link className="button secondary" href="/fim-de-semana">Resumo de sexta a domingo ↗</Link><Link className="text-link" href="/organizadores">Organizadores favoritos ↗</Link></div>
+        <div className="discovery-shortcuts"><Link className="text-link" href="/comparar">Comparar rolês ↗</Link><Link className="text-link" href="/programacao">Montar minha programação ↗</Link><Link className="button secondary" href="/fim-de-semana">Resumo de sexta a domingo ↗</Link><Link className="text-link" href="/organizadores">Organizadores favoritos ↗</Link></div>
         <div className="search-row">
           <label className="search">
             <Search size={21} />

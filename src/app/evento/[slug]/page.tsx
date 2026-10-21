@@ -12,6 +12,7 @@ import {
 import { publicData } from "@/lib/data";
 import { displayDate, upcoming } from "@/lib/dates";
 import { Attendance } from "@/components/attendance";
+import {CompareButton} from '@/components/compare-selection';
 import {FollowOrganizer} from '@/components/follow-organizer';
 import {SimilarEvents} from '@/components/similar-events';
 import {SharePoster} from '@/components/share-poster';
@@ -140,6 +141,7 @@ export default async function Detail({
           <EventNotice event={e}/>
           <InstagramLink url={e.instagram_url}/>
           <FollowOrganizer event={e}/>
+          <CompareButton id={e.id} title={e.title}/>
           <h2>Sobre esse rolê</h2>
           <p className="description">{e.description}</p>
           {e.additional_info && (

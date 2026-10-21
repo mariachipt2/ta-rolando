@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import { MapPin, ArrowUpRight, CalendarDays, Radio } from "lucide-react";
+import {NativeCompareTray} from '@/components/compare-tray-native';
 import { Pwa } from "@/components/pwa";
 import "./globals.css";
 export const metadata: Metadata = {
@@ -52,6 +53,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               <Link href="/linha-do-tempo">Linha do tempo</Link>
               <Link href="/organizadores">Organizadores</Link>
               <Link href="/fim-de-semana">Fim de semana</Link>
+              <Link href="/comparar">Comparar</Link>
+              <Link href="/programacao">Programação</Link>
             </nav>
           </div>
         </header>
@@ -68,6 +71,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <Link href="/privacidade">Privacidade</Link>
           <span>Não fique de fora. ♡</span>
         </footer>
+        <NativeCompareTray/>
         <Pwa />
       </body>
     </html>

@@ -54,3 +54,11 @@ Não houve publicação na internet, criação de credenciais externas ou inser�
 - Pendências e atalho para completar cadastro conferidos em prévia administrativa com dados fictícios locais.
 - Sem alterações de esquema ou variáveis no Supabase. Publicação da interface fica a cargo do aplicativo usado pela administradora.
 
+
+## Comparação e programação — 21/10/2026
+
+- 25 testes automatizados aprovados, incluindo limite de seleção, links sem dados privados, visibilidade pública e sobreposição de horários.
+- Comparação de dois eventos reais conferida na prévia local, sem alterar cadastros ou marcações. Terceira seleção bloqueada e persistência após recarregar confirmada.
+- Programação gerada com dois eventos entre as opções disponíveis e aberta em outra aba: somente os dois escolhidos aparecem. Nenhuma mensagem foi enviada pelo WhatsApp.
+- Sem alterações no Supabase. Interface depende de publicação dos arquivos locais pelo aplicativo habitual.
+

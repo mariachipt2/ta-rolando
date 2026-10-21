@@ -2,6 +2,7 @@ import Link from "next/link";
 import { MapPin, ArrowUpRight, Users, CalendarDays } from "lucide-react";
 import type { Event } from "@/lib/types";
 import { displayDate } from "@/lib/dates";
+import {CompareButton} from './compare-selection';
 import {EventNotice} from "./event-notice";
 import {InstagramLink} from './instagram-link';
 export function EventCard({ event: e, rank }: { event: Event; rank?: number }) {
@@ -58,6 +59,7 @@ export function EventCard({ event: e, rank }: { event: Event; rank?: number }) {
           </Link>
           </div>
         </div>
+        <CompareButton id={e.id} title={e.title}/>
       </div>
     </article>
   );

@@ -27,6 +27,7 @@ export function Agenda({ events }: { events: Event[] }) {
   const selected = events.filter((e) => ids?.includes(e.id));
   return (
     <>
+      <div className="agenda-banner"><div><h2>Combine os planos com os amigos</h2><p>Escolha quais eventos compartilhar, sem mostrar o restante da sua agenda.</p></div><Link className="button secondary" href="/programacao">Montar programação compartilhável ↗</Link></div>
       <p role="status">{error || (!ids ? "Carregando seus planos…" : "")}</p>
       {error && <button className="button secondary" onClick={()=>setAttempt(n=>n+1)}>Tentar novamente</button>}
       {ids && selected.length === 0 ? (
