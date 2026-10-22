@@ -84,12 +84,12 @@ As marcações são interesse, não compra de ingresso ou confirmação de prese
 
 ## 7. Linha do Tempo e datas
 
-- [ ] Abrir a Linha do Tempo e conferir os eventos agrupados por dia.
-- [ ] Alternar Próximos, Anteriores e Todos.
+- [ ] Abrir a Linha do Tempo: mês atual, todos os eventos em linhas compactas agrupadas por dia.
+- [ ] Alternar Próximos, Anteriores e Todos do mês.
 - [ ] Conferir a ordem cronológica; Anteriores mostra os mais recentes primeiro.
 - [ ] Buscar por evento, local, organizador ou categoria e filtrar por mês.
-- [ ] Limpar busca remove os filtros, inclusive Para crianças.
-- [ ] Quando houver muitas datas, Ver mais datas expande a lista.
+- [ ] Limpar filtros remove a busca e Para crianças, volta a Todos do mês e preserva o mês escolhido.
+- [ ] Usar Mês anterior, Próximo mês, Ir para o mês e Mês atual; escolher diretamente um dos Meses com eventos. O mês inteiro aparece sem Ver mais datas.
 - [ ] Evento encerrado sai das recomendações futuras e aparece em Anteriores; seu cadastro não é apagado automaticamente.
 - [ ] Com encerramento informado, o evento permanece em andamento até aquele horário.
 - [ ] Sem encerramento, ele é considerado passado quando chega o horário de início.
@@ -260,3 +260,4 @@ O título e a seleção são acessíveis a qualquer pessoa com o link. A seleç�
 ## Como anotar problemas
 
 Para cada falha, anote: item desta lista, celular/computador e navegador, nome do evento, o que você fez, o resultado e uma captura da tela quando possível. Isso ajuda a reproduzir e corrigir exatamente o problema.
+
