@@ -10,10 +10,18 @@ Possíveis duplicados são comparados com todos os cadastros, incluindo lixeira,
 
 Backend: função autenticada admin-discovery no Supabase, verifica usuário e admin_profiles ativo antes da consulta. Limite de seis consultas por administradora por hora. URL de origem fixa, sem fetch de links enviados pelo navegador. Resposta limitada a 4 MB e 18 segundos. A função não escreve eventos; usa apenas o contador de limite existente. O Next oferece a mesma consulta em POST /api/admin/discovery.
 
-Sem migração SQL ou novos campos. Origem e data da consulta ficam no campo Informações adicionais do cadastro. Para atualizar o Pages, publicar pelo aplicativo habitual.
+A consulta original não exige novos campos; as marcações persistentes usam a migração 009_discovery_marks.sql, já aplicada no projeto Supabase. Origem e data da consulta ficam no campo Informações adicionais do cadastro. Para atualizar o Pages, publicar pelo aplicativo habitual.
 
 ## Rascunhos
 
 A aba Rascunhos mostra os cadastros salvos ainda não publicados. Ver prévia abre uma visualização privada com cartaz, dados e horário da última gravação. Editar e publicar abre o formulário do cadastro existente; a publicação só acontece após selecionar Status: Publicado e salvar com confirmação do Supabase.
 
 Na busca de eventos, resultados já cadastrados oferecem Editar rascunho ou Abrir cadastro existente. Cadastros na lixeira orientam a restaurar pela aba Lixeira. Não há alteração SQL ou publicação automática.
+
+## Controle do que falta revisar
+
+A busca abre em Pendentes. As abas Já adicionados, Ignorados e Todos mostram contagens para a lista consultada. Cadastros existentes, inclusive rascunhos e lixeira, são reconhecidos automaticamente. Também é possível marcar manualmente um resultado como já adicionado ou ignorado. Essas ações não criam nem excluem eventos. Desfazer marcação remove a decisão manual; se já existe cadastro, ele continua reconhecido como adicionado.
+
+As decisões ficam na tabela privada discovery_marks, identificadas por URL de origem e início da sessão. A função mark_discovery valida o perfil administrativo, registra usuário e horário no servidor e devolve o recibo. A interface muda a marcação somente após receber a confirmação. A consulta é protegida por RLS e a escrita é permitida apenas pela função administrativa. Migração 009 aplicada em 22/10/2026; não precisa rodar novamente.
+
+O botão Histórico agora usa largura de texto. As alterações mostram Antes e Depois em colunas no computador e empilhadas no celular, com quebra de texto e rolagem para conteúdo extenso, sem truncar em 600 caracteres.

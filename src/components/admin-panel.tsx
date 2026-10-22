@@ -180,7 +180,7 @@ export function AdminPanel({
       {previewEvent&&<AdminEventPreview event={previewEvent} onClose={()=>setPreviewEvent(null)} onEdit={()=>{setReviewId(undefined);setEdit(previewEvent);setPreviewEvent(null);setTab('events')}}/>}
       {historyEvent&&<EventHistory key={historyEvent.id} event={historyEvent} onClose={()=>setHistoryEvent(null)} onSaved={refresh}/>}
       {tab==='export'&&<AdminExport/>}
-      <div hidden={tab!=='discovery'}><AdminDiscovery events={allEvents} categories={categories} onReview={event=>{setReviewId(undefined);setEdit(event);setTab('events')}}/></div>
+      <div hidden={tab!=='discovery'}><AdminDiscovery onMarked={setReceipt} events={allEvents} categories={categories} onReview={event=>{setReviewId(undefined);setEdit(event);setTab('events')}}/></div>
       {tab==='pending'&&<AdminPending events={events} submissions={submissions} onEdit={event=>openPending(event)} onSubmissions={()=>setTab('submissions')}/>}
       {tab==='trash'&&<EventTrash events={allEvents.filter(e=>!!e.deleted_at)} onSaved={refresh} onHistory={setHistoryEvent}/>}
       {tab==='reports'&&<AdminReports reports={reports} events={allEvents} onSaved={refresh} onEdit={e=>{setReviewId(undefined);setEdit(e);setTab('events')}}/>}
@@ -303,7 +303,7 @@ export function AdminPanel({
                       >
                         <Trash2 size={18} />
                       </button>
-                      <button title="Histórico de alterações" aria-label={"Histórico de "+e.title} onClick={()=>setHistoryEvent(e)}>Histórico</button>
+                      <button className="button secondary" title="Histórico de alterações" aria-label={"Histórico de "+e.title} onClick={()=>setHistoryEvent(e)}>Histórico</button>
                     </div>
                   </article>
                 ))}
@@ -508,6 +508,7 @@ export function AdminPanel({
     </>
   );
 }
+
 
 
 

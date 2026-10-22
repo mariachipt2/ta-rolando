@@ -288,3 +288,14 @@ Para cada falha, anote: item desta lista, celular/computador e navegador, nome d
 - [ ] Clique fora ou Escape fecha o menu; Escape devolve o foco ao botão. É possível navegar com Tab e Enter.
 - [ ] Ao escolher um destino, o menu fecha e o grupo da página atual fica destacado.
 - [ ] No celular, Abrir menu mostra as opções; escolher um link recolhe o menu. Sem rolagem horizontal no cabeçalho.
+
+## Marcações da busca e histórico
+
+- [ ] Busca abre em Pendentes e exibe contagens em Já adicionados, Ignorados e Todos.
+- [ ] Ignorar retira o item de Pendentes; em Ignorados, Desfazer marcação retorna o item pendente quando não existe cadastro.
+- [ ] Marcar já adicionado salva a decisão sem criar evento; o resultado aparece em Já adicionados.
+- [ ] Cadastros existentes e rascunhos aparecem automaticamente em Já adicionados e permitem abrir o cadastro.
+- [ ] Reabrir o administrador e repetir a busca preserva as marcações retornadas pelo Supabase, com horário de gravação.
+- [ ] Marcar sessões em datas diferentes do mesmo evento não altera as demais sessões.
+- [ ] Se o Supabase falhar, a interface mostra erro e não confirma marcação que não foi salva.
+- [ ] Histórico cabe no botão; textos longos têm Antes e Depois legíveis, com rolagem e sem corte, no PC e celular.

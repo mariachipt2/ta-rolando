@@ -1,3 +1,4 @@
+import {loadDiscoveryMarks,saveDiscoveryMark} from '@/lib/discovery-mark-actions';
 import {loadRegistryExport} from '@/lib/admin-export';
 import {saveEvent,trashEvent,reviewSuggestion,reviewReport,getVersions,restoreVersion,signedSubmissions} from '@/lib/admin-actions';
 import { createClient } from "@supabase/supabase-js";
@@ -205,6 +206,7 @@ export async function transport(
       return json({ ok: true });
     }
     if (!(await isAdmin())) return json({ error: "Acesso negado." }, 401);
+    if(path==='/api/admin/discovery-marks')return json(init.method==='POST'?await saveDiscoveryMark(db,body):await loadDiscoveryMarks(db));
     if(path==='/api/admin/discovery'){
       const {data:{session}}=await db.auth.getSession();
       if(!session)return json({error:'Sessão expirada. Entre novamente.'},401);
@@ -273,4 +275,5 @@ export async function transport(
     );
   }
 }
+
 
