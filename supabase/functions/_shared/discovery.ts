@@ -54,7 +54,7 @@ export async function discoverEvents() {
  try{for(;;){const {done,value}=await reader.read();if(done)break;size+=value.byteLength;if(size>4_000_000)throw Error('A resposta da fonte excedeu o limite.');html+=decoder.decode(value,{stream:true})}html+=decoder.decode()}finally{await reader.cancel()}
  return {items:parseDiscovery(html),searched_at:new Date().toISOString(),source:DISCOVERY_SOURCE,coverage:'Eventos futuros de Ipatinga presentes na agenda Socialyte consultada. Cobertura parcial; ausência de resultados não significa ausência de eventos. Datas, preços e detalhes precisam de conferência na fonte.'};
 }
-export function discoveryDuplicate(item:DiscoveredEvent,events:{title:string;starts_at:string;ticket_url?:string;additional_info?:string;deleted_at?:string|null}[]) {
+export function discoveryDuplicate<T extends {title:string;starts_at:string;ticket_url?:string;additional_info?:string;deleted_at?:string|null}>(item:DiscoveredEvent,events:T[]) {
  return events.find(e=>(e.additional_info?.includes(item.source_url)&&Date.parse(e.starts_at)===Date.parse(item.starts_at))||(item.ticket_url&&e.ticket_url===item.ticket_url&&Date.parse(e.starts_at)===Date.parse(item.starts_at))||(norm(e.title).replace(/[^a-z0-9]/g,'')===norm(item.title).replace(/[^a-z0-9]/g,'')&&Math.abs(Date.parse(e.starts_at)-Date.parse(item.starts_at))<6*3600_000));
 }
 

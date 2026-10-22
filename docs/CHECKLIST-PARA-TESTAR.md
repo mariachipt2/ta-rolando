@@ -274,3 +274,8 @@ Para cada falha, anote: item desta lista, celular/computador e navegador, nome d
 - [ ] Possível duplicado, inclusive na lixeira, fica destacado e não sobrescreve o cadastro.
 - [ ] Conta sem sessão ou sem perfil administrativo não pode consultar a função.
 - [ ] Falha da fonte e limite de buscas exibem erro sem indicar que não existem eventos na cidade.
+
+- [ ] Rascunhos mostra somente os eventos salvos como rascunho; Ver prévia abre imagem e dados sem tentar acessar a página pública.
+- [ ] Editar e publicar abre o cadastro existente; fechar sem alterar mantém Rascunho.
+- [ ] Na busca, um resultado já salvo como rascunho oferece Editar rascunho e reabre o mesmo ID.
+- [ ] Publicar exige escolher Status: Publicado e salvar; confirmar o horário do Supabase antes de conferir no site público.

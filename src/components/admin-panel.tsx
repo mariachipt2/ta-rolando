@@ -14,6 +14,7 @@ import {
 import type { Event, Category, EventSubmission, SaveState, EventReport } from "@/lib/types";
 import { displayDate, upcoming, day } from "@/lib/dates";
 import { EventForm } from "./event-form";
+import {AdminEventPreview} from './admin-event-preview';
 import { SubmissionList } from "./submission-list";
 import { SaveConfirmation, savedTime } from "./save-confirmation";
 import {EventHistory} from './event-history';
@@ -48,6 +49,7 @@ export function AdminPanel({
 }) {
   const events=allEvents.filter(e=>!e.deleted_at);
   const [historyEvent,setHistoryEvent]=useState<Event|null>(null);
+  const [previewEvent,setPreviewEvent]=useState<Event|null>(null);
   const router = useRouter();
   const [edit, setEdit] = useState<Partial<Event> | null>(null),
     [tab, setTab] = useState(()=>discoveryHasResults()?"discovery":"events"),
@@ -152,6 +154,7 @@ export function AdminPanel({
       <div className="period-list">
         {[
           ["events", "Eventos"],
+          ["drafts", `Rascunhos (${events.filter(e=>e.status==='draft').length})`],
           ["categories", "Categorias"],
           ["pending", `Pendências (${pendingEvents.length+pendingSuggestions})`],
           [
@@ -174,14 +177,16 @@ export function AdminPanel({
         ))}
       </div>
       {error && <p role="alert">{error}</p>}
+      {previewEvent&&<AdminEventPreview event={previewEvent} onClose={()=>setPreviewEvent(null)} onEdit={()=>{setReviewId(undefined);setEdit(previewEvent);setPreviewEvent(null);setTab('events')}}/>}
       {historyEvent&&<EventHistory key={historyEvent.id} event={historyEvent} onClose={()=>setHistoryEvent(null)} onSaved={refresh}/>}
       {tab==='export'&&<AdminExport/>}
       <div hidden={tab!=='discovery'}><AdminDiscovery events={allEvents} categories={categories} onReview={event=>{setReviewId(undefined);setEdit(event);setTab('events')}}/></div>
       {tab==='pending'&&<AdminPending events={events} submissions={submissions} onEdit={event=>openPending(event)} onSubmissions={()=>setTab('submissions')}/>}
       {tab==='trash'&&<EventTrash events={allEvents.filter(e=>!!e.deleted_at)} onSaved={refresh} onHistory={setHistoryEvent}/>}
       {tab==='reports'&&<AdminReports reports={reports} events={allEvents} onSaved={refresh} onEdit={e=>{setReviewId(undefined);setEdit(e);setTab('events')}}/>}
-      {tab === "events" && (
+      {(tab === "events"||tab === "drafts") && (
         <>
+          {tab==='drafts'&&<p className="notice">Rascunhos salvos no Supabase. Eles só aparecem aqui; use Editar e publicar, escolha Status: Publicado e salve quando estiver pronto.</p>}
           <div className="search-row">
             <input
               aria-label="Buscar no painel"
@@ -216,7 +221,7 @@ export function AdminPanel({
             <div className="admin-list">
               {events
                 .filter((e) =>
-                  e.title.toLowerCase().includes(filter.toLowerCase()),
+                  (tab!=='drafts'||e.status==='draft')&&e.title.toLowerCase().includes(filter.toLowerCase()),
                 )
                 .map((e) => (
                   <article className="admin-row" key={e.id}>
@@ -245,6 +250,7 @@ export function AdminPanel({
                     </div>
                     <div className="row-actions">
                       <button
+                        className={e.status==='draft'?'button secondary':undefined}
                         title="Editar"
                         aria-label={"Editar " + e.title}
                         onClick={() => {
@@ -252,7 +258,7 @@ export function AdminPanel({
                           setEdit(e);
                         }}
                       >
-                        <Pencil size={18} />
+                        <Pencil size={18} /> {e.status==='draft'&&'Editar e publicar'}
                       </button>
                       <button
                         title="Duplicar como rascunho"
@@ -282,11 +288,12 @@ export function AdminPanel({
                         <BarChart3 size={18} />
                       </button>
                       <button
+                        className="button secondary"
                         title="Pré-visualizar"
                         aria-label={"Pré-visualizar " + e.title}
-                        onClick={() => setEdit(e)}
+                        onClick={() => setPreviewEvent(e)}
                       >
-                        <Eye size={18} />
+                        <Eye size={18} /> Ver prévia
                       </button>
                       <button
                         disabled={busy}
@@ -300,9 +307,9 @@ export function AdminPanel({
                     </div>
                   </article>
                 ))}
-              {events.length === 0 && (
+              {!events.some(e=>(tab!=='drafts'||e.status==='draft')&&e.title.toLowerCase().includes(filter.toLowerCase())) && (
                 <div className="empty">
-                  Tudo pronto para o primeiro evento. Clique em “Novo evento”.
+                  Nenhum evento nesta seleção. Confira a busca e a aba Eventos.
                 </div>
               )}
             </div>

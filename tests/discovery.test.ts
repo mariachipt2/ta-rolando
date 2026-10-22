@@ -22,3 +22,10 @@ test('Duplicidade reconhece origem e título/data, incluindo cadastro na lixeira
  assert.equal(discoveryDuplicate(item,[{title:item.title,starts_at:'2031-01-01T12:00:00Z'}]),undefined);
  assert.throws(()=>parseDiscovery('<html>Indisponível</html>',now),/formato/);
 });
+
+test('Cadastro duplicado mantém ID e status para reabrir o rascunho, sem criar outra cópia',()=>{
+ const [item]=parseDiscovery(html(raw),now);
+ const existing={id:'draft-id',status:'draft',title:item.title,starts_at:item.starts_at};
+ const found=discoveryDuplicate(item,[existing]);
+ assert.equal(found?.id,'draft-id');assert.equal(found?.status,'draft');assert.equal(found,existing);
+});

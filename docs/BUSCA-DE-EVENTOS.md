@@ -11,3 +11,9 @@ Possíveis duplicados são comparados com todos os cadastros, incluindo lixeira,
 Backend: função autenticada admin-discovery no Supabase, verifica usuário e admin_profiles ativo antes da consulta. Limite de seis consultas por administradora por hora. URL de origem fixa, sem fetch de links enviados pelo navegador. Resposta limitada a 4 MB e 18 segundos. A função não escreve eventos; usa apenas o contador de limite existente. O Next oferece a mesma consulta em POST /api/admin/discovery.
 
 Sem migração SQL ou novos campos. Origem e data da consulta ficam no campo Informações adicionais do cadastro. Para atualizar o Pages, publicar pelo aplicativo habitual.
+
+## Rascunhos
+
+A aba Rascunhos mostra os cadastros salvos ainda não publicados. Ver prévia abre uma visualização privada com cartaz, dados e horário da última gravação. Editar e publicar abre o formulário do cadastro existente; a publicação só acontece após selecionar Status: Publicado e salvar com confirmação do Supabase.
+
+Na busca de eventos, resultados já cadastrados oferecem Editar rascunho ou Abrir cadastro existente. Cadastros na lixeira orientam a restaurar pela aba Lixeira. Não há alteração SQL ou publicação automática.

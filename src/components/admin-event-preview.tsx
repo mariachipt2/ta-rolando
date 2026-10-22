@@ -1,0 +1,12 @@
+"use client";
+import {useEffect,useRef} from 'react';
+import type {Event} from '@/lib/types';
+import {displayDate} from '@/lib/dates';
+import {savedTime} from './save-confirmation';
+import {InstagramLink} from './instagram-link';
+export function AdminEventPreview({event:e,onClose,onEdit}:{event:Event;onClose:()=>void;onEdit:()=>void}) {
+ const dialog=useRef<HTMLDialogElement>(null);
+ useEffect(()=>{const element=dialog.current;element?.showModal();return()=>element?.close()},[]);
+ const cover=e.cover_url||e.gallery?.[0];
+ return <dialog className="admin-event-preview" ref={dialog} aria-labelledby="admin-preview-title" onCancel={onClose} onClick={ev=>{if(ev.target===ev.currentTarget)onClose()}}><div className="section-heading"><span className="eyebrow">PRÉVIA ADMINISTRATIVA · {e.status==='draft'?'RASCUNHO':e.status==='published'?'PUBLICADO':e.status==='scheduled'?'AGENDADO':'CANCELADO'}</span><button className="button secondary" onClick={onClose}>Fechar prévia</button></div><h2 id="admin-preview-title">{e.title}</h2>{e.status==='draft'&&<p className="notice">Este rascunho está salvo e só aparece no administrador. Para colocá-lo no site, edite, escolha Status: Publicado e salve.</p>}{cover&&<img className="admin-preview-cover" src={cover} alt={'Cartaz de '+e.title}/>}<p><strong>Início:</strong> {displayDate(e.starts_at)} · Brasília</p>{e.ends_at&&<p><strong>Encerramento:</strong> {displayDate(e.ends_at)}</p>}<p><strong>Local:</strong> {e.venue_name}</p><p>{[e.address,e.neighborhood,e.city,e.state].filter(Boolean).join(' · ')}</p><p><strong>Entrada:</strong> {e.is_free?'Gratuita':e.price||'Pago · valor não informado'}</p><p><strong>Categoria:</strong> {e.categories?.name||'Consultar cadastro'}</p><p><strong>Organizador:</strong> {e.organizer||'Não informado'}</p><p><strong>Classificação:</strong> {e.age_rating||'Não informada'} · {e.family_friendly===true?'Adequado para crianças':e.family_friendly===false?'Não recomendado para crianças':'Adequação infantil não informada'}</p><p className="description">{e.description}</p><InstagramLink url={e.instagram_url}/>{e.additional_info&&<p className="description muted">{e.additional_info}</p>}<p className="muted">{e.updated_at?'Salvo no Supabase em '+savedTime(e.updated_at)+' · Brasília':'Horário de salvamento não disponível.'}</p><button className="button lime-button" onClick={onEdit}>{e.status==='draft'?'Editar e publicar':'Editar evento'}</button></dialog>;
+}
