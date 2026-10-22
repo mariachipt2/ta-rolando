@@ -1,6 +1,21 @@
 import type {Event} from './types';
 import {day,upcoming} from './dates';
 export type TimelinePeriod='upcoming'|'past'|'all';
+export type TimelinePrice='all'|'free'|'paid';
+const normalize=(value:string)=>value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+export function timelineOptions(events:Event[],field:'organizer'|'neighborhood') {
+  const values=new Map<string,string>();
+  for(const event of events.filter(e=>!e.deleted_at)) {
+    const value=event[field]?.trim();
+    if(value&&!values.has(normalize(value)))values.set(normalize(value),value);
+  }
+  return [...values].sort(([,a],[,b])=>a.localeCompare(b,'pt-BR')).map(([value,label])=>({value,label}));
+}
+export function matchesTimelineFilters(event:Event,filters:{price:TimelinePrice;organizer:string;neighborhood:string}) {
+  return (filters.price==='all'||(filters.price==='free'?event.is_free===true:event.is_free===false))&&
+    (!filters.organizer||normalize(event.organizer||'')===filters.organizer)&&
+    (!filters.neighborhood||normalize(event.neighborhood||'')===filters.neighborhood);
+}
 export function shiftMonth(month:string,offset:number) {
   const [year,value]=month.split('-').map(Number);
   const date=new Date(Date.UTC(year,value-1+offset,1));

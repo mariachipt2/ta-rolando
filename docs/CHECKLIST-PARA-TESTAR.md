@@ -261,3 +261,5 @@ O título e a seleção são acessíveis a qualquer pessoa com o link. A seleç�
 
 Para cada falha, anote: item desta lista, celular/computador e navegador, nome do evento, o que você fez, o resultado e uma captura da tela quando possível. Isso ajuda a reproduzir e corrigir exatamente o problema.
 
+
+- [ ] Na Linha do tempo, combinar Entrada (Pago/Gratuito), Organizador e Bairro com mês, busca e Para crianças. Limpar filtros restaura todas as opções e preserva o mês.

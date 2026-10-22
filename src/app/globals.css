@@ -1316,3 +1316,5 @@ footer > span {
 .monthly-tags>*{padding:2px 7px;border:1px solid var(--border);border-radius:5px}.monthly-tags strong{color:var(--lime)}.monthly-tags .monthly-cancelled{color:#ffaaa5}
 .monthly-price{font-size:13px;overflow-wrap:anywhere}.monthly-open{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--lime)}
 @media(max-width:640px){.month-browser{padding:14px}.month-heading{gap:10px;justify-content:space-between}.month-heading h2{font-size:21px;min-width:0}.month-controls label{min-width:150px}.monthly-event-row{grid-template-columns:49px minmax(0,1fr);gap:8px 12px;padding:13px 10px}.monthly-time{font-size:16px}.monthly-event-info h3{font-size:16px}.monthly-price{grid-column:2}.monthly-open{display:none}.timeline-page .timeline-filters{gap:10px}.timeline-page .timeline-filters label{min-width:100%;}.monthly-day-label{font-size:14px}}
+.timeline-page .timeline-filters label{min-width:160px;flex:1}.timeline-page .timeline-filters label:first-child{flex-basis:100%}.timeline-page .timeline-filters select{width:100%}
+@media(max-width:640px){.timeline-page .timeline-filters label{min-width:100%;max-width:100%}}
