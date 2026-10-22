@@ -279,3 +279,12 @@ Para cada falha, anote: item desta lista, celular/computador e navegador, nome d
 - [ ] Editar e publicar abre o cadastro existente; fechar sem alterar mantém Rascunho.
 - [ ] Na busca, um resultado já salvo como rascunho oferece Editar rascunho e reabre o mesmo ID.
 - [ ] Publicar exige escolher Status: Publicado e salvar; confirmar o horário do Supabase antes de conferir no site público.
+
+## Menu principal
+
+- [ ] No computador, conferir Explorar, Fim de semana, Planejar rolê e Minha agenda com espaçamento e ícones.
+- [ ] Explorar abre Todos os eventos, Categorias, Linha do tempo e Organizadores.
+- [ ] Planejar rolê abre Comparar rolês e Minha programação, com descrições curtas.
+- [ ] Clique fora ou Escape fecha o menu; Escape devolve o foco ao botão. É possível navegar com Tab e Enter.
+- [ ] Ao escolher um destino, o menu fecha e o grupo da página atual fica destacado.
+- [ ] No celular, Abrir menu mostra as opções; escolher um link recolhe o menu. Sem rolagem horizontal no cabeçalho.

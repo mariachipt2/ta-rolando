@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
-import { MapPin, ArrowUpRight, CalendarDays, Radio } from "lucide-react";
+import { MapPin, Radio } from "lucide-react";
+import {NativeSiteNavigation} from '@/components/site-navigation-native';
 import {NativeCompareTray} from '@/components/compare-tray-native';
 import { Pwa } from "@/components/pwa";
 import "./globals.css";
@@ -31,31 +32,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <a href="#main" className="skip">
           Pular para o conteúdo
         </a>
-        <header>
-          <div className="shell nav">
+        <header className="site-header">
+          <div className="shell nav site-nav">
             <Link href="/" className="logo" aria-label="Tá Rolando, início">
               <Radio size={27} /> tá rolando
             </Link>
             <span className="location">
               <MapPin size={14} /> Ipatinga, MG
             </span>
-            <nav aria-label="Navegação principal">
-              <Link href="/#explorar">
-                Explorar <ArrowUpRight size={15} />
-              </Link>
-              <Link href="/#categorias" className="desktop-link">
-                Categorias
-              </Link>
-              <Link href="/agenda" className="agenda-link">
-                <CalendarDays size={17} />
-                <span>Minha agenda</span>
-              </Link>
-              <Link href="/linha-do-tempo">Linha do tempo</Link>
-              <Link href="/organizadores">Organizadores</Link>
-              <Link href="/fim-de-semana">Fim de semana</Link>
-              <Link href="/comparar">Comparar</Link>
-              <Link href="/programacao">Programação</Link>
-            </nav>
+            <NativeSiteNavigation/>
           </div>
         </header>
         <main id="main">{children}</main>
@@ -77,3 +62,4 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     </html>
   );
 }
+

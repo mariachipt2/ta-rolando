@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { Radio, MapPin, CalendarDays, ArrowLeft } from "lucide-react";
+import {SiteNavigation} from '@/components/site-navigation';
 import { Discover } from "@/components/discover";
 import { Agenda } from "@/components/agenda";
 import {CompareTray,CompareButton} from '@/components/compare-selection';
@@ -253,28 +254,15 @@ function App() {
       <a className="skip" href="#main">
         Pular para o conteúdo
       </a>
-      <header>
-        <div className="shell nav">
+      <header className="site-header">
+        <div className="shell nav site-nav">
           <a className="logo" href="#/" aria-label="Tá Rolando, início">
             <Radio size={27} /> tá rolando
           </a>
           <span className="location">
             <MapPin size={14} /> Ipatinga, MG
           </span>
-          <nav aria-label="Navegação principal">
-            <a href="#/?section=explorar">Explorar ↗</a>
-            <a href="#/?section=categorias" className="desktop-link">
-              Categorias
-            </a>
-            <a href="#/agenda" className="agenda-link">
-              <CalendarDays size={17} /> Minha agenda
-            </a>
-            <a href="#/linha-do-tempo" aria-current={path==='/linha-do-tempo'?'page':undefined}>Linha do tempo</a>
-            <a href="#/organizadores" aria-current={path==='/organizadores'?'page':undefined}>Organizadores</a>
-            <a href="#/fim-de-semana" aria-current={path==='/fim-de-semana'?'page':undefined}>Fim de semana</a>
-            <a href="#/comparar" aria-current={path==='/comparar'?'page':undefined}>Comparar</a>
-            <a href="#/programacao" aria-current={path==='/programacao'?'page':undefined}>Programação</a>
-          </nav>
+          <SiteNavigation path={path}/>
         </div>
       </header>
       <main id="main">
@@ -366,3 +354,4 @@ if (
   !location.hostname.match(/^(localhost|127\.)/)
 )
   navigator.serviceWorker.register("./sw.js").catch(() => {});
+
