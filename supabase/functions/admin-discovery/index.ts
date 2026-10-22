@@ -1,5 +1,5 @@
 import {createClient} from 'npm:@supabase/supabase-js@2';
-import {discoverEvents} from '../_shared/discovery.ts';
+import {discoverEvents,discoverySource} from '../_shared/discovery.ts';
 const db=createClient(Deno.env.get('SUPABASE_URL')!,Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,{auth:{persistSession:false}});
 const allowed=(Deno.env.get('ALLOWED_ORIGINS')||'').split(',').map(v=>v.trim()).filter(Boolean);
 Deno.serve(async req=>{
@@ -16,8 +16,10 @@ Deno.serve(async req=>{
  const profile=await db.from('admin_profiles').select('user_id').eq('user_id',user.id).eq('active',true).maybeSingle();
  if(profile.error||!profile.data)return reply({error:'Acesso negado.'},403);
  try {
+ const raw=await req.text();if(raw.length>300)return reply({error:'Requisição inválida.'},400);
+ let source;try{source=discoverySource(raw?JSON.parse(raw).source:undefined)}catch{return reply({error:'Escolha uma fonte válida.'},400)}
  const limited=await db.rpc('consume_limit',{p_key:'discovery:'+user.id,p_max:6,p_seconds:3600});
  if(limited.error)throw limited.error;if(limited.data!==true)return reply({error:'Limite de 6 buscas por hora atingido. Tente mais tarde.'},429);
- return reply(await discoverEvents());
+ return reply(await discoverEvents(source));
  }catch(e){return reply({error:e instanceof Error?e.message:'Não foi possível consultar a agenda.'},503)}
 });

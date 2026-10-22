@@ -299,3 +299,13 @@ Para cada falha, anote: item desta lista, celular/computador e navegador, nome d
 - [ ] Marcar sessões em datas diferentes do mesmo evento não altera as demais sessões.
 - [ ] Se o Supabase falhar, a interface mostra erro e não confirma marcação que não foi salva.
 - [ ] Histórico cabe no botão; textos longos têm Antes e Depois legíveis, com rolagem e sem corte, no PC e celular.
+
+## Novas fontes da busca
+
+- [ ] Selecionar Pystta ou Lhever e buscar; conferir nome da fonte e o link em cada resultado.
+- [ ] Nova consulta abre em Pendentes; mudar apenas o seletor não troca a identificação dos resultados antigos.
+- [ ] No Lhever, páginas adicionais são consultadas; uma falha parcial exibe aviso sem descartar os resultados válidos.
+- [ ] Um evento sem preço não vira gratuito; escolher a entrada após conferir antes de abrir o formulário.
+- [ ] Revisar e cadastrar abre rascunho com dados e ingresso da fonte; completar endereço e demais campos ausentes.
+- [ ] Marcar Já adicionado/Ignorar funciona nas três fontes e mantém as marcações antigas.
+- [ ] Mesmo ingresso/sessão cadastrado por outra fonte é reconhecido; outra data não é confundida.

@@ -210,7 +210,7 @@ export async function transport(
     if(path==='/api/admin/discovery'){
       const {data:{session}}=await db.auth.getSession();
       if(!session)return json({error:'Sessão expirada. Entre novamente.'},401);
-      return fetch(__SUPABASE_URL__+'/functions/v1/admin-discovery',{method:'POST',headers:{apikey:__SUPABASE_PUBLIC_KEY__,Authorization:'Bearer '+session.access_token},signal:AbortSignal.timeout(25000)});
+      return fetch(__SUPABASE_URL__+'/functions/v1/admin-discovery',{method:'POST',headers:{apikey:__SUPABASE_PUBLIC_KEY__,Authorization:'Bearer '+session.access_token,'Content-Type':'application/json'},body:JSON.stringify({source:body.source}),signal:AbortSignal.timeout(60000)});
     }
     if(path==='/api/admin/export')return json(await loadRegistryExport(db));
     if(path.startsWith('/api/admin/history?'))return json({versions:await getVersions(db,new URL(path,'https://local').searchParams.get('event_id')||'')});
