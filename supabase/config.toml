@@ -1,2 +1,5 @@
 [functions.public-events]
 verify_jwt = false
+
+[functions.admin-discovery]
+verify_jwt = false

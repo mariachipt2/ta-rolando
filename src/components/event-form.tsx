@@ -13,6 +13,7 @@ import {AGE_OPTIONS} from '@/lib/age-options';
 type Values = z.infer<typeof eventSchema>;
 export function EventForm({
   event: e,
+  initialUnsaved=false,
   categories,
   onClose,
   onSaved,
@@ -21,6 +22,7 @@ export function EventForm({
   onDirtyChange,
 }: {
   event: Partial<Event>;
+  initialUnsaved?:boolean;
   categories: Category[];
   onClose: () => void;
   onSaved: (savedAt: string) => void;
@@ -67,7 +69,7 @@ export function EventForm({
       featured: e.featured || false,
     },
   });
-  const [frequency,setFrequency]=useState('none'),[count,setCount]=useState(4),[usePhoto,setUsePhoto]=useState(!!submissionPhoto),[extraDirty,setExtraDirty]=useState(false);
+  const [frequency,setFrequency]=useState('none'),[count,setCount]=useState(4),[usePhoto,setUsePhoto]=useState(!!submissionPhoto),[extraDirty,setExtraDirty]=useState(initialUnsaved);
   const requestId=useRef<{id:string;payload:string}|null>(null);
   const v = watch();
   const dirty=isDirty||extraDirty;
@@ -390,3 +392,4 @@ export function EventForm({
     </form>
   );
 }
+

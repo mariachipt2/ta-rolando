@@ -263,3 +263,14 @@ Para cada falha, anote: item desta lista, celular/computador e navegador, nome d
 
 
 - [ ] Na Linha do tempo, combinar Entrada (Pago/Gratuito), Organizador e Bairro com mês, busca e Para crianças. Limpar filtros restaura todas as opções e preserva o mês.
+
+## Busca de eventos no administrador
+
+- [ ] Buscar eventos mostra horário da consulta (distinto de salvamento) e informa cobertura parcial.
+- [ ] Conferir que só aparecem eventos futuros com local explicitamente em Ipatinga.
+- [ ] Resultado incompleto lista campos para revisar e aponta para a fonte.
+- [ ] Escolher categoria e confirmar entrada quando não informada; Revisar e cadastrar abre o formulário como rascunho, sem publicar automaticamente.
+- [ ] Completar, salvar e conferir confirmação com horário do Supabase; retornar à lista da busca sem perder os resultados.
+- [ ] Possível duplicado, inclusive na lixeira, fica destacado e não sobrescreve o cadastro.
+- [ ] Conta sem sessão ou sem perfil administrativo não pode consultar a função.
+- [ ] Falha da fonte e limite de buscas exibem erro sem indicar que não existem eventos na cidade.

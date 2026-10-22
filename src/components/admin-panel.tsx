@@ -18,6 +18,7 @@ import { SubmissionList } from "./submission-list";
 import { SaveConfirmation, savedTime } from "./save-confirmation";
 import {EventHistory} from './event-history';
 import {EventTrash} from './event-trash';
+import {AdminDiscovery,discoveryHasResults} from './admin-discovery';
 import {AdminExport} from './admin-export';
 import {AdminPending} from './admin-pending';
 import {eventIssues} from '@/lib/event-discovery';
@@ -49,7 +50,7 @@ export function AdminPanel({
   const [historyEvent,setHistoryEvent]=useState<Event|null>(null);
   const router = useRouter();
   const [edit, setEdit] = useState<Partial<Event> | null>(null),
-    [tab, setTab] = useState("events"),
+    [tab, setTab] = useState(()=>discoveryHasResults()?"discovery":"events"),
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false),
     [filter, setFilter] = useState(""),
@@ -60,6 +61,7 @@ export function AdminPanel({
     [dirty,setDirty]=useState(false);
   const refresh = (savedAt: string) => {
     setReceipt(savedAt);
+    if(!edit?.id&&edit?.additional_info?.startsWith('Fonte da busca:'))setTab('discovery');
     setHistoryEvent(null);
     setEdit(null);
     setReviewId(undefined);
@@ -160,6 +162,7 @@ export function AdminPanel({
           ["trash", `Lixeira (${allEvents.filter(e=>e.deleted_at).length})`],
           ["stats", "Estatísticas"],
           ["export", "Exportar cadastros"],
+          ["discovery", "Buscar eventos"],
         ].map(([v, t]) => (
           <button
             className={tab === v ? "active" : ""}
@@ -173,6 +176,7 @@ export function AdminPanel({
       {error && <p role="alert">{error}</p>}
       {historyEvent&&<EventHistory key={historyEvent.id} event={historyEvent} onClose={()=>setHistoryEvent(null)} onSaved={refresh}/>}
       {tab==='export'&&<AdminExport/>}
+      <div hidden={tab!=='discovery'}><AdminDiscovery events={allEvents} categories={categories} onReview={event=>{setReviewId(undefined);setEdit(event);setTab('events')}}/></div>
       {tab==='pending'&&<AdminPending events={events} submissions={submissions} onEdit={event=>openPending(event)} onSubmissions={()=>setTab('submissions')}/>}
       {tab==='trash'&&<EventTrash events={allEvents.filter(e=>!!e.deleted_at)} onSaved={refresh} onHistory={setHistoryEvent}/>}
       {tab==='reports'&&<AdminReports reports={reports} events={allEvents} onSaved={refresh} onEdit={e=>{setReviewId(undefined);setEdit(e);setTab('events')}}/>}
@@ -200,8 +204,9 @@ export function AdminPanel({
             <EventForm
               key={edit.id || "new"}
               event={edit}
+              initialUnsaved={!edit.id&&!!edit.additional_info?.startsWith('Fonte da busca:')}
               categories={categories}
-              onClose={() => setEdit(null)}
+              onClose={() => {if(!edit.id&&edit.additional_info?.startsWith('Fonte da busca:'))setTab('discovery');setEdit(null)}}
               onSaved={refresh}
               submissionId={reviewId}
               submissionPhoto={submissions.find(s=>s.id===reviewId)?.photo_url}
@@ -496,3 +501,7 @@ export function AdminPanel({
     </>
   );
 }
+
+
+
+

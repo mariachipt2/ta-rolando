@@ -205,6 +205,11 @@ export async function transport(
       return json({ ok: true });
     }
     if (!(await isAdmin())) return json({ error: "Acesso negado." }, 401);
+    if(path==='/api/admin/discovery'){
+      const {data:{session}}=await db.auth.getSession();
+      if(!session)return json({error:'Sessão expirada. Entre novamente.'},401);
+      return fetch(__SUPABASE_URL__+'/functions/v1/admin-discovery',{method:'POST',headers:{apikey:__SUPABASE_PUBLIC_KEY__,Authorization:'Bearer '+session.access_token},signal:AbortSignal.timeout(25000)});
+    }
     if(path==='/api/admin/export')return json(await loadRegistryExport(db));
     if(path.startsWith('/api/admin/history?'))return json({versions:await getVersions(db,new URL(path,'https://local').searchParams.get('event_id')||'')});
     if(path==='/api/admin/history')return json(await restoreVersion(db,body.version_id));
@@ -268,3 +273,4 @@ export async function transport(
     );
   }
 }
+
