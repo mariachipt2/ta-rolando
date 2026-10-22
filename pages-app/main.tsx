@@ -1,3 +1,4 @@
+import {VenueSubmission} from '@/components/venue-submission';
 import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { Radio, MapPin, CalendarDays, ArrowLeft } from "lucide-react";
@@ -240,6 +241,7 @@ function App() {
       ? event.title + " | Tá Rolando"
       : path === "/admin"
         ? "Administração | Tá Rolando"
+        : path === '/enviar-evento' ? 'Enviar programação | Tá Rolando'
         : path === '/comparar' ? 'Comparar rolês | Tá Rolando'
         : path === '/programacao' ? 'Minha programação | Tá Rolando'
         : path === '/programacao-compartilhada' ? 'Programação compartilhada | Tá Rolando'
@@ -291,6 +293,8 @@ function App() {
               />
             )}
           </div>
+        ) : path === '/enviar-evento' ? (
+          <VenueSubmission id={new URLSearchParams(location.hash.split('?')[1]||'').get('local')||''} categories={data?.categories||[]}/>
         ) : path === "/agenda" ? (
           <div className="shell page">
             <span className="eyebrow">TEM COISA BOA TE ESPERANDO</span>

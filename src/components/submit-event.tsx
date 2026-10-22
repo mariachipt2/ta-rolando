@@ -1,4 +1,5 @@
 "use client";
+import {venueEvent,type PublicVenue} from '@/lib/venues';
 import { useRef, useState, useEffect } from "react";
 import { Send } from "lucide-react";
 import type { Category } from "@/lib/types";
@@ -9,8 +10,8 @@ import { BotCheck } from "./bot-check";
 import { savedTime } from "./save-confirmation";
 import {AGE_OPTIONS} from '@/lib/age-options';
 import {photoType} from '../../supabase/functions/_shared/photos';
-export function SubmitEvent({ categories }: { categories: Category[] }) {
-  const [open, setOpen] = useState(false),
+export function SubmitEvent({ categories,initialVenue }: { categories: Category[];initialVenue?:PublicVenue }) {
+  const [open, setOpen] = useState(!!initialVenue),
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
     [saved, setSaved] = useState(""),
@@ -29,7 +30,7 @@ export function SubmitEvent({ categories }: { categories: Category[] }) {
     <label>
       {label}
       {required ? " *" : ""}
-      <input name={name} type={type} required={required} />
+      <input name={name} type={type} required={required} defaultValue={initialVenue?(venueEvent(initialVenue) as Record<string,string>)[name]||'':''} />
     </label>
   );
   return (
@@ -37,7 +38,7 @@ export function SubmitEvent({ categories }: { categories: Category[] }) {
       <div className="agenda-banner">
         <div>
           <span className="eyebrow">A CIDADE TAMBÉM É FEITA POR VOCÊ</span>
-          <h2>Sabe de um evento que vai rolar?</h2>
+          <h2>{initialVenue?'Envie a programação de '+initialVenue.name:'Sabe de um evento que vai rolar?'}</h2>
           <p>
             Envie sua sugestão. A administração confere as informações antes de
             publicar.

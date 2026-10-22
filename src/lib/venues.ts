@@ -1,0 +1,6 @@
+export type Venue={id:string;name:string;kind:'bar'|'nightclub'|'other';address:string;neighborhood:string;city:string;state:string;organizer:string;instagram_url:string;website:string;source_key:string|null;source_url:string;active:boolean;share_enabled:boolean;created_at?:string;updated_at?:string};
+export type PublicVenue=Pick<Venue,'id'|'name'|'kind'|'address'|'neighborhood'|'city'|'state'|'organizer'|'instagram_url'>;
+export const venueKind={bar:'Bar / pub',nightclub:'Boate / casa noturna',other:'Outro espaço'};
+export function venueEvent(v:PublicVenue){return {venue_name:v.name,address:v.address,neighborhood:v.neighborhood,city:v.city,state:v.state,organizer:v.organizer,instagram_url:v.instagram_url}}
+export function buildVenueSubmitLink(base:string,id:string,staticMode:boolean){const url=new URL(base);url.search='';url.hash='';if(staticMode){if(url.pathname.endsWith('.html'))url.pathname=url.pathname.slice(0,url.pathname.lastIndexOf('/')+1);url.hash='/enviar-evento?local='+encodeURIComponent(id)}else{url.pathname='/enviar-evento';url.search='?local='+encodeURIComponent(id)}return url.href}
+export function venueSubmitLink(v:Pick<Venue,'id'>){return buildVenueSubmitLink(location.href,v.id,location.hash.startsWith('#/'))}

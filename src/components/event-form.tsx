@@ -1,4 +1,6 @@
 "use client";
+import {VenuePicker} from './venue-picker';
+import {venueEvent} from '@/lib/venues';
 import { request, navigate } from "@/lib/transport";
 import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
@@ -216,6 +218,7 @@ export function EventForm({
       </div>
       <p>Horários de Brasília. Campos com * são obrigatórios.</p>
       <SaveConfirmation at={e.updated_at} dirty={dirty} busy={busy} />
+      <VenuePicker onSelect={venue=>{const values=venueEvent(venue);for(const key of Object.keys(values) as (keyof typeof values)[])setValue(key,values[key],{shouldDirty:true,shouldValidate:true})}}/>
       <div className="form-grid">
         {field("title", "Título", true)}
         <label>

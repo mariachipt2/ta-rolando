@@ -1,3 +1,4 @@
+import {loadVenues,saveVenue,publicVenue} from '@/lib/venue-actions';
 import {loadDiscoveryMarks,saveDiscoveryMark} from '@/lib/discovery-mark-actions';
 import {loadRegistryExport} from '@/lib/admin-export';
 import {saveEvent,trashEvent,reviewSuggestion,reviewReport,getVersions,restoreVersion,signedSubmissions} from '@/lib/admin-actions';
@@ -192,6 +193,7 @@ export async function transport(
         },
         503,
       );
+    if(path.startsWith('/api/venues?'))return json(await publicVenue(db,new URL(path,'https://local').searchParams.get('local')||''));
     if (path === "/api/admin/login") {
       if (init.method === "DELETE") {
         await db.auth.signOut();
@@ -206,6 +208,8 @@ export async function transport(
       return json({ ok: true });
     }
     if (!(await isAdmin())) return json({ error: "Acesso negado." }, 401);
+    if(path==='/api/admin/venues')return json(init.method==='POST'?await saveVenue(db,body):await loadVenues(db));
+    if(path==='/api/admin/places'){const {data:{session}}=await db.auth.getSession();if(!session)return json({error:'Sessão expirada.'},401);return fetch(__SUPABASE_URL__+'/functions/v1/admin-places',{method:'POST',headers:{apikey:__SUPABASE_PUBLIC_KEY__,Authorization:'Bearer '+session.access_token},signal:AbortSignal.timeout(40000)})}
     if(path==='/api/admin/discovery-marks')return json(init.method==='POST'?await saveDiscoveryMark(db,body):await loadDiscoveryMarks(db));
     if(path==='/api/admin/discovery'){
       const {data:{session}}=await db.auth.getSession();

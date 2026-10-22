@@ -3,3 +3,6 @@ verify_jwt = false
 
 [functions.admin-discovery]
 verify_jwt = false
+
+[functions.admin-places]
+verify_jwt = false
