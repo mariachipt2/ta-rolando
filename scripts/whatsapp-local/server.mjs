@@ -3,7 +3,7 @@ import {readFile,writeFile,rename,mkdir,open,unlink} from 'node:fs/promises';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {createClient} from '@supabase/supabase-js';
-import {ownNumber,messageFor,pendingNotices,sendOnce} from './core.mjs';
+import {ownNumber,messageFor,pendingNotices,sendOnce,brasiliaDay,dailyConfig,dailyDue,dailyMessage} from './core.mjs';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../..');
 try{process.loadEnvFile(path.join(root,'.env.local'))}catch{}
 const runtime=path.join(process.env.LOCALAPPDATA,'TaRolando','WhatsApp');await mkdir(runtime,{recursive:true});
@@ -35,6 +35,16 @@ async function tick(){if(working||!settings.enabled)return;working=true;try{
  if(!data||data.status==='cancelled'){state[n.id]={status:'skipped',at:new Date().toISOString()};await atomic(stateFile,state);continue}
  await sendOnce(n,{state,persist:()=>atomic(stateFile,state),send:()=>evo('message/sendText/'+instanceName,{number:settings.recipient,text:messageFor(n,data)})});
  }
+ if(dailyDue(settings,state)){
+ const today=brasiliaDay();let offset=0,dayRows=[];
+ while(true){const {data,error}=await db.from('public_events').select('id,title,starts_at,ends_at,venue_name,status').neq('status','cancelled').lt('starts_at',today.end).or('starts_at.gte.'+today.start+',ends_at.gt.'+today.start).order('starts_at').order('id').range(offset,offset+499);if(error)throw Error('Falha ao consultar os eventos do resumo diário.');dayRows.push(...data);if(data.length<500)break;offset+=500}
+ const now=new Date();
+ // Recheck the date and pause switches after fetching; never send yesterday's digest after midnight.
+ if(brasiliaDay(now).day===today.day&&dailyDue(settings,state,now)){
+ const text=dailyMessage(dayRows,now);
+ if(text)await sendOnce({id:'daily:'+today.day},{state,persist:()=>atomic(stateFile,state),send:()=>evo('message/sendText/'+instanceName,{number:settings.recipient,text})});
+ }
+ }
  lastError='';lastCheck=new Date().toISOString();
  }catch(e){lastError=e.message||'Falha ao conferir os avisos.'}finally{working=false}}
 const html=await readFile(path.join(root,'scripts/whatsapp-local/panel.html'));
@@ -44,7 +54,12 @@ http.createServer(async(req,res)=>{
  if(req.method==='POST'&&!['http://127.0.0.1:'+port,'http://localhost:'+port].includes(req.headers.origin))return json({error:'Origem inválida'},403);
  try{
  if(req.method==='GET'&&req.url==='/'){res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store','X-Frame-Options':'DENY','Content-Security-Policy':"default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'"});return res.end(html)}
- if(req.method==='GET'&&req.url==='/status'){let status='unavailable',number=null;try{const current=await instance();number=ownNumber(current);status=current?await connection():'not-created'}catch{}return json({status,number,enabled:settings.enabled,lastCheck,lastError,counts:Object.values(state).reduce((a,n)=>(a[n.status]=(a[n.status]||0)+1,a),{})})}
+ if(req.method==='GET'&&req.url==='/status'){let status='unavailable',number=null;try{const current=await instance();number=ownNumber(current);status=current?await connection():'not-created'}catch{}return json({status,number,enabled:settings.enabled,daily:{...dailyConfig(settings),today:state['daily:'+brasiliaDay().day]||null},lastCheck,lastError,counts:Object.values(state).reduce((a,n)=>(a[n.status]=(a[n.status]||0)+1,a),{})})}
+ if(req.method==='POST'&&req.url==='/daily-settings'){
+ let body='';for await(const chunk of req){body+=chunk;if(body.length>2048)throw Error('Configuração muito grande.')}
+ const config=JSON.parse(body);if(typeof config.enabled!=='boolean'||! /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(config.time))throw Error('Informe um horário válido, entre 00:00 e 23:59.');
+ settings={...settings,dailyEnabled:config.enabled,dailyTime:config.time};await atomic(settingsFile,settings);void tick();return json({ok:true});
+ }
  if(req.method==='POST'&&req.url==='/pair'){if(!await instance())await evo('instance/create',{instanceName,integration:'WHATSAPP-BAILEYS',qrcode:false,syncFullHistory:false,readMessages:false,readStatus:false,alwaysOnline:false});const qr=await evo('instance/connect/'+instanceName);return json({base64:qr.base64||qr.qrcode?.base64||null})}
  if(req.method==='POST'&&req.url==='/enable'){const current=await instance(),number=ownNumber(current);if(!number||await connection()!=='open')throw Error('Conecte seu WhatsApp primeiro.');settings={...settings,enabled:true,recipient:number,enabledAt:settings.recipient===number&&settings.enabledAt?settings.enabledAt:new Date().toISOString()};await atomic(settingsFile,settings);void tick();return json({ok:true})}
  if(req.method==='POST'&&req.url==='/shutdown'){json({ok:true});setTimeout(async()=>{await unlink(lockPath).catch(()=>{});process.exit(0)},250);return}

@@ -33,3 +33,13 @@ O computador tem 8 GB de RAM, no limite mínimo informado para Docker/WSL; os co
 - https://docs.docker.com/desktop/setup/install/windows-install/
 
 Conferidos: Compose válido, API autenticada respondendo, QR Code gerado, bloqueios de origem/host externos, testes de formatação, elegibilidade, persistência antes do envio e prevenção de duplicação. A conexão pelo celular e a entrega real dependem da leitura do QR pelo usuário.
+
+## Resumo diário dos eventos
+
+Na seção 3 do painel local, habilite Receber resumo diário e escolha um horário de Brasília. A configuração inicial é 08:00. A opção geral de avisos também precisa estar ativada. A configuração é preservada junto do número, sem nova SQL no Supabase.
+
+Envia uma mensagem por data de Brasília quando houver eventos públicos naquele dia, excluindo cancelados. Inclui eventos que começaram antes e seguem em andamento. O resumo lista até 15 eventos, com nome, horário e local; se houver mais, informa a quantidade restante e o link da agenda. O tamanho é limitado para manter uma mensagem curta. Eventos cadastrados depois de um resumo já enviado não disparam outro resumo no mesmo dia.
+
+Se o computador ligar depois do horário, verifica somente o dia atual; não manda resumos de dias anteriores. Em dia vazio, não envia nem consome a possibilidade de um resumo caso surja um evento depois. O registro diário é persistido antes da tentativa de envio; reiniciar ou mudar o horário não repete uma tentativa aceita ou de resultado incerto. Aceite pela Evolution ainda depende de conferência no celular para confirmar recebimento.
+
+Validado em 23/10/2026: quatro testes do conector passaram, com virada do dia/mês em Brasília, horário, pausa, exclusões, eventos em andamento, tamanho e prevenção de repetição. Typecheck passou. O resumo de 23/10 foi aceito pela Evolution às 12:00 de Brasília; salvar novamente o horário não gerou repetição. Tela registrada em docs/previews/whatsapp-resumo-diario.png.
