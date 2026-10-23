@@ -1,4 +1,5 @@
 "use client";
+import {useNow} from '@/lib/use-now';
 import Link from 'next/link';
 import { useMemo, useState } from "react";
 import {
@@ -35,6 +36,7 @@ export function Discover({
     [childrenOnly,setChildrenOnly]=useState(false),
     [filters, setFilters] = useState(false),
     [limits, setLimits] = useState<Record<string, number>>({});
+  const now=useNow();
   const active = !!(
     childrenOnly ||
     query ||
@@ -45,8 +47,8 @@ export function Discover({
     date
   );
   const future = useMemo(
-    () => events.filter((e) => upcoming(e) && e.status !== "cancelled"),
-    [events],
+    () => events.filter((e) => upcoming(e,new Date(now)) && e.status !== "cancelled"),
+    [events,now],
   );
   const filtered = future.filter(
     (e) =>
@@ -56,7 +58,7 @@ export function Discover({
           .includes(query.toLocaleLowerCase("pt-BR"))) &&
       (!childrenOnly || forChildren(e)) &&
       (!category || e.category_id === category) &&
-      (period === "all" || inPeriod(e.starts_at, e.ends_at, period)) &&
+      (period === "all" || inPeriod(e.starts_at, e.ends_at, period,new Date(now))) &&
       (price === "all" || e.is_free === (price === "free")) &&
       (!place ||
         `${e.venue_name} ${e.neighborhood}`
@@ -313,19 +315,19 @@ export function Discover({
             {section(
               "Tá rolando hoje",
               "APROVEITE O AGORA",
-              future.filter((e) => inPeriod(e.starts_at, e.ends_at, "today")),
+              future.filter((e) => inPeriod(e.starts_at, e.ends_at, "today",new Date(now))),
             )}
             {section(
               "Vai rolar amanhã",
               "GUARDE UM ESPAÇO NA AGENDA",
               future.filter((e) =>
-                inPeriod(e.starts_at, e.ends_at, "tomorrow"),
+                inPeriod(e.starts_at, e.ends_at, "tomorrow",new Date(now)),
               ),
             )}
             {section(
               "Rolês do fim de semana",
               "SAIA DA ROTINA",
-              future.filter((e) => inPeriod(e.starts_at, e.ends_at, "weekend")),
+              future.filter((e) => inPeriod(e.starts_at, e.ends_at, "weekend",new Date(now))),
             )}
             <div className="agenda-banner">
               <div>

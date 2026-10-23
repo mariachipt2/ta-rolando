@@ -1,4 +1,5 @@
 "use client";
+import {useNow} from '@/lib/use-now';
 import {request,navigate} from "@/lib/transport";
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -8,6 +9,7 @@ import { Attendance } from "./attendance";
 import {CalendarDownload} from "./calendar-download";
 import { upcoming } from "@/lib/dates";
 export function Agenda({ events }: { events: Event[] }) {
+  const now=useNow();
   const [ids, setIds] = useState<string[] | null>(null),
     [error, setError] = useState(""),
     [attempt, setAttempt] = useState(0);
@@ -49,7 +51,7 @@ export function Agenda({ events }: { events: Event[] }) {
                 <Attendance
                   id={e.id}
                   count={e.interest_count}
-                  disabled={!upcoming(e) || e.status === "cancelled"}
+                  disabled={!upcoming(e,new Date(now)) || e.status === "cancelled"}
                   onChange={(going) => {
                     if (!going) setIds(ids!.filter((id) => id !== e.id));
                   }}

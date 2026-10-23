@@ -73,3 +73,11 @@ test("Calendário escapa conteúdo e preserva UTC", () => {
   assert.match(result, /SUMMARY:Festa\\, show\\; legal/);
   assert.match(result, /Linha 1\\nLinha 2/);
 });
+
+test('Pizero atravessa a madrugada e encerra exatamente às 02h30 de sexta em Brasília',()=>{
+ const event={starts_at:'2026-10-23T01:30:00Z',ends_at:'2026-10-23T05:30:00Z'};
+ assert.equal(day(event.starts_at),'2026-10-22');
+ assert.equal(upcoming(event,new Date('2026-10-23T04:00:00Z')),true);
+ assert.equal(upcoming(event,new Date('2026-10-23T05:30:00Z')),false);
+ assert.equal(upcoming(event,new Date('2026-10-23T15:05:00Z')),false);
+});

@@ -25,7 +25,7 @@ export function eventsForDay(rows,now=new Date()){
  const {start,end}=brasiliaDay(now),seen=new Set();
  return rows.filter(e=>{if(seen.has(e.id)||e.status==='cancelled'||e.status==='draft'||e.deleted_at||e.categories?.active===false)return false;
  const starts=Date.parse(e.starts_at),ends=Date.parse(e.ends_at||e.starts_at);
- if(!Number.isFinite(starts)||!Number.isFinite(ends)||starts>=Date.parse(end)||ends<Date.parse(start)||(ends===Date.parse(start)&&starts<Date.parse(start)))return false;
+ if(!Number.isFinite(starts)||!Number.isFinite(ends)||ends<=now.getTime()||starts>=Date.parse(end)||ends<Date.parse(start)||(ends===Date.parse(start)&&starts<Date.parse(start)))return false;
  seen.add(e.id);return true}).sort((a,b)=>Date.parse(a.starts_at)-Date.parse(b.starts_at)||a.title.localeCompare(b.title,'pt-BR'));
 }
 export function dailyMessage(rows,now=new Date()){

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { MapPin, ArrowUpRight, Users, CalendarDays } from "lucide-react";
 import type { Event } from "@/lib/types";
-import { displayDate } from "@/lib/dates";
+import { displayDate,upcoming } from "@/lib/dates";
 import {CompareButton} from './compare-selection';
 import {EventNotice} from "./event-notice";
 import {InstagramLink} from './instagram-link';
@@ -26,7 +26,9 @@ export function EventCard({ event: e, rank }: { event: Event; rank?: number }) {
         <span className={"price-tag " + (e.is_free ? "free" : "")}>
           {e.status === "cancelled"
             ? "Cancelado"
-            : e.is_free
+            : !upcoming(e)
+              ? "Encerrado"
+              : e.is_free
               ? "Entrada gratuita"
               : e.price || "Evento pago"}
         </span>

@@ -1,3 +1,4 @@
+import {useNow} from '@/lib/use-now';
 import {VenueSubmission} from '@/components/venue-submission';
 import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
@@ -152,6 +153,7 @@ function Detail({ event: e,events }: { event: Event;events:Event[] }) {
   );
 }
 function App() {
+  useNow();
   const [path, setPath] = useState(route),
     [revision, setRevision] = useState(0),
     [data, setData] = useState<Awaited<ReturnType<typeof loadPublic>> | null>(
