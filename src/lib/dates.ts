@@ -1,6 +1,7 @@
+import {clockNow} from './site-clock';
 import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
 export const TZ = "America/Sao_Paulo";
-export function day(d: Date | string = new Date()) {
+export function day(d: Date | string = new Date(clockNow())) {
   return formatInTimeZone(d, TZ, "yyyy-MM-dd");
 }
 export function displayDate(d: string) {
@@ -14,7 +15,7 @@ export function toISO(d: string) {
 }
 export function upcoming(
   e: { starts_at: string; ends_at: string | null },
-  now = new Date(),
+  now = new Date(clockNow()),
 ) {
   return new Date(e.ends_at || e.starts_at) > now;
 }
@@ -22,7 +23,7 @@ export function inPeriod(
   start: string,
   end: string | null,
   period: string,
-  now = new Date(),
+  now = new Date(clockNow()),
 ) {
   const today = day(now);
   const base = new Date(today + "T12:00:00Z");

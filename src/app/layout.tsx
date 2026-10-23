@@ -1,3 +1,4 @@
+import {ServerClock} from '@/components/server-clock';
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import { MapPin, Radio } from "lucide-react";
@@ -57,7 +58,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <span>Não fique de fora. ♡</span>
         </footer>
         <NativeCompareTray/>
-        <Pwa />
+        <Pwa /><ServerClock/>
       </body>
     </html>
   );

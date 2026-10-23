@@ -1,3 +1,5 @@
+import {publicClock} from '@/lib/public-clock';
+import {siteClock} from '@/lib/site-clock';
 import {publicationInbox,readPublicationNotice} from '@/lib/publication-notifications';
 import {loadVenues,saveVenue,publicVenue} from '@/lib/venue-actions';
 import {loadDiscoveryMarks,saveDiscoveryMark} from '@/lib/discovery-mark-actions';
@@ -21,7 +23,7 @@ export async function loadPublic() {
       error: false,
     };
   try {
-    const [events, categories] = await Promise.all([
+    const [events, categories,serverNow] = await Promise.all([
       readAll<Event>((a, b) =>
         db!
           .from("public_events")
@@ -38,7 +40,9 @@ export async function loadPublic() {
           .order("name")
           .range(a, b),
       ),
+      publicClock(db),
     ]);
+    siteClock.sync(serverNow);
     return { events, categories, error: false };
   } catch {
     return { events: [] as Event[], categories: [] as Category[], error: true };

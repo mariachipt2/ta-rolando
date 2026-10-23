@@ -1,4 +1,5 @@
 "use client";
+import {useNow} from '@/lib/use-now';
 import {AdminNotifications} from './admin-notifications';
 import {AdminVenues} from './admin-venues';
 import {venueEvent} from '@/lib/venues';
@@ -50,6 +51,7 @@ export function AdminPanel({
   submissions: EventSubmission[];
   saveState: SaveState;
 }) {
+  const now=new Date(useNow());
   const events=allEvents.filter(e=>!e.deleted_at);
   const [historyEvent,setHistoryEvent]=useState<Event|null>(null);
   const [previewEvent,setPreviewEvent]=useState<Event|null>(null);
@@ -133,8 +135,8 @@ export function AdminPanel({
       <div className="stats-grid">
         {[
           ["Eventos cadastrados", events.length],
-          ["Futuros", events.filter((e) => upcoming(e)).length],
-          ["Encerrados", events.filter((e) => !upcoming(e)).length],
+          ["Futuros", events.filter((e) => upcoming(e,now)).length],
+          ["Encerrados", events.filter((e) => !upcoming(e,now)).length],
           [
             "Publicados",
             events.filter(
@@ -142,7 +144,7 @@ export function AdminPanel({
                 e.status === "published" ||
                 (e.status === "scheduled" &&
                   !!e.publish_at &&
-                  new Date(e.publish_at) <= new Date()),
+                  new Date(e.publish_at) <= now),
             ).length,
           ],
           ["Rascunhos", events.filter((e) => e.status === "draft").length],
@@ -240,6 +242,7 @@ export function AdminPanel({
                             cancelled: "Cancelado",
                           }[e.status]
                         }
+                        {e.status!=='draft'&&e.status!=='cancelled'&&!upcoming(e,now)&&' · Encerrado'}
                       </span>
                       <h3>{e.title}</h3>
                       {eventIssues(e).length>0&&<ul className="pending-reasons">{eventIssues(e).map(issue=><li key={issue.type}>{issue.label}</li>)}</ul>}

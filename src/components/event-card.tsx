@@ -1,3 +1,5 @@
+"use client";
+import {useNow} from '@/lib/use-now';
 import Link from "next/link";
 import { MapPin, ArrowUpRight, Users, CalendarDays } from "lucide-react";
 import type { Event } from "@/lib/types";
@@ -6,6 +8,7 @@ import {CompareButton} from './compare-selection';
 import {EventNotice} from "./event-notice";
 import {InstagramLink} from './instagram-link';
 export function EventCard({ event: e, rank }: { event: Event; rank?: number }) {
+  const now=new Date(useNow());
   const cover=e.cover_url||e.gallery?.[0];
   return (
     <article className="event-card">
@@ -26,7 +29,7 @@ export function EventCard({ event: e, rank }: { event: Event; rank?: number }) {
         <span className={"price-tag " + (e.is_free ? "free" : "")}>
           {e.status === "cancelled"
             ? "Cancelado"
-            : !upcoming(e)
+            : !upcoming(e,now)
               ? "Encerrado"
               : e.is_free
               ? "Entrada gratuita"

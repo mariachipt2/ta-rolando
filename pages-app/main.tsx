@@ -235,6 +235,14 @@ function App() {
       current = false;
     };
   }, [path, revision]);
+  useEffect(()=>{
+    if(path==='/admin')return;
+    let active=true,pending=false;
+    const recheck=async()=>{if(document.hidden||pending)return;pending=true;try{const next=await loadPublic();if(active)setData(next)}finally{pending=false}};
+    const timer=setInterval(()=>void recheck(),60000);
+    const onReturn=()=>void recheck();window.addEventListener('focus',onReturn);document.addEventListener('visibilitychange',onReturn);window.addEventListener('pageshow',onReturn);
+    return()=>{active=false;clearInterval(timer);window.removeEventListener('focus',onReturn);document.removeEventListener('visibilitychange',onReturn);window.removeEventListener('pageshow',onReturn)};
+  },[path]);
   const event = path.startsWith("/evento/")
     ? data?.events.find((e) => e.slug === decodeURIComponent(path.slice(8)))
     : undefined;

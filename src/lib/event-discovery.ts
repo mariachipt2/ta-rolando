@@ -1,7 +1,8 @@
+import {clockNow} from './site-clock';
 import type {Event} from './types';
 import {upcoming} from './dates';
 export function forChildren(event:Event){return event.family_friendly===true}
-export function similarEvents(event:Event,events:Event[],now=new Date()){
+export function similarEvents(event:Event,events:Event[],now=new Date(clockNow())){
  return events.filter(e=>e.id!==event.id&&e.category_id===event.category_id&&!e.deleted_at&&e.status!=='cancelled'&&upcoming(e,now)&&(e.status==='published'||(e.status==='scheduled'&&!!e.publish_at&&Date.parse(e.publish_at)<=now.getTime()))).sort((a,b)=>Date.parse(a.starts_at)-Date.parse(b.starts_at)||a.id.localeCompare(b.id)).slice(0,3);
 }
 export type EventIssue={type:'photo'|'address';label:string};
