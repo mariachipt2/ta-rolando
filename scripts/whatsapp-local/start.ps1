@@ -5,6 +5,9 @@ $docker=Get-Command docker.exe -ErrorAction SilentlyContinue | Select-Object -Ex
 if(!$docker){$docker=$dockerCandidates | Where-Object {Test-Path -LiteralPath $_} | Select-Object -First 1}
 if(!$docker){throw 'Instale e abra o Docker Desktop antes de continuar.'}
 $env:PATH=(Split-Path -Parent $docker)+';'+$env:PATH
+Write-Output 'Abrindo o Docker Desktop e aguardando ficar pronto...'
+& $docker desktop start --timeout 180
+if($LASTEXITCODE -ne 0){throw 'O Docker não ficou pronto. Abra o Docker Desktop para conferir a mensagem.'}
 & $docker info --format '{{.ServerVersion}}'
 if($LASTEXITCODE -ne 0){throw 'O Docker ainda não está pronto. Abra o Docker Desktop e conclua a configuração do WSL.'}
 $runtime=Join-Path $env:LOCALAPPDATA 'TaRolando\WhatsApp'
