@@ -1346,3 +1346,5 @@ footer > span {
 
 .venue-submission-intro{min-height:0;padding-top:2rem;padding-bottom:1.5rem}
 
+
+.admin-header-actions{display:flex;align-items:center;gap:.65rem;flex-wrap:wrap}.notification-count{border-radius:999px;background:var(--lime,#c3ff45);color:#121416;padding:.1rem .45rem;font-weight:800}.notification-inbox{position:fixed;top:1rem;right:1rem;z-index:120;width:min(630px,calc(100vw - 2rem));max-height:calc(100dvh - 2rem);overflow:auto;background:#171521;border:1px solid #62527e;box-shadow:0 16px 70px #000a;border-radius:18px;padding:1.5rem}.notification-inbox h2{font-size:1.3rem}.notification-inbox .section-heading{gap:.75rem;align-items:center}.notification-list{display:grid;gap:.8rem;margin-top:1rem}.publication-notice{padding:1rem;border:1px solid #40394e;border-radius:12px}.publication-notice.unread{border-left:4px solid #c3ff45}.publication-notice h3{margin:.5rem 0;overflow-wrap:anywhere}.publication-notice p{margin:.5rem 0}.notification-inbox .share-buttons{flex-wrap:wrap}@media(max-width:600px){.notification-inbox{padding:1rem}.notification-inbox .section-heading{align-items:flex-start;flex-wrap:wrap}}

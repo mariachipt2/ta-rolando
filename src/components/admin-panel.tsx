@@ -1,4 +1,5 @@
 "use client";
+import {AdminNotifications} from './admin-notifications';
 import {AdminVenues} from './admin-venues';
 import {venueEvent} from '@/lib/venues';
 import { request, navigate } from "@/lib/transport";
@@ -117,7 +118,7 @@ export function AdminPanel({
             A cidade em movimento<span className="lime">.</span>
           </h1>
         </div>
-        <button
+        <div className="admin-header-actions"><AdminNotifications/><button
           className="button secondary"
           onClick={async () => {
             await request("/api/admin/login", { method: "DELETE" });
@@ -125,7 +126,7 @@ export function AdminPanel({
           }}
         >
           <LogOut size={17} /> Sair
-        </button>
+        </button></div>
       </div>
       <SaveConfirmation at={receipt} />
       {(pendingEvents.length>0||pendingSuggestions>0)&&<div className="pending-summary"><p><strong>Para revisar:</strong> {pendingEvents.length} {pendingEvents.length===1?'evento com dados pendentes':'eventos com dados pendentes'} · {pendingSuggestions} {pendingSuggestions===1?'sugestão aguardando análise':'sugestões aguardando análise'}.</p><button className="button secondary" onClick={()=>openPending()}>Ver pendências</button></div>}
