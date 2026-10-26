@@ -22,7 +22,7 @@ test('Fim de semana usa sexta a domingo em Brasília, com link fixo e eventos em
  assert.equal(weekendStart(new Date('2026-10-26T04:00:00Z')),'2026-10-30');
  assert.equal(validWeekendStart('2026-10-23'),true);assert.equal(validWeekendStart('2026-10-24'),false);assert.equal(validWeekendStart('2026-02-30'),false);
  const data=[event('friday',{starts_at:'2026-10-23T00:00:00-03:00'}),event('sunday',{starts_at:'2026-10-26T02:59:00Z'}),event('monday',{starts_at:'2026-10-26T03:00:00Z'}),event('ongoing',{starts_at:'2026-10-22T22:00:00-03:00',ends_at:'2026-10-23T03:00:00-03:00'}),event('ends-before',{starts_at:'2026-10-22T22:00:00-03:00',ends_at:'2026-10-23T00:00:00-03:00'}),event('cancelled',{status:'cancelled',starts_at:'2026-10-23T20:00:00-03:00'}),event('draft',{status:'draft',starts_at:'2026-10-23T20:00:00-03:00'})];
- assert.deepEqual(weekendEvents(data,'2026-10-23').map(e=>e.id),['ongoing','friday','sunday']);
+ assert.deepEqual(weekendEvents(data,'2026-10-23',new Date('2026-10-22T18:00:00-03:00')).map(e=>e.id),['ongoing','friday','sunday']);
  assert.equal(inPeriod(data[0].starts_at,null,'weekend',new Date('2026-10-20T15:00:00Z')),true);
  assert.equal(weekendUrl('https://example.test/ta-rolando/#/fim-de-semana','2026-10-23'),'https://example.test/ta-rolando/#/fim-de-semana?inicio=2026-10-23');
  assert.equal(weekendUrl('https://example.test/fim-de-semana','2026-10-23'),'https://example.test/fim-de-semana?inicio=2026-10-23');
@@ -33,4 +33,15 @@ test('Exportação preserva cadastros e lixeira, omite hashes e links temporári
  assert.equal(data.events.length,2);assert.ok(data.events[1].deleted_at);assert.equal(data.submissions[0].photo_path,'private/photo.png');assert.equal(JSON.stringify(data).includes('secret'),false);
  const csv=registryCsv(data,'submissions');assert.ok(csv.startsWith('\ufeff'));assert.ok(csv.includes('"\'=HYPERLINK(""https://evil.test"'));assert.ok(csv.includes("'=HYPERLINK"));assert.ok(csv.includes('""aspas""'));assert.ok(csv.includes('Outra linha'));assert.ok(csv.includes('submission_status'));
  assert.equal(csvCell('  +SUM(1,2)'),`"'  +SUM(1,2)"`);assert.equal(csvCell('@formula'),`"'@formula"`);assert.equal(csvCell('normal'),'"normal"');
+});
+
+test('Fim de semana exclui o Pizero encerrado na madrugada de sexta, sem perder evento ainda em andamento',()=>{
+ const pizero=event('pizero',{title:'Pizero da Estação',starts_at:'2026-10-23T01:30:00Z',ends_at:'2026-10-23T05:30:00Z'});
+ const friday=event('sexta',{starts_at:'2026-10-23T23:00:00Z'}),saturday=event('sabado',{starts_at:'2026-10-25T00:00:00Z'});
+ const ongoing=event('em-andamento',{starts_at:'2026-10-22T23:00:00Z',ends_at:'2026-10-23T23:00:00Z'});
+ const rows=[pizero,friday,saturday,ongoing];
+ assert.ok(weekendEvents(rows,'2026-10-23',new Date('2026-10-23T04:00:00Z')).some(e=>e.id==='pizero'));
+ assert.ok(!weekendEvents(rows,'2026-10-23',new Date('2026-10-23T05:30:00Z')).some(e=>e.id==='pizero'));
+ assert.deepEqual(weekendEvents(rows,'2026-10-23',new Date('2026-10-23T18:00:00Z')).map(e=>e.id),['em-andamento','sexta','sabado']);
+ assert.deepEqual(weekendEvents(rows,'2026-10-23',new Date('2026-10-26T15:00:00Z')),[]);
 });
