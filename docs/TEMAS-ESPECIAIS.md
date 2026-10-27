@@ -20,7 +20,10 @@ Título, data, local, contagem e botão continuam sendo dados reais do evento.
 No celular, a cena tem versão menor e mostra o castelo abaixo da chamada.
 A abertura normal fica oculta enquanto o destaque estiver ativo.
 Sem animação e redução de movimento mantêm a arte, mas retiram a neve.
-O Halloween continua usando a capa do evento ou seu símbolo.
+O Halloween usa uma mansão panorâmica, lua, abóboras iluminadas, névoa e
+morcegos animados. O destaque mantém os dados reais do evento. A animação
+suave reduz os morcegos, a intensa aumenta o movimento, e sem animação
+mantém o cenário estático. A preferência de reduzir movimento também é respeitada.
 
 As artes WebP ficam em `src/assets/themes/` e são incluídas com caminhos
 versionados pelo build do Vite e do Next.js. Esta atualização visual não
@@ -51,3 +54,9 @@ do evento Aventura Congelante | O Legado e a configuração de tema simulada
 somente na prévia local. Busca, menu móvel, prévia do painel, animação desligada
 e retorno ao visual normal foram exercitados sem gravar a configuração real.
 A checagem Pages também valida os arquivos referenciados pelas URLs do CSS.
+
+A revisão da mansão de Halloween foi conferida em 1280px e 390px, com
+dados públicos do evento Halloween Mansão e configuração simulada na prévia
+local. Menus, prévia isolada, animações desligadas e desativação foram
+verificados. Builds Pages e Next.js e caminhos das artes no CSS passaram.
+Nenhuma configuração de produção foi ativada ou alterada nesta revisão.
