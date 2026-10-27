@@ -1,3 +1,4 @@
+import {SpecialTheme} from '../src/components/special-theme';
 import {useNow} from '@/lib/use-now';
 import {VenueSubmission} from '@/components/venue-submission';
 import React, { useEffect, useState } from "react";
@@ -278,6 +279,7 @@ function App() {
         </div>
       </header>
       <main id="main">
+        <SpecialTheme path={path}/>
         {error ? (
           <div className="shell page">
             <p role="alert">{error}</p>
@@ -368,4 +370,3 @@ if (
   !location.hostname.match(/^(localhost|127\.)/)
 )
   navigator.serviceWorker.register("./sw.js").catch(() => {});
-

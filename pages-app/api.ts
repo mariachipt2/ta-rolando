@@ -1,4 +1,5 @@
 import {publicClock} from '@/lib/public-clock';
+import {loadSpecialTheme,saveSpecialTheme} from '@/lib/special-theme-actions';
 import {siteClock} from '@/lib/site-clock';
 import {publicationInbox,readPublicationNotice} from '@/lib/publication-notifications';
 import {loadVenues,saveVenue,publicVenue} from '@/lib/venue-actions';
@@ -199,6 +200,7 @@ export async function transport(
         503,
       );
     if(path.startsWith('/api/venues?'))return json(await publicVenue(db,new URL(path,'https://local').searchParams.get('local')||''));
+    if(path==='/api/special-theme')return json(await loadSpecialTheme(db));
     if (path === "/api/admin/login") {
       if (init.method === "DELETE") {
         await db.auth.signOut();
@@ -213,6 +215,7 @@ export async function transport(
       return json({ ok: true });
     }
     if (!(await isAdmin())) return json({ error: "Acesso negado." }, 401);
+    if(path==='/api/admin/special-theme')return json(init.method==='POST'?await saveSpecialTheme(db,body):await loadSpecialTheme(db,true));
     if(path==='/api/admin/notifications')return json(init.method==='POST'?await readPublicationNotice(db,body):await publicationInbox(db));
     if(path==='/api/admin/venues')return json(init.method==='POST'?await saveVenue(db,body):await loadVenues(db));
     if(path==='/api/admin/places'){const {data:{session}}=await db.auth.getSession();if(!session)return json({error:'Sessão expirada.'},401);return fetch(__SUPABASE_URL__+'/functions/v1/admin-places',{method:'POST',headers:{apikey:__SUPABASE_PUBLIC_KEY__,Authorization:'Bearer '+session.access_token},signal:AbortSignal.timeout(40000)})}

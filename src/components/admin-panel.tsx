@@ -1,5 +1,6 @@
 "use client";
 import {useNow} from '@/lib/use-now';
+import {AdminSpecialTheme} from './admin-special-theme';
 import {AdminNotifications} from './admin-notifications';
 import {AdminVenues} from './admin-venues';
 import {venueEvent} from '@/lib/venues';
@@ -172,6 +173,7 @@ export function AdminPanel({
           ["export", "Exportar cadastros"],
           ["discovery", "Buscar eventos"],
           ["venues", "Bares e boates"],
+          ["theme", "Tema especial"],
         ].map(([v, t]) => (
           <button
             className={tab === v ? "active" : ""}
@@ -186,6 +188,7 @@ export function AdminPanel({
       {previewEvent&&<AdminEventPreview event={previewEvent} onClose={()=>setPreviewEvent(null)} onEdit={()=>{setReviewId(undefined);setEdit(previewEvent);setPreviewEvent(null);setTab('events')}}/>}
       {historyEvent&&<EventHistory key={historyEvent.id} event={historyEvent} onClose={()=>setHistoryEvent(null)} onSaved={refresh}/>}
       {tab==='export'&&<AdminExport/>}
+      {tab==='theme'&&<AdminSpecialTheme events={allEvents} onSaved={setReceipt} onDirtyChange={setDirty}/>}
       {tab==='venues'&&<AdminVenues events={allEvents} onSaved={setReceipt} onDirtyChange={setDirty} onEvent={v=>{setReviewId(undefined);setEdit({...venueEvent(v),status:'draft'});setTab('events')}}/>}
       <div hidden={tab!=='discovery'}><AdminDiscovery onMarked={setReceipt} events={allEvents} categories={categories} onReview={event=>{setReviewId(undefined);setEdit(event);setTab('events')}}/></div>
       {tab==='pending'&&<AdminPending events={events} submissions={submissions} onEdit={event=>openPending(event)} onSubmissions={()=>setTab('submissions')}/>}

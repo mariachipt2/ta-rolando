@@ -1,4 +1,5 @@
 import {ServerClock} from '@/components/server-clock';
+import {NativeSpecialTheme} from '@/components/special-theme-native';
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import { MapPin, Radio } from "lucide-react";
@@ -44,7 +45,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <NativeSiteNavigation/>
           </div>
         </header>
-        <main id="main">{children}</main>
+        <main id="main"><NativeSpecialTheme/>{children}</main>
         <footer className="shell">
           <Link className="logo" href="/">
             tá rolando
