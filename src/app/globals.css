@@ -1368,3 +1368,55 @@ html[data-special-theme] body{background:radial-gradient(ellipse at 80% 0%,color
 .theme-settings-fields{border:0;padding:0;margin:0;min-width:0}.theme-settings-fields:disabled{opacity:.6}.theme-preview{margin-top:24px;padding:22px;border:1px solid var(--border);border-radius:18px;background:var(--bg);color:var(--text);overflow:hidden}.theme-preview-menu{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}.theme-preview-menu button{padding:12px 18px}.theme-preview .special-theme-banner{width:100%;margin-top:20px}.theme-preview>.eyebrow{color:var(--muted)}
 @media(max-width:700px){.special-theme-banner{grid-template-columns:minmax(0,1fr);gap:18px;padding:24px;margin-top:18px}.special-theme-art{min-height:120px}.special-theme-art>img{height:200px}.special-theme-art>svg{height:120px}.special-theme-copy h2{font-size:32px}.theme-preview{padding:14px}.theme-preview-menu button{padding:9px}.special-theme-title{font-size:18px}}
 @media(prefers-reduced-motion:reduce){[data-special-theme] *,[data-special-theme] *::before,[data-special-theme] *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+/* Immersive ice art direction, with real controls over the generated scenery. */
+.discovery-theme-title{display:none}
+html[data-special-theme] :is(.hero,.ticker){display:none}
+html[data-special-theme] .discovery-normal-title{display:none}
+html[data-special-theme] .discovery-theme-title{display:inline}
+html[data-special-theme] .discovery-theme-title>span{color:var(--lime)}
+html[data-special-theme] .discovery{padding-top:38px}
+.special-theme-copy :is(h1,h2){font-size:clamp(30px,4vw,54px);line-height:1.12;letter-spacing:-1.5px;margin:18px 0}
+[data-special-theme="ice"]{--bg:#031222;--card:#081d32;--lime:#51e2f7;--purple:#a6bfff;--muted:#b5cadd;--border:#25465d;--theme-glint:#ddfbff;--theme-shadow:#68dfff}
+html[data-special-theme="ice"] body{background:radial-gradient(ellipse at 85% 12%,#0a365266,transparent 55%),radial-gradient(ellipse at 10% 65%,#12335644,transparent 55%),var(--bg)}
+html[data-special-theme="ice"] .site-header{z-index:40;background:#031323e8;backdrop-filter:blur(14px);border-bottom:1px solid #a1eaff24}
+html[data-special-theme="ice"] .logo>svg{color:#b3ff4a}
+html[data-special-theme="ice"] .event-card{background:linear-gradient(160deg,#0a2439e6,#061625f5);border-color:#3d6b85;box-shadow:0 12px 35px #0003}
+html[data-special-theme="ice"] .event-card:hover{border-color:#9aefff;box-shadow:0 10px 40px #30c9ec22}
+html[data-special-theme="ice"] .category-list button.selected{background:var(--lime);color:#032230;box-shadow:0 0 23px #52e8ff33}
+html[data-special-theme="ice"] .site-nav :is(.nav-trigger,.nav-top-link,.nav-agenda){border-color:#8cddff55;background:linear-gradient(180deg,#8fdaff12,transparent);box-shadow:inset 0 1px 0 #d0f9ff66,0 0 12px #5ccfff0a}
+html[data-special-theme="ice"] .nav-agenda{color:#a8f3ff!important}
+.ice-palace-hero{position:relative;isolation:isolate;min-height:610px;overflow:hidden;background-color:#031222;background-image:linear-gradient(90deg,#020d1c66 0%,#020d1c20 44%,transparent 70%),linear-gradient(0deg,#031222 0%,transparent 20%),url('../assets/themes/ice-palace.webp');background-position:center;background-size:cover;border-bottom:1px solid #78d4ff22}
+.ice-hero-inner{position:relative;z-index:2;min-height:610px;display:flex;align-items:center;padding-top:62px;padding-bottom:60px}
+.ice-hero-copy{width:56%;max-width:680px;min-width:0;text-shadow:0 2px 20px #00101f99}
+.ice-special-label{display:flex;align-items:center;gap:13px;color:#a5f0ff;font-size:12px;letter-spacing:3px;font-weight:700}
+.ice-special-label svg{filter:drop-shadow(0 0 10px #73eaff88)}
+.ice-hero-copy :is(h1,h2){font-size:clamp(66px,7.6vw,112px);font-weight:850;line-height:.93;letter-spacing:-5px;margin:27px 0 23px;color:#fff;max-width:100%;overflow-wrap:normal}
+.ice-hero-copy :is(h1,h2)>span{color:#52e3f8;text-shadow:0 0 50px #36dbff25}
+.ice-hero-subtitle{font-size:clamp(17px,1.6vw,23px);line-height:1.4;color:#e1f6ff;max-width:500px;margin:0 0 18px}
+.ice-event-title{font-weight:650;font-size:16px;color:#d0f4ff;margin:0 0 10px;overflow-wrap:anywhere;max-width:530px}
+.ice-event-details{display:flex;gap:6px 18px;flex-wrap:wrap;max-width:540px;font-size:12px;color:#afcce0}.ice-event-details>span{display:flex;gap:7px;align-items:center}.ice-event-details svg{flex-shrink:0}
+.ice-hero-actions{display:flex;flex-direction:column;align-items:flex-start;gap:15px;margin-top:24px}
+.ice-hero-actions .theme-countdown{display:inline-flex;align-items:center;gap:10px;margin:0;padding:8px 17px;border:1px solid #83dcff7a;background:#05213985;backdrop-filter:blur(8px);color:#e1f6ff;font-weight:650;font-size:14px;border-radius:30px}
+.ice-event-button{display:inline-flex;align-items:center;justify-content:center;gap:24px;min-width:240px;min-height:53px;padding:13px 25px;border-radius:99px;border:1px solid #b4faff66;background:linear-gradient(120deg,#8bf3ff,#31d5ee);color:#002331;box-shadow:0 5px 25px #35def738;font-size:16px;font-weight:800;text-shadow:none;transition:transform .25s,box-shadow .25s}
+.ice-event-button:hover,.ice-event-button:focus-visible{background:#a0f7ff;color:#002331;box-shadow:0 0 35px #3ee3fa77;transform:translateY(-2px)}
+.ice-palace-glow{position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at 76% 55%,#6be9ff15,transparent 46%);opacity:.6}
+.ice-hero-crystals{position:absolute;inset:0;z-index:1;pointer-events:none;color:#c1f8ff;opacity:.65}.ice-hero-crystals>svg{position:absolute;width:20px;height:20px;filter:drop-shadow(0 0 13px #b8f9ff)}.ice-hero-crystals>svg:nth-child(1){right:5%;top:18%;width:34px;height:34px}.ice-hero-crystals>svg:nth-child(2){right:48%;bottom:13%}.ice-hero-crystals>svg:nth-child(3){right:19%;top:8%;width:13px;height:13px}
+.ice-atmosphere{position:fixed;inset:0;z-index:25;pointer-events:none;overflow:hidden;contain:strict}
+.ice-frost-frame{position:absolute;inset:0;background:url('../assets/themes/ice-frost.webp') center/100% 100% no-repeat;opacity:.8;mask-image:linear-gradient(90deg,#000,transparent 7%,transparent 93%,#000),linear-gradient(#000,transparent 9%,transparent 95%,#000)}
+.ice-snowfall{position:absolute;inset:0;overflow:hidden}.ice-snowfall>span{position:absolute;left:var(--snow-x);top:-4%;width:var(--snow-size);height:var(--snow-size);border-radius:50%;background:#d8faff;box-shadow:0 0 7px #c7f9ff99;opacity:.45;transform:translateY(35vh)}
+[data-theme-motion="soft"] .ice-snowfall>span,[data-theme-motion="full"] .ice-snowfall>span{animation:ice-snow-fall var(--snow-duration) var(--snow-delay) linear infinite}
+[data-theme-motion="soft"] .ice-snowfall>span:nth-child(n+13){display:none}
+[data-theme-motion="full"] .ice-snowfall>span{opacity:.75}
+[data-theme-motion="off"] .ice-snowfall{display:none}
+[data-theme-motion="soft"] .ice-palace-glow,[data-theme-motion="full"] .ice-palace-glow{animation:ice-palace-breathe 9s ease-in-out infinite alternate}
+[data-theme-motion="soft"] .ice-hero-crystals>svg,[data-theme-motion="full"] .ice-hero-crystals>svg{animation:theme-crystal-float 8s ease-in-out infinite alternate}
+@keyframes ice-snow-fall{from{transform:translate3d(0,-2vh,0)}to{transform:translate3d(var(--snow-drift),108vh,0)}}
+@keyframes ice-palace-breathe{from{opacity:.25}to{opacity:.9}}
+.theme-preview{position:relative;isolation:isolate}.theme-preview>.ice-atmosphere{position:absolute;z-index:4}.theme-preview>.eyebrow,.theme-preview-menu{position:relative;z-index:5}.theme-preview .ice-palace-hero{margin:24px -22px -22px;border-radius:0 0 17px 17px}.theme-preview .ice-hero-inner{min-height:510px;padding:40px 32px}.theme-preview .ice-hero-copy{width:65%}.theme-preview .ice-hero-copy :is(h1,h2){font-size:clamp(50px,6.5vw,86px)}
+@media(min-width:1800px){.ice-palace-hero{background-position:center 42%;background-size:100% auto}.ice-hero-inner{min-height:690px}}
+@media(max-width:900px){.ice-hero-inner{min-height:590px;padding-top:46px;padding-bottom:48px}.ice-hero-copy{width:66%}.ice-hero-copy :is(h1,h2){font-size:78px}.ice-frost-frame{opacity:.55;mask-image:linear-gradient(90deg,#000,transparent 5%,transparent 95%,#000)}.ice-palace-hero{background-position:65% center}}
+@media(max-width:600px){.ice-palace-hero{min-height:760px;background-image:linear-gradient(0deg,#031222 0%,#03122205 22%,#0312221a 50%,#031222e6 76%,#031222 100%),url('../assets/themes/ice-palace-mobile.webp');background-position:center,68% bottom;background-size:cover,auto 540px;background-repeat:no-repeat}.ice-hero-inner{align-items:flex-start;min-height:760px;padding-top:36px;padding-bottom:270px}.ice-hero-copy,.theme-preview .ice-hero-copy{width:100%;max-width:100%}.ice-special-label{font-size:10px;letter-spacing:2px}.ice-hero-copy :is(h1,h2),.theme-preview .ice-hero-copy :is(h1,h2){font-size:68px;letter-spacing:-3.5px;margin:22px 0 17px}.ice-hero-subtitle{font-size:17px;max-width:310px}.ice-event-title{font-size:14px;max-width:310px}.ice-event-details{font-size:11px;max-width:310px;gap:7px}.ice-hero-actions{gap:13px;margin-top:19px}.ice-event-button{min-width:214px;min-height:50px}.ice-frost-frame{opacity:.65;mask-image:linear-gradient(90deg,#000,transparent 6%,transparent 94%,#000)}.ice-snowfall>span:nth-child(n+13){display:none}.ice-hero-crystals>svg:nth-child(1){right:12%;top:67%}.ice-hero-crystals>svg:nth-child(2){right:66%;bottom:15%}.theme-preview .ice-palace-hero{margin:22px -14px -14px}.theme-preview .ice-hero-inner{min-height:760px;padding:30px 22px 270px}.discovery-theme-title{font-size:29px;line-height:1.15}.ice-palace-hero+.discovery{padding-top:25px}}
+@media(prefers-reduced-motion:reduce){.ice-snowfall{display:none!important}[data-special-theme] .ice-palace-glow,[data-special-theme] .ice-hero-crystals>svg,[data-special-theme] .ice-snowfall>span{animation:none!important}.ice-event-button{transition:none!important}.ice-event-button:hover{transform:none}}
+
+@media(max-width:600px){.ice-frost-frame{background-image:url('../assets/themes/ice-frost-mobile.webp')}}

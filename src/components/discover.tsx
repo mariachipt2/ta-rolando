@@ -195,7 +195,7 @@ export function Discover({
         <div className="section-heading">
           <div>
             <span className="eyebrow">A CIDADE É SUA</span>
-            <h2>Qual é a boa?</h2>
+            <h2><span className="discovery-normal-title">Qual é a boa?</span><span className="discovery-theme-title">Encontre seu próximo <span>rolê.</span></span></h2>
           </div>
           <a href="#bombando" className="text-link">
             <Flame size={17} /> Tá bombando <ArrowUpRight size={16} />

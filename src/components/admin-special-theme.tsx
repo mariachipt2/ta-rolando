@@ -5,7 +5,7 @@ import {request} from '@/lib/transport';
 import {defaultTheme,themeActive,specialThemeSchema,type SpecialTheme as Settings} from '@/lib/special-theme';
 import {localInput,toISO} from '@/lib/dates';
 import {useNow} from '@/lib/use-now';
-import {ThemeBanner} from './special-theme';
+import {ThemeBanner,IceAtmosphere} from './special-theme';
 import {SaveConfirmation} from './save-confirmation';
 
 export function AdminSpecialTheme({events,onSaved,onDirtyChange}:{events:Event[];onSaved:(at:string)=>void;onDirtyChange:(dirty:boolean)=>void}){
@@ -46,6 +46,6 @@ export function AdminSpecialTheme({events,onSaved,onDirtyChange}:{events:Event[]
         <div className="share-buttons"><button className="button lime-button" disabled={!dirty}>{busy?'Aguardando confirmação…':'Salvar tema'}</button><button className="button secondary" type="button" onClick={()=>setPreview(v=>!v)}>{preview?'Fechar prévia':'Pré-visualizar'}</button><button className="button secondary" type="button" disabled={!saved.enabled} onClick={()=>void save({...saved,enabled:false})}>Desativar agora</button></div>
       </fieldset>
     </form>
-    {preview&&<div className="theme-preview" data-special-theme={settings.theme} data-theme-motion={settings.motion}><p className="eyebrow">PRÉVIA LOCAL · AINDA NÃO PUBLICADA</p><div className="theme-preview-menu"><button type="button">Explorar</button><button type="button">Fim de semana</button><button type="button">Minha agenda</button></div>{event?<ThemeBanner data={{settings,event}} now={now} preview/>:<p>Selecione um evento para visualizar o destaque.</p>}</div>}
+    {preview&&<div className="theme-preview" data-special-theme={settings.theme} data-theme-motion={settings.motion}>{settings.theme==='ice'&&<IceAtmosphere/>}<p className="eyebrow">PRÉVIA LOCAL · AINDA NÃO PUBLICADA</p><div className="theme-preview-menu"><button type="button">Explorar</button><button type="button">Fim de semana</button><button type="button">Minha agenda</button></div>{event?<ThemeBanner data={{settings,event}} now={now} preview/>:<p>Selecione um evento para visualizar o destaque.</p>}</div>}
   </section>;
 }

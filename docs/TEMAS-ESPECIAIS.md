@@ -13,9 +13,18 @@ As páginas abertas atualizam a configuração em até um minuto ou ao voltar à
 
 O brilho percorre os menus e os detalhes do destaque flutuam suavemente.
 A preferência `prefers-reduced-motion` desliga as animações. No celular, o menu
-mantém os mesmos controles. A capa usada é a do próprio evento; sem capa,
-aparece um símbolo do tema. As imagens conceituais geradas são referências,
-não fundos incorporados ao site.
+mantém os mesmos controles. O tema Gelo usa uma cena panorâmica de castelo,
+lago congelado e floresta, moldura de cristais transparente e neve animada.
+A cena foi produzida a partir da proposta visual escolhida pela usuária.
+Título, data, local, contagem e botão continuam sendo dados reais do evento.
+No celular, a cena tem versão menor e mostra o castelo abaixo da chamada.
+A abertura normal fica oculta enquanto o destaque estiver ativo.
+Sem animação e redução de movimento mantêm a arte, mas retiram a neve.
+O Halloween continua usando a capa do evento ou seu símbolo.
+
+As artes WebP ficam em `src/assets/themes/` e são incluídas com caminhos
+versionados pelo build do Vite e do Next.js. Esta atualização visual não
+exige novos campos nem nova migração no Supabase.
 
 ## Supabase
 
@@ -36,3 +45,9 @@ permissões e recibo em PostgreSQL local (PGlite); build Pages, verificação do
 assets e build Next.js. Interface exercitada com dados ilustrativos e transporte
 simulado, sem publicar eventos nem ativar o tema em produção. Leitura pública
 real da configuração e permissões conferidas no Supabase.
+
+A revisão visual do castelo foi conferida em 1280px e 390px, com dados públicos
+do evento Aventura Congelante | O Legado e a configuração de tema simulada
+somente na prévia local. Busca, menu móvel, prévia do painel, animação desligada
+e retorno ao visual normal foram exercitados sem gravar a configuração real.
+A checagem Pages também valida os arquivos referenciados pelas URLs do CSS.
