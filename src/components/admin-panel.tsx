@@ -216,6 +216,7 @@ export function AdminPanel({
             <EventForm
               key={edit.id || "new"}
               event={edit}
+              savedEvents={events}
               initialUnsaved={!edit.id&&!!edit.additional_info?.startsWith('Fonte da busca:')}
               categories={categories}
               onClose={() => {if(!edit.id&&edit.additional_info?.startsWith('Fonte da busca:'))setTab('discovery');setEdit(null)}}

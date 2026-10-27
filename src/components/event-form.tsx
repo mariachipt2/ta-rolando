@@ -1,5 +1,6 @@
 "use client";
 import {VenuePicker} from './venue-picker';
+import {OrganizerPicker} from './organizer-picker';
 import {venueEvent} from '@/lib/venues';
 import { request, navigate } from "@/lib/transport";
 import { useState, useEffect, useRef } from "react";
@@ -17,6 +18,7 @@ export function EventForm({
   event: e,
   initialUnsaved=false,
   categories,
+  savedEvents=[],
   onClose,
   onSaved,
   submissionId,
@@ -26,6 +28,7 @@ export function EventForm({
   event: Partial<Event>;
   initialUnsaved?:boolean;
   categories: Category[];
+  savedEvents?: Event[];
   onClose: () => void;
   onSaved: (savedAt: string) => void;
   submissionId?: string;
@@ -218,6 +221,7 @@ export function EventForm({
       </div>
       <p>Horários de Brasília. Campos com * são obrigatórios.</p>
       <SaveConfirmation at={e.updated_at} dirty={dirty} busy={busy} />
+      <OrganizerPicker events={savedEvents} onSelect={values=>{for(const key of Object.keys(values) as (keyof typeof values)[])setValue(key,values[key],{shouldDirty:true,shouldValidate:true})}}/>
       <VenuePicker onSelect={venue=>{const values=venueEvent(venue);for(const key of Object.keys(values) as (keyof typeof values)[])setValue(key,values[key],{shouldDirty:true,shouldValidate:true})}}/>
       <div className="form-grid">
         {field("title", "Título", true)}
