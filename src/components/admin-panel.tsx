@@ -56,6 +56,7 @@ export function AdminPanel({
   const now=new Date(useNow());
   const events=allEvents.filter(e=>!e.deleted_at);
   const [historyEvent,setHistoryEvent]=useState<Event|null>(null);
+  const [showEnded,setShowEnded]=useState(false);
   const [previewEvent,setPreviewEvent]=useState<Event|null>(null);
   const router = useRouter();
   const [edit, setEdit] = useState<Partial<Event> | null>(null),
@@ -78,6 +79,11 @@ export function AdminPanel({
   };
   const pendingEvents=events.filter(e=>eventIssues(e).length),pendingSuggestions=submissions.filter(s=>s.status==='pending').length;
   const openPending=(event?:Event)=>{if(dirty&&!confirm('Há alterações não salvas. Sair sem salvar?'))return;setReviewId(undefined);setEdit(event||null);setTab(event?'events':'pending')};
+  const endedEvents=events.filter(event=>event.status!=='draft'&&!upcoming(event,now));
+  const listedEvents=events.filter(event=>{
+    const inView=tab==='drafts'?event.status==='draft':showEnded?event.status!=='draft'&&!upcoming(event,now):event.status==='draft'||upcoming(event,now);
+    return inView&&event.title.toLocaleLowerCase('pt-BR').includes(filter.toLocaleLowerCase('pt-BR'));
+  });
   const total = events.reduce((n, e) => n + e.interest_count, 0);
   const metricList = metrics.filter((m) => !stats || m.event_id === stats);
   const days = Array.from({ length: 14 }, (_, i) =>
@@ -159,7 +165,7 @@ export function AdminPanel({
         ))}
       </div>
       <div className="admin-workspace">
-      <AdminNavigation selected={tab} counts={{drafts:events.filter(e=>e.status==='draft').length,pending:pendingEvents.length+pendingSuggestions,submissions:pendingSuggestions,reports:reports.filter(r=>r.status==='pending').length,trash:allEvents.filter(e=>e.deleted_at).length}} onSelect={value=>{if(value===tab)return true;if(dirty&&!confirm('Há alterações não salvas. Sair sem salvar?'))return false;setEdit(null);setReviewId(undefined);setTab(value);return true}}/>
+      <AdminNavigation selected={tab} counts={{drafts:events.filter(e=>e.status==='draft').length,pending:pendingEvents.length+pendingSuggestions,submissions:pendingSuggestions,reports:reports.filter(r=>r.status==='pending').length,trash:allEvents.filter(e=>e.deleted_at).length}} onSelect={value=>{if(value===tab)return true;if(dirty&&!confirm('Há alterações não salvas. Sair sem salvar?'))return false;setEdit(null);setReviewId(undefined);setShowEnded(false);setTab(value);return true}}/>
       <div className="admin-workspace-content">
       {error && <p role="alert">{error}</p>}
       {previewEvent&&<AdminEventPreview event={previewEvent} onClose={()=>setPreviewEvent(null)} onEdit={()=>{setReviewId(undefined);setEdit(previewEvent);setPreviewEvent(null);setTab('events')}}/>}
@@ -192,6 +198,7 @@ export function AdminPanel({
               <Plus size={17} /> Novo evento
             </button>
           </div>
+          {!edit&&tab==='events'&&<div className="admin-event-view"><p>{showEnded?'Eventos encerrados':'Próximos eventos e rascunhos'}</p><button type="button" className="button secondary" aria-pressed={showEnded} onClick={()=>setShowEnded(value=>!value)}><Eye size={16}/>{showEnded?'Voltar aos próximos eventos':`Visualizar encerrados (${endedEvents.length})`}</button></div>}
           {edit ? (
             <EventForm
               key={edit.id || "new"}
@@ -207,11 +214,7 @@ export function AdminPanel({
             />
           ) : (
             <div className="admin-list">
-              {events
-                .filter((e) =>
-                  (tab!=='drafts'||e.status==='draft')&&e.title.toLowerCase().includes(filter.toLowerCase()),
-                )
-                .map((e) => (
+              {listedEvents.map((e) => (
                   <article className="admin-row" key={e.id}>
                     <div>
                       <span className="eyebrow">
@@ -296,9 +299,9 @@ export function AdminPanel({
                     </div>
                   </article>
                 ))}
-              {!events.some(e=>(tab!=='drafts'||e.status==='draft')&&e.title.toLowerCase().includes(filter.toLowerCase())) && (
+              {listedEvents.length===0 && (
                 <div className="empty">
-                  Nenhum evento nesta seleção. Confira a busca e a aba Eventos.
+                  {tab==='drafts'?'Nenhum rascunho nesta busca.':showEnded?'Nenhum evento encerrado nesta busca.':'Nenhum evento nesta seleção. Confira a busca ou use Visualizar encerrados para consultar os que já passaram.'}
                 </div>
               )}
             </div>
