@@ -1,4 +1,5 @@
 "use client";
+import {AdminNavigation} from './admin-navigation';
 import {useNow} from '@/lib/use-now';
 import {AdminSpecialTheme} from './admin-special-theme';
 import {AdminNotifications} from './admin-notifications';
@@ -114,7 +115,7 @@ export function AdminPanel({
   }
   return (
     <>
-      <div className="section-heading">
+      <div className="section-heading admin-page-heading">
         <div>
           <span className="eyebrow">PAINEL ADMINISTRATIVO</span>
           <h1>
@@ -133,7 +134,7 @@ export function AdminPanel({
       </div>
       <SaveConfirmation at={receipt} />
       {(pendingEvents.length>0||pendingSuggestions>0)&&<div className="pending-summary"><p><strong>Para revisar:</strong> {pendingEvents.length} {pendingEvents.length===1?'evento com dados pendentes':'eventos com dados pendentes'} · {pendingSuggestions} {pendingSuggestions===1?'sugestão aguardando análise':'sugestões aguardando análise'}.</p><button className="button secondary" onClick={()=>openPending()}>Ver pendências</button></div>}
-      <div className="stats-grid">
+      <div className="stats-grid admin-overview">
         {[
           ["Eventos cadastrados", events.length],
           ["Futuros", events.filter((e) => upcoming(e,now)).length],
@@ -157,33 +158,9 @@ export function AdminPanel({
           </div>
         ))}
       </div>
-      <div className="period-list">
-        {[
-          ["events", "Eventos"],
-          ["drafts", `Rascunhos (${events.filter(e=>e.status==='draft').length})`],
-          ["categories", "Categorias"],
-          ["pending", `Pendências (${pendingEvents.length+pendingSuggestions})`],
-          [
-            "submissions",
-            `Sugestões (${submissions.filter((s) => s.status === "pending").length})`,
-          ],
-          ["reports", `Problemas (${reports.filter(r=>r.status==='pending').length})`],
-          ["trash", `Lixeira (${allEvents.filter(e=>e.deleted_at).length})`],
-          ["stats", "Estatísticas"],
-          ["export", "Exportar cadastros"],
-          ["discovery", "Buscar eventos"],
-          ["venues", "Bares e boates"],
-          ["theme", "Tema especial"],
-        ].map(([v, t]) => (
-          <button
-            className={tab === v ? "active" : ""}
-            onClick={() => {if(dirty&&!confirm('Há alterações não salvas. Sair sem salvar?'))return;setEdit(null);setReviewId(undefined);setTab(v)}}
-            key={v}
-          >
-            {t}
-          </button>
-        ))}
-      </div>
+      <div className="admin-workspace">
+      <AdminNavigation selected={tab} counts={{drafts:events.filter(e=>e.status==='draft').length,pending:pendingEvents.length+pendingSuggestions,submissions:pendingSuggestions,reports:reports.filter(r=>r.status==='pending').length,trash:allEvents.filter(e=>e.deleted_at).length}} onSelect={value=>{if(value===tab)return true;if(dirty&&!confirm('Há alterações não salvas. Sair sem salvar?'))return false;setEdit(null);setReviewId(undefined);setTab(value);return true}}/>
+      <div className="admin-workspace-content">
       {error && <p role="alert">{error}</p>}
       {previewEvent&&<AdminEventPreview event={previewEvent} onClose={()=>setPreviewEvent(null)} onEdit={()=>{setReviewId(undefined);setEdit(previewEvent);setPreviewEvent(null);setTab('events')}}/>}
       {historyEvent&&<EventHistory key={historyEvent.id} event={historyEvent} onClose={()=>setHistoryEvent(null)} onSaved={refresh}/>}
@@ -517,6 +494,8 @@ export function AdminPanel({
           </p>
         </>
       )}
+      </div>
+      </div>
     </>
   );
 }
