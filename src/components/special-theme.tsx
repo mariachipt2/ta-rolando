@@ -4,7 +4,8 @@ import Link from 'next/link';
 import {Snowflake,MoonStar,ArrowUpRight,CalendarDays,MapPin} from 'lucide-react';
 import {request} from '@/lib/transport';
 import {useNow} from '@/lib/use-now';
-import {themeActive,themeCountdown,type ThemeData} from '@/lib/special-theme';
+import {themeActive,type ThemeData} from '@/lib/special-theme';
+import {ThemeCountdown} from './theme-countdown';
 import {displayDate} from '@/lib/dates';
 
 export function IceAtmosphere(){
@@ -28,7 +29,7 @@ export function ThemeBanner({data,now,preview=false}:{data:ThemeData;now:Date;pr
       <p className="ice-hero-subtitle">{ice?`A magia do gelo está chegando a ${event.city||'Ipatinga'}.`:'A noite mais sombria do ano está chegando.'}</p>
       <p className="ice-event-title">{event.title}</p>
       <div className="ice-event-details"><span><CalendarDays size={16}/>{displayDate(event.starts_at)}</span><span><MapPin size={16}/>{event.venue_name}</span></div>
-      <div className="ice-hero-actions"><span className="theme-countdown"><CalendarDays size={18}/>{themeCountdown(event,now)}</span>
+      <div className="ice-hero-actions"><ThemeCountdown event={event}/>
       {preview?<span className="button ice-event-button">Ver evento <ArrowUpRight size={20}/></span>:<Link className="button ice-event-button" href={'/evento/'+event.slug}>Ver evento <ArrowUpRight size={20}/></Link>}
       </div>
     </div></div>

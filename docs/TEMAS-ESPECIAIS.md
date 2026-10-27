@@ -60,3 +60,9 @@ dados públicos do evento Halloween Mansão e configuração simulada na prévia
 local. Menus, prévia isolada, animações desligadas e desativação foram
 verificados. Builds Pages e Next.js e caminhos das artes no CSS passaram.
 Nenhuma configuração de produção foi ativada ou alterada nesta revisão.
+
+O destaque e a prévia dos dois temas mostram dias, horas, minutos e segundos
+até o início do evento. Só o contador atualiza a cada segundo, usando o relógio
+sincronizado do site. Ao voltar à aba, recalcula pelo horário atual. Não consulta
+o Supabase a cada segundo. No início muda para Está rolando (ou É agora,
+quando o encerramento não foi informado), e nunca mostra valores negativos.
