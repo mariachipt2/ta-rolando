@@ -2,10 +2,10 @@
 import {useEffect,useState} from 'react';
 import type {Event} from '@/lib/types';
 import {request} from '@/lib/transport';
-import {defaultTheme,themeActive,specialThemeSchema,type SpecialTheme as Settings} from '@/lib/special-theme';
+import {defaultTheme,themeActive,specialThemeSchema,themeLabels,type SpecialTheme as Settings} from '@/lib/special-theme';
 import {localInput,toISO} from '@/lib/dates';
 import {useNow} from '@/lib/use-now';
-import {ThemeBanner,IceAtmosphere,HalloweenAtmosphere} from './special-theme';
+import {ThemeBanner,ThemeAtmosphere} from './special-theme';
 import {SaveConfirmation} from './save-confirmation';
 
 export function AdminSpecialTheme({events,onSaved,onDirtyChange}:{events:Event[];onSaved:(at:string)=>void;onDirtyChange:(dirty:boolean)=>void}){
@@ -37,7 +37,7 @@ export function AdminSpecialTheme({events,onSaved,onDirtyChange}:{events:Event[]
       <fieldset disabled={busy||(!saved.updated_at&&!!error)} className="theme-settings-fields">
         <div className="form-grid">
           <label className="check"><input type="checkbox" checked={settings.enabled} onChange={e=>change('enabled',e.target.checked)}/>Ativar tema especial</label>
-          <label>Tema<select value={settings.theme} onChange={e=>change('theme',e.target.value as Settings['theme'])}><option value="ice">Gelo / Frozen</option><option value="halloween">Halloween</option></select></label>
+          <label>Tema<select value={settings.theme} onChange={e=>change('theme',e.target.value as Settings['theme'])}>{Object.entries(themeLabels).map(([key,label])=><option key={key} value={key}>{label}</option>)}</select></label>
           <label className="full">Evento destacado<select value={settings.event_id||''} onChange={e=>change('event_id',e.target.value||null)}><option value="">Selecione um evento</option>{events.filter(e=>!e.deleted_at&&(e.status==='published'||e.status==='scheduled')).map(e=><option key={e.id} value={e.id}>{e.title} · {localInput(e.starts_at).replace('T',' ')}</option>)}</select><small>Eventos com publicação agendada só aparecem ao público depois da publicação.</small></label>
           <label>Animação<select value={settings.motion} onChange={e=>change('motion',e.target.value as Settings['motion'])}><option value="off">Sem animação</option><option value="soft">Suave</option><option value="full">Intensa</option></select><small>O brilho percorre os menus lentamente. Respeita a preferência de reduzir animações do aparelho.</small></label>
           <label>Começar em (Brasília)<input type="datetime-local" value={settings.starts_at?localInput(settings.starts_at):''} onChange={e=>change('starts_at',e.target.value?toISO(e.target.value):null)}/><small>Vazio: começa assim que você ativar e salvar.</small></label>
@@ -46,6 +46,6 @@ export function AdminSpecialTheme({events,onSaved,onDirtyChange}:{events:Event[]
         <div className="share-buttons"><button className="button lime-button" disabled={!dirty}>{busy?'Aguardando confirmação…':'Salvar tema'}</button><button className="button secondary" type="button" onClick={()=>setPreview(v=>!v)}>{preview?'Fechar prévia':'Pré-visualizar'}</button><button className="button secondary" type="button" disabled={!saved.enabled} onClick={()=>void save({...saved,enabled:false})}>Desativar agora</button></div>
       </fieldset>
     </form>
-    {preview&&<div className="theme-preview" data-special-theme={settings.theme} data-theme-motion={settings.motion}>{settings.theme==='ice'?<IceAtmosphere/>:<HalloweenAtmosphere/>}<p className="eyebrow">PRÉVIA LOCAL · AINDA NÃO PUBLICADA</p><div className="theme-preview-menu"><button type="button">Explorar</button><button type="button">Fim de semana</button><button type="button">Minha agenda</button></div>{event?<ThemeBanner data={{settings,event}} now={now} preview/>:<p>Selecione um evento para visualizar o destaque.</p>}</div>}
+    {preview&&<div className="theme-preview" data-special-theme={settings.theme} data-theme-motion={settings.motion}><ThemeAtmosphere theme={settings.theme}/><p className="eyebrow">PRÉVIA LOCAL · AINDA NÃO PUBLICADA</p><div className="theme-preview-menu"><button type="button">Explorar</button><button type="button">Fim de semana</button><button type="button">Minha agenda</button></div>{event?<ThemeBanner data={{settings,event}} now={now} preview/>:<p>Selecione um evento para visualizar o destaque.</p>}</div>}
   </section>;
 }

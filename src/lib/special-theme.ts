@@ -1,7 +1,8 @@
 import {z} from 'zod';
 import type {Event} from './types';
 import {day,upcoming} from './dates';
-export const specialThemeSchema=z.object({enabled:z.boolean(),theme:z.enum(['ice','halloween']),motion:z.enum(['off','soft','full']),event_id:z.string().uuid().nullable(),starts_at:z.string().datetime({offset:true}).nullable(),ends_at:z.string().datetime({offset:true}).nullable()}).refine(v=>!v.enabled||!!v.event_id,{message:'Selecione o evento destacado.'}).refine(v=>!v.starts_at||!v.ends_at||Date.parse(v.ends_at)>Date.parse(v.starts_at),{message:'O término do tema deve ser depois do início.'});
+export const themeLabels={ice:'Gelo / Frozen',halloween:'Halloween',christmas:'Natal',newyear:'Ano Novo'};
+export const specialThemeSchema=z.object({enabled:z.boolean(),theme:z.enum(['ice','halloween','christmas','newyear']),motion:z.enum(['off','soft','full']),event_id:z.string().uuid().nullable(),starts_at:z.string().datetime({offset:true}).nullable(),ends_at:z.string().datetime({offset:true}).nullable()}).refine(v=>!v.enabled||!!v.event_id,{message:'Selecione o evento destacado.'}).refine(v=>!v.starts_at||!v.ends_at||Date.parse(v.ends_at)>Date.parse(v.starts_at),{message:'O término do tema deve ser depois do início.'});
 export type SpecialTheme=z.infer<typeof specialThemeSchema>&{updated_at?:string};
 export type ThemeData={settings:SpecialTheme;event:Event|null};
 export const defaultTheme:SpecialTheme={enabled:false,theme:'ice',motion:'soft',event_id:null,starts_at:null,ends_at:null};

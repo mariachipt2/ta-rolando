@@ -1,6 +1,6 @@
 # Temas especiais
 
-No administrador, abra **Tema especial**. Escolha Gelo / Frozen ou Halloween,
+No administrador, abra **Tema especial**. Escolha Gelo / Frozen, Halloween, Natal ou Ano Novo,
 o evento destacado e a animação (sem animação, suave ou intensa).
 Use **Pré-visualizar** antes de ativar e salvar. A prévia não publica nada.
 
@@ -66,3 +66,19 @@ até o início do evento. Só o contador atualiza a cada segundo, usando o reló
 sincronizado do site. Ao voltar à aba, recalcula pelo horário atual. Não consulta
 o Supabase a cada segundo. No início muda para Está rolando (ou É agora,
 quando o encerramento não foi informado), e nunca mostra valores negativos.
+
+## Seleção sazonal
+
+A seleção final contém somente Gelo/Frozen, Halloween, Natal e Ano Novo.
+A preparação de Rock, Verão e da fila automática foi removida antes de
+publicar ou criar agendamentos no banco. Natal e Ano Novo são opções manuais,
+com prévia, intensidade, contagem regressiva e os controles de início, término
+e desativação já existentes. Os novos temas não foram ativados.
+A migração 015_seasonal_themes.sql apenas amplia a lista permitida no campo
+existente; não cria tabelas ou campos e não altera a configuração ativa.
+
+A migração 015 foi aplicada e a leitura de confirmação mostrou somente
+ice, halloween, christmas e newyear como valores permitidos. O Halloween
+ativo e o evento vinculado permaneceram intactos. Os dois novos temas foram
+conferidos com dados públicos, sem salvar a configuração da prévia. Cinco
+testes de tema/contagem, tipos e builds foram validados nesta revisão.
