@@ -261,7 +261,6 @@ export function Discover({
           ))}
         </div>
         </div>
-        <p className="muted" role="status">Data da agenda: {day(new Date(now)).split('-').reverse().join('/')} · Brasília</p>
           <div className="period-list">
           {[
             ["all", "Qualquer dia"],
