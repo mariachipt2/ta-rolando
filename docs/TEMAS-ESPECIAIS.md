@@ -1,6 +1,6 @@
 # Temas especiais
 
-No administrador, abra **Tema especial**. Escolha Gelo / Frozen, Halloween, Natal ou Ano Novo,
+No administrador, abra **Tema especial**. Escolha Gelo / Frozen, Halloween, Natal, Ano Novo ou Día de los Muertos,
 o evento destacado e a animação (sem animação, suave ou intensa).
 Use **Pré-visualizar** antes de ativar e salvar. A prévia não publica nada.
 
@@ -69,7 +69,7 @@ quando o encerramento não foi informado), e nunca mostra valores negativos.
 
 ## Seleção sazonal
 
-A seleção final contém somente Gelo/Frozen, Halloween, Natal e Ano Novo.
+A seleção contém Gelo/Frozen, Halloween, Natal, Ano Novo e Día de los Muertos.
 A preparação de Rock, Verão e da fila automática foi removida antes de
 publicar ou criar agendamentos no banco. Natal e Ano Novo são opções manuais,
 com prévia, intensidade, contagem regressiva e os controles de início, término
@@ -82,3 +82,29 @@ ice, halloween, christmas e newyear como valores permitidos. O Halloween
 ativo e o evento vinculado permaneceram intactos. Os dois novos temas foram
 conferidos com dados públicos, sem salvar a configuração da prévia. Cinco
 testes de tema/contagem, tipos e builds foram validados nesta revisão.
+
+
+## Día de los Muertos
+
+No administrador, escolha **Tema especial → Día de los Muertos**, selecione
+**FIESTA DE LOS MUERTOS** e use Pré-visualizar. Ative e salve quando desejar.
+O tema mantém os controles de início, fim, desativação e contagem regressiva.
+A arte usa caveira decorada, flores cempasúchil, velas e papel picado;
+pétalas flutuam na animação suave/intensa, respeitando movimento reduzido.
+Sem animação esconde as pétalas e mantém o cenário estático.
+
+A migração `016_muertos_theme.sql` foi aplicada em 29/10/2026: apenas amplia
+a restrição do campo `theme` existente. Nenhum campo/tabela novo é necessário.
+A configuração anterior (Halloween desligado) e seu recibo foram preservados;
+o novo tema não foi ativado. Código pronto para publicação pelo app da usuária.
+
+Arte criada com a ferramenta integrada de geração de imagens. Prompt:
+“Cenário noturno cinematográfico de Día de los Muertos; caveira de açúcar
+ornamentada à direita, flores alaranjadas cempasúchil, velas e papel picado,
+tons ameixa, magenta e turquesa, espaço escuro à esquerda para texto,
+sem palavras, logotipos ou elementos de interface.” Assets finais:
+`src/assets/themes/muertos.webp` e `muertos-mobile.webp`.
+
+Validação: testes de esquema, ativação, permissões e recibo em PGlite;
+prévia com dados públicos reais do evento em desktop e celular de 390px,
+sem gravação real. Prévia isolada do painel e opção Sem animação conferidas.

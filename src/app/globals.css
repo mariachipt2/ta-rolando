@@ -1514,3 +1514,19 @@ html:is([data-special-theme="christmas"],[data-special-theme="newyear"]) .event-
 .category-toggle:focus-visible{outline:2px solid var(--lime);outline-offset:4px}
 @media(max-width:600px){.category-toggle{width:100%}.category-chevron{margin-left:auto}.discovery-categories .category-list button{white-space:normal;text-align:left}}
 @media(prefers-reduced-motion:reduce){.category-chevron{transition:none}}
+
+/* Día de los Muertos: cempasúchil, velas e papel picado. */
+[data-special-theme="muertos"]{--bg:#160d20;--card:#27152f;--lime:#ffc078;--purple:#f29acb;--muted:#dbc4dd;--border:#63415f;--theme-glint:#ffe8ac;--theme-shadow:#ee69b4;--theme-cycle:12s}
+html[data-special-theme="muertos"] .site-header{z-index:40;background:#160d20ed;backdrop-filter:blur(14px)}
+html[data-special-theme="muertos"] .logo>svg{color:#b3ff4a}
+html[data-special-theme="muertos"] .event-card{background:linear-gradient(145deg,#301a36,#1d1228);border-color:var(--border)}
+html[data-special-theme="muertos"] .event-card:hover{border-color:#ffb75c;box-shadow:0 10px 32px #e95e9c22}
+.muertos-hero{background-color:#160d20;background-image:linear-gradient(90deg,#160d20bb,transparent 80%),linear-gradient(0deg,#160d20,transparent 25%),url('../assets/themes/muertos.webp');border-color:#efb66a44}
+.muertos-hero .ice-hero-copy :is(h1,h2)>span{background:linear-gradient(110deg,#ffe2a3,#ffb654 55%,#f491c5);background-clip:text;-webkit-text-fill-color:transparent}
+.muertos-hero .ice-special-label{color:#ffbd76}.muertos-hero .ice-event-title{color:#ffe1bc}.muertos-hero .ice-event-details{color:#eddae8}
+.muertos-hero .ice-event-button{background:linear-gradient(110deg,#ffd58a,#ffb567);color:#30182c;border-color:#ffd58a}
+.muertos-hero .event-countdown-unit{background:linear-gradient(150deg,#51253daa,#21112cdd);border-color:#ffbe7870}
+.muertos-hero .event-countdown-unit strong{color:#ffcf91}
+.muertos-atmosphere .seasonal-sparkles>span{width:7px;height:10px;border-radius:70% 10% 70% 20%;background:#ffb34f;box-shadow:0 0 8px #ff9b4c44;opacity:.55}
+.muertos-atmosphere .seasonal-sparkles>span:nth-child(3n){width:5px;height:7px;background:#ed83bd}
+@media(max-width:600px){.muertos-hero{background-image:linear-gradient(0deg,#160d20 0%,#160d2010 18%,#160d2044 48%,#160d20ef 76%,#160d20 100%),url('../assets/themes/muertos-mobile.webp')}}
