@@ -1500,3 +1500,17 @@ html:is([data-special-theme="christmas"],[data-special-theme="newyear"]) .event-
 .program-stories{margin-top:18px;padding-top:18px;border-top:1px solid var(--border)}.program-stories-content{margin-top:22px;min-width:0}.program-stories-content>p{max-width:820px}.program-stories-content>label{display:block;margin:20px 0 12px}.program-stories-content input{min-width:0;width:100%}.program-story-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;margin-top:24px}.program-story-item{min-width:0;padding:16px;border:1px solid var(--border);border-radius:15px;background:#100f19}.program-story-item h4{margin:0 0 12px}.program-story-item>img{display:block;width:100%;height:auto;aspect-ratio:9/16;border-radius:9px}.program-story-item .share-buttons{gap:9px;flex-direction:column;align-items:stretch;margin-top:15px}.program-story-item .button{font-size:12px;padding:11px 12px}.program-story-item .muted{font-size:12px;line-height:1.5}
 @media(max-width:1000px){.program-story-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.program-story-grid{grid-template-columns:minmax(0,1fr)}.program-stories>.button{width:100%}.program-story-item{padding:13px}}
+
+/* Categorias recolhidas para dar espaço à agenda. */
+.discovery-categories{margin:22px 0}
+.category-toggle{display:flex;align-items:center;gap:12px;max-width:100%;padding:12px 16px;border:1px solid var(--border);border-radius:12px;background:var(--card);color:var(--text);text-align:left;cursor:pointer}
+.category-toggle>svg:first-child{color:var(--purple);flex-shrink:0}
+.category-toggle span{display:grid;gap:3px;overflow-wrap:anywhere}
+.category-toggle small{color:var(--muted);font-size:11px}
+.category-chevron{margin-left:20px;flex-shrink:0;transition:transform .2s}
+.category-toggle[aria-expanded="true"] .category-chevron{transform:rotate(180deg)}
+.discovery-categories .category-list{margin:12px 0 0;flex-wrap:wrap;overflow:visible}
+.discovery-categories .category-list[hidden]{display:none}
+.category-toggle:focus-visible{outline:2px solid var(--lime);outline-offset:4px}
+@media(max-width:600px){.category-toggle{width:100%}.category-chevron{margin-left:auto}.discovery-categories .category-list button{white-space:normal;text-align:left}}
+@media(prefers-reduced-motion:reduce){.category-chevron{transition:none}}

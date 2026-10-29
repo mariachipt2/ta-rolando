@@ -1,9 +1,10 @@
 "use client";
 import {useNow} from '@/lib/use-now';
 import Link from 'next/link';
-import { useMemo, useState } from "react";
+import { useId, useMemo, useRef, useState } from "react";
 import {
   Search,
+  ChevronDown,
   ArrowDown,
   ArrowUpRight,
   SlidersHorizontal,
@@ -36,6 +37,15 @@ export function Discover({
     [childrenOnly,setChildrenOnly]=useState(false),
     [filters, setFilters] = useState(false),
     [limits, setLimits] = useState<Record<string, number>>({});
+  const [categoriesOpen, setCategoriesOpen] = useState(false);
+  const categoryPanelId = useId();
+  const categoryTrigger = useRef<HTMLButtonElement>(null);
+  const selectedCategory = categories.find(c => c.id === category);
+  const selectCategory = (id: string) => {
+    setCategory(id);
+    setCategoriesOpen(false);
+    categoryTrigger.current?.focus();
+  };
   const now=useNow();
   const active = !!(
     childrenOnly ||
@@ -201,7 +211,6 @@ export function Discover({
             <Flame size={17} /> Tá bombando <ArrowUpRight size={16} />
           </a>
         </div>
-        <div className="discovery-shortcuts"><Link className="text-link" href="/comparar">Comparar rolês ↗</Link><Link className="text-link" href="/programacao">Montar minha programação ↗</Link><Link className="button secondary" href="/fim-de-semana">Resumo de sexta a domingo ↗</Link><Link className="text-link" href="/organizadores">Organizadores favoritos ↗</Link></div>
         <div className="search-row">
           <label className="search">
             <Search size={21} />
@@ -220,10 +229,22 @@ export function Discover({
             <SlidersHorizontal size={18} /> Filtros
           </button>
         </div>
-        <div className="category-list" id="categorias">
+        <div className="discovery-categories" id="categorias" onKeyDown={e => {
+          if (e.key === 'Escape' && categoriesOpen) {
+            setCategoriesOpen(false);
+            categoryTrigger.current?.focus();
+          }
+        }}>
+          <button ref={categoryTrigger} className="category-toggle" aria-expanded={categoriesOpen} aria-controls={categoryPanelId} onClick={() => setCategoriesOpen(!categoriesOpen)}>
+            {selectedCategory ? <CategoryIcon name={selectedCategory.icon} /> : <Sparkles size={20} />}
+            <span><small>Tipo de rolê</small>{selectedCategory?.name || 'Todos os rolês'}</span>
+            <ChevronDown size={18} className="category-chevron" />
+          </button>
+        <div className="category-list" id={categoryPanelId} hidden={!categoriesOpen}>
           <button
             className={!category ? "selected" : ""}
-            onClick={() => setCategory("")}
+            aria-pressed={!category}
+            onClick={() => selectCategory("")}
           >
             <Sparkles size={20} /> Todos os rolês
           </button>
@@ -231,12 +252,14 @@ export function Discover({
             <button
               key={c.id}
               className={category === c.id ? "selected" : ""}
-              onClick={() => setCategory(c.id)}
+              aria-pressed={category === c.id}
+              onClick={() => selectCategory(c.id)}
             >
               <CategoryIcon name={c.icon} />
               {c.name}
             </button>
           ))}
+        </div>
         </div>
         <p className="muted" role="status">Data da agenda: {day(new Date(now)).split('-').reverse().join('/')} · Brasília</p>
           <div className="period-list">
