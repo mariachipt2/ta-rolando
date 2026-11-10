@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import assert from 'node:assert/strict';
 const html=fs.readFileSync('dist-pages/index.html','utf8');
 const base=process.env.PAGES_BASE||'/ta-rolando/';
-const assets=[...html.matchAll(/(?:src|href)="([^"]+\/assets\/[^\"]+)"/g)].map(x=>x[1]);
+const assets=[...html.matchAll(/(?:src|href)="([^"]*\/assets\/[^\"]+)"/g)].map(x=>x[1]);
 assert.ok(assets.length>=2,'HTML deve incluir JS e CSS');
 for(const asset of assets){assert.ok(asset.startsWith(base),'Asset fora do subdiretório Pages');assert.ok(fs.existsSync('dist-pages/'+asset.slice(base.length)))}
 const css=fs.readdirSync('dist-pages/assets').filter(x=>x.endsWith('.css')).map(x=>fs.readFileSync('dist-pages/assets/'+x,'utf8')).join('\n');
