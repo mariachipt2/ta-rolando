@@ -47,7 +47,7 @@ export function Share({
         rel="noopener noreferrer"
         href={"https://wa.me/?text=" + encodeURIComponent(title + " — " + url)}
       >
-        <MessageCircle size={16} /> WhatsApp
+        <MessageCircle size={16} /> Enviar só o link
       </a>
       <button
         className="button secondary"
