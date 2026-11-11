@@ -11,14 +11,33 @@ import {
   Sparkles,
   Flame,
   CalendarDays,
-  MapPin,
   X,
 } from "lucide-react";
 import type { Event, Category } from "@/lib/types";
-import { upcoming, inPeriod, day } from "@/lib/dates";
+import { upcoming, inPeriod, day, displayDate } from "@/lib/dates";
 import { EventCard } from "./event-card";
 import {forChildren} from '@/lib/event-discovery';
 import { CategoryIcon } from "./category-icon";
+
+function HeroEvent({ event }: { event: Event }) {
+  const cover = event.cover_url || event.gallery?.[0];
+  const [failed, setFailed] = useState(false);
+  return (
+    <Link href={"/evento/" + event.slug} className="home-spotlight">
+      <div className="home-spotlight-art">
+        {cover && !failed ? (
+          <img src={cover} alt="" decoding="async" onError={() => setFailed(true)} />
+        ) : <CalendarDays size={46} aria-hidden="true" />}
+      </div>
+      <div className="home-spotlight-copy">
+        <span className="eyebrow">{event.featured ? "Em destaque" : "Na agenda"}</span>
+        <strong>{event.title}</strong>
+        <span>{displayDate(event.starts_at)}</span>
+        <span className="home-spotlight-action">Ver evento <ArrowUpRight size={16} /></span>
+      </div>
+    </Link>
+  );
+}
 export function Discover({
   events,
   categories,
@@ -77,6 +96,10 @@ export function Discover({
       (!date ||
         (day(e.starts_at) <= date && day(e.ends_at || e.starts_at) >= date)),
   );
+  const nextEvents = [...future].sort((a, b) => a.starts_at.localeCompare(b.starts_at));
+  const spotlight = nextEvents.find(e => e.featured && (e.cover_url || e.gallery?.[0]))
+    ?? nextEvents.find(e => e.cover_url || e.gallery?.[0])
+    ?? nextEvents[0];
   const ranking = [...future]
     .sort(
       (a, b) =>
@@ -142,10 +165,10 @@ export function Discover({
   );
   return (
     <>
-      <section className="hero shell">
+      <section className="hero shell home-hero">
         <div className="hero-copy">
           <span className="live-label">
-            <i /> A CIDADE NÃO PARA. VOCÊ TAMBÉM NÃO.
+            <i /> AGENDA DE IPATINGA
           </span>
           <h1>
             O que tá rolando
@@ -159,48 +182,17 @@ export function Discover({
             Shows, festas, cultura, esportes, feiras e tudo que movimenta a
             cidade. <strong>Descubra seu próximo rolê!</strong>
           </p>
-          <a className="button lime-button" href="#explorar">
-            Bora descobrir <ArrowDown size={18} />
-          </a>
-          <div className="hero-note">
-            <MapPin size={15} /> Seu próximo encontro começa aqui.
+          <div className="home-hero-actions">
+            <a className="button lime-button" href="#explorar">
+              Explorar eventos <ArrowDown size={18} />
+            </a>
+            <Link href="/fim-de-semana" className="button secondary">
+              Fim de semana <ArrowUpRight size={17} />
+            </Link>
           </div>
         </div>
-        <div className="hero-art" aria-hidden="true">
-          <div className="orbit orbit-one" />
-          <div className="orbit orbit-two" />
-          <div className="poster">
-            <span>
-              IPATINGA
-              <br />
-              FORA DO ÓBVIO
-            </span>
-            <div className="poster-title">
-              VIVA
-              <br />
-              <em>A SUA</em>
-              <br />
-              CIDADE<span>↗</span>
-            </div>
-            <div className="poster-bottom">
-              MÚSICA. CULTURA. ENCONTROS.
-              <br />
-              <b>O PRÓXIMO ROLÊ É SEU.</b>
-            </div>
-          </div>
-          <div className="floating-sticker">
-            <Sparkles size={22} /> tem rolê
-            <br />
-            <b>pra todo mundo.</b>
-          </div>
-          <div className="starburst">✳</div>
-        </div>
+        {spotlight && <HeroEvent key={spotlight.id} event={spotlight} />}
       </section>
-      <div className="ticker">
-        <span>MENOS ROTINA</span> ✳ <span>MAIS HISTÓRIAS</span> ✳{" "}
-        <span>VIVA IPATINGA</span> ✳ <span>ENCONTRE SUA TURMA</span> ✳{" "}
-        <span>MAIS ROLÊS</span>
-      </div>
       <div className="shell discovery" id="explorar">
         <div className="section-heading">
           <div>
@@ -272,6 +264,7 @@ export function Discover({
             <button
               key={v}
               className={period === v ? "active" : ""}
+              aria-pressed={period === v}
               onClick={() => setPeriod(v)}
             >
               {t}
@@ -279,6 +272,7 @@ export function Discover({
           ))}
           <button
             className={price === "free" ? "active" : ""}
+            aria-pressed={price === "free"}
             onClick={() => setPrice(price === "free" ? "all" : "free")}
           >
             ✦ Gratuitos

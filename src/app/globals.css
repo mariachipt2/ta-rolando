@@ -1530,3 +1530,65 @@ html[data-special-theme="muertos"] .event-card:hover{border-color:#ffb75c;box-sh
 .muertos-atmosphere .seasonal-sparkles>span{width:7px;height:10px;border-radius:70% 10% 70% 20%;background:#ffb34f;box-shadow:0 0 8px #ff9b4c44;opacity:.55}
 .muertos-atmosphere .seasonal-sparkles>span:nth-child(3n){width:5px;height:7px;background:#ed83bd}
 @media(max-width:600px){.muertos-hero{background-image:linear-gradient(0deg,#160d20 0%,#160d2010 18%,#160d2044 48%,#160d20ef 76%,#160d20 100%),url('../assets/themes/muertos-mobile.webp')}}
+
+/* Home: upcoming event artwork and compact discovery controls. */
+.home-hero {
+  min-height: 0;
+  gap: clamp(28px, 5vw, 72px);
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  padding-block: clamp(36px, 6vw, 84px);
+  background: radial-gradient(ellipse at 78% 42%, #8f57fa24, transparent 55%);
+}
+.home-hero .hero-copy { grid-column: 1 / -1; }
+.home-hero:has(.home-spotlight) .hero-copy { grid-column: auto; }
+.home-hero-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.home-spotlight {
+  display: grid;
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  overflow: hidden;
+  background: var(--card);
+  color: var(--text);
+  transition: border-color .2s, transform .2s;
+  animation: home-enter .3s ease-out;
+}
+.home-spotlight-art {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  color: var(--purple);
+  background: radial-gradient(ellipse at center, #3a265d, #15101f 75%);
+}
+.home-spotlight-art img { width: 100%; height: 100%; min-height: 0; object-fit: contain; }
+.home-spotlight-copy { display: grid; gap: 5px; padding: 16px 20px; min-width: 0; }
+.home-spotlight-copy strong { font-size: clamp(19px, 2vw, 28px); overflow-wrap: anywhere; }
+.home-spotlight-copy > span:nth-child(3) { color: var(--muted); font-size: 13px; }
+.home-spotlight-action { display: flex; gap: 6px; align-items: center; color: var(--lime); font-size: 13px; font-weight: 700; }
+.home-spotlight:focus-visible { outline: 2px solid var(--lime); outline-offset: -3px; }
+.discovery .filter-panel, .discovery .category-list:not([hidden]) { animation: home-enter .18s ease-out; }
+@keyframes home-enter {
+  from { opacity: .65; transform: translateY(7px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .home-spotlight:hover { border-color: var(--purple); transform: translateY(-3px); }
+}
+@media (max-width: 700px) {
+  .home-hero { grid-template-columns: minmax(0, 1fr); gap: 20px; padding-block: 26px 12px; }
+  .home-hero h1 { font-size: clamp(34px, 9.8vw, 55px); margin-bottom: 13px; }
+  .home-hero p { margin-bottom: 16px; line-height: 1.55; }
+  .home-hero .live-label { margin-bottom: 13px; font-size: 10px; }
+  .home-hero-actions .button { padding-inline: 12px; }
+  .home-spotlight { grid-template-columns: minmax(0, 28%) minmax(0, 1fr); border-radius: 15px; }
+  .home-spotlight-art { aspect-ratio: auto; position: relative; }
+  .home-spotlight-art img { position: absolute; inset: 0; }
+  .home-spotlight-copy { padding: 12px; }
+  .home-spotlight-copy strong { font-size: 17px; }
+  .discovery .period-list { gap: 6px; flex-wrap: wrap; }
+  .discovery .period-list button { min-height: 44px; }
+  .discovery .category-list:not([hidden]) { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); max-height: none; }
+  .discovery .category-list button { min-height: 44px; font-size: 12px; }
+  .discovery .category-list button svg { flex-shrink: 0; }
+}
