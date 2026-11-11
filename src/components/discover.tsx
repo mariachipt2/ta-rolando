@@ -2,9 +2,12 @@
 import {useNow} from '@/lib/use-now';
 import Link from 'next/link';
 import { useId, useMemo, useRef, useState } from "react";
+import { LazyMotion, domAnimation, m, useReducedMotion } from "motion/react";
 import {
   Search,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   ArrowDown,
   ArrowUpRight,
   SlidersHorizontal,
@@ -32,10 +35,51 @@ function HeroEvent({ event }: { event: Event }) {
       <div className="home-spotlight-copy">
         <span className="eyebrow">{event.featured ? "Em destaque" : "Na agenda"}</span>
         <strong>{event.title}</strong>
-        <span>{displayDate(event.starts_at)}</span>
+        <span className="home-spotlight-date">{displayDate(event.starts_at)}</span>
         <span className="home-spotlight-action">Ver evento <ArrowUpRight size={16} /></span>
       </div>
     </Link>
+  );
+}
+
+function HomeSpotlight({ events }: { events: Event[] }) {
+  const [selected, setSelected] = useState(0);
+  const reduceMotion = useReducedMotion();
+  const index = Math.min(selected, events.length - 1);
+  const event = events[index];
+  if (!event) return null;
+
+  const move = (step: number) => {
+    setSelected((index + step + events.length) % events.length);
+  };
+
+  return (
+    <section className="home-spotlight-panel" aria-label="Eventos em destaque">
+      <LazyMotion features={domAnimation} strict>
+        <m.div
+          key={event.id}
+          initial={reduceMotion ? false : { opacity: 0.6, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: reduceMotion ? 0 : 0.22, ease: "easeOut" }}
+        >
+          <HeroEvent event={event} />
+        </m.div>
+      </LazyMotion>
+      {events.length > 1 && (
+        <div className="home-spotlight-controls">
+          <span aria-live="polite" aria-atomic="true">
+            {index + 1} de {events.length}
+            <span className="home-spotlight-announcement">: {event.title}</span>
+          </span>
+          <button type="button" aria-label="Destaque anterior" onClick={() => move(-1)}>
+            <ChevronLeft size={20} aria-hidden="true" />
+          </button>
+          <button type="button" aria-label="Próximo destaque" onClick={() => move(1)}>
+            <ChevronRight size={20} aria-hidden="true" />
+          </button>
+        </div>
+      )}
+    </section>
   );
 }
 export function Discover({
@@ -96,10 +140,14 @@ export function Discover({
       (!date ||
         (day(e.starts_at) <= date && day(e.ends_at || e.starts_at) >= date)),
   );
-  const nextEvents = [...future].sort((a, b) => a.starts_at.localeCompare(b.starts_at));
-  const spotlight = nextEvents.find(e => e.featured && (e.cover_url || e.gallery?.[0]))
-    ?? nextEvents.find(e => e.cover_url || e.gallery?.[0])
-    ?? nextEvents[0];
+  const spotlight = useMemo(() => {
+    const hasCover = (event: Event) => Boolean(event.cover_url || event.gallery?.[0]);
+    return [...future].sort((a, b) =>
+      Number(b.featured && hasCover(b)) - Number(a.featured && hasCover(a)) ||
+      Number(hasCover(b)) - Number(hasCover(a)) ||
+      Date.parse(a.starts_at) - Date.parse(b.starts_at)
+    ).slice(0, 4);
+  }, [future]);
   const ranking = [...future]
     .sort(
       (a, b) =>
@@ -191,7 +239,7 @@ export function Discover({
             </Link>
           </div>
         </div>
-        {spotlight && <HeroEvent key={spotlight.id} event={spotlight} />}
+        <HomeSpotlight events={spotlight} />
       </section>
       <div className="shell discovery" id="explorar">
         <div className="section-heading">
