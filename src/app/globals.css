@@ -1612,3 +1612,71 @@ html[data-special-theme="muertos"] .event-card:hover{border-color:#ffb75c;box-sh
   .discovery .category-list button { min-height: 44px; font-size: 12px; }
   .discovery .category-list button svg { flex-shrink: 0; }
 }
+
+/* Editorial treatment for the default homepage. */
+.home-hero {
+  isolation: isolate;
+  background:
+    radial-gradient(ellipse at 78% 40%, #733ed326, transparent 59%),
+    linear-gradient(155deg, transparent 40%, #2117306b);
+  border-bottom: 1px solid #a47aff38;
+}
+.home-hero .live-label { color: #d8c7f2; }
+.home-hero h1 {
+  font-weight: 850;
+  font-size: clamp(48px, 6.15vw, 94px);
+  line-height: .98;
+  text-wrap: balance;
+}
+.home-spotlight {
+  border-color: #be98ff42;
+  border-radius: 16px;
+  box-shadow: 0 18px 48px #0005;
+}
+.home-spotlight-art { aspect-ratio: 16 / 10; isolation: isolate; }
+.home-spotlight-art .home-spotlight-glow {
+  object-fit: cover;
+  opacity: .42;
+  filter: blur(27px) saturate(1.35);
+  transform: scale(1.22);
+  pointer-events: none;
+}
+.home-spotlight-art .home-spotlight-poster { padding: 8px; }
+.home-spotlight-copy {
+  padding: 17px 20px;
+  border-top: 1px solid #ffffff18;
+  background: linear-gradient(115deg, #231a32, #15121c);
+}
+.home-spotlight-copy strong { line-height: 1.12; }
+.home-spotlight-controls button:active,
+.editorial-discovery .event-card .cover:active { opacity: .8; }
+html:not([data-special-theme]) .editorial-discovery .event-card {
+  background: linear-gradient(155deg, #1e1928, #15121b 68%);
+  border-color: #ffffff1c;
+}
+html:not([data-special-theme]) .editorial-discovery .cover {
+  aspect-ratio: 6 / 5;
+  background: radial-gradient(ellipse at 50% 30%, #30243f, #141019 78%);
+}
+html:not([data-special-theme]) .editorial-discovery .card-body h3 {
+  font-size: clamp(19px, 1.65vw, 25px);
+  line-height: 1.15;
+  letter-spacing: -.025em;
+  margin-bottom: 12px;
+}
+html:not([data-special-theme]) .editorial-discovery .price-tag {
+  left: 10px;
+  top: 10px;
+  border-radius: 8px;
+}
+@media (hover: none), (prefers-reduced-motion: reduce) {
+  .editorial-discovery .event-card:hover { transform: none; }
+}
+@media (max-width: 700px) {
+  .home-hero h1 { font-size: clamp(38px, 9.8vw, 60px); text-wrap: initial; }
+  .home-spotlight { grid-template-columns: minmax(0, 34%) minmax(0, 1fr); }
+  .home-spotlight-art { aspect-ratio: auto; min-height: 130px; }
+  .home-spotlight-art .home-spotlight-glow { filter: blur(16px) saturate(1.2); }
+  .home-spotlight-art .home-spotlight-poster { padding: 4px; }
+  .home-spotlight-copy { align-content: center; padding: 12px; border-top: 0; }
+}

@@ -29,7 +29,10 @@ function HeroEvent({ event }: { event: Event }) {
     <Link href={"/evento/" + event.slug} className="home-spotlight">
       <div className="home-spotlight-art">
         {cover && !failed ? (
-          <img src={cover} alt="" decoding="async" onError={() => setFailed(true)} />
+          <>
+            <img className="home-spotlight-glow" src={cover} alt="" aria-hidden="true" />
+            <img className="home-spotlight-poster" src={cover} alt="" decoding="async" onError={() => setFailed(true)} />
+          </>
         ) : <CalendarDays size={46} aria-hidden="true" />}
       </div>
       <div className="home-spotlight-copy">
@@ -241,7 +244,7 @@ export function Discover({
         </div>
         <HomeSpotlight events={spotlight} />
       </section>
-      <div className="shell discovery" id="explorar">
+      <div className="shell discovery editorial-discovery" id="explorar">
         <div className="section-heading">
           <div>
             <span className="eyebrow">A CIDADE É SUA</span>
