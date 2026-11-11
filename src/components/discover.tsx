@@ -133,6 +133,7 @@ export function Discover({
     [limits, setLimits] = useState<Record<string, number>>({});
   const [categoriesOpen, setCategoriesOpen] = useState(false);
   const categoryPanelId = useId();
+  const advancedFilterId = useId();
   const categoryTrigger = useRef<HTMLButtonElement>(null);
   const selectedCategory = categories.find(c => c.id === category);
   const selectCategory = (id: string) => {
@@ -258,8 +259,7 @@ export function Discover({
             </span>
           </h1>
           <p>
-            Shows, festas, cultura, esportes, feiras e tudo que movimenta a
-            cidade. <strong>Descubra seu próximo rolê!</strong>
+            Shows, festas, cultura e mais em Ipatinga.
           </p>
           <div className="home-hero-actions">
             <a className="button lime-button" href="#explorar">
@@ -282,7 +282,7 @@ export function Discover({
             <Flame size={17} /> Tá bombando <ArrowUpRight size={16} />
           </a>
         </div>
-        <div className="search-row">
+        <div className="search-row" id="categorias">
           <label className="search">
             <Search size={21} />
             <input
@@ -296,55 +296,21 @@ export function Discover({
             className={"button secondary " + (filters ? "selected" : "")}
             onClick={() => setFilters(!filters)}
             aria-expanded={filters}
+            aria-controls={advancedFilterId}
           >
             <SlidersHorizontal size={18} /> Filtros
           </button>
         </div>
-        <div className="discovery-categories" id="categorias" onKeyDown={e => {
-          if (e.key === 'Escape' && categoriesOpen) {
-            setCategoriesOpen(false);
-            categoryTrigger.current?.focus();
-          }
-        }}>
-          <button ref={categoryTrigger} className="category-toggle" aria-expanded={categoriesOpen} aria-controls={categoryPanelId} onClick={() => setCategoriesOpen(!categoriesOpen)}>
-            {selectedCategory ? <CategoryIcon name={selectedCategory.icon} /> : <Sparkles size={20} />}
-            <span><small>Tipo de rolê</small>{selectedCategory?.name || 'Todos os rolês'}</span>
-            <ChevronDown size={18} className="category-chevron" />
-          </button>
-        <div className="category-list" id={categoryPanelId} hidden={!categoriesOpen}>
-          <button
-            className={!category ? "selected" : ""}
-            aria-pressed={!category}
-            onClick={() => selectCategory("")}
-          >
-            <Sparkles size={20} /> Todos os rolês
-          </button>
-          {categories.map((c) => (
-            <button
-              key={c.id}
-              className={category === c.id ? "selected" : ""}
-              aria-pressed={category === c.id}
-              onClick={() => selectCategory(c.id)}
-            >
-              <CategoryIcon name={c.icon} />
-              {c.name}
-            </button>
-          ))}
-        </div>
-        </div>
-          <div className="period-list">
+        <div className="period-list discovery-quick-filters" role="group" aria-label="Filtros rápidos">
           {[
-            ["all", "Qualquer dia"],
             ["today", "Hoje"],
-            ["tomorrow", "Amanhã"],
             ["weekend", "Fim de semana"],
-            ["week", "Próximos 7 dias"],
           ].map(([v, t]) => (
             <button
               key={v}
               className={period === v ? "active" : ""}
               aria-pressed={period === v}
-              onClick={() => setPeriod(v)}
+              onClick={() => setPeriod(period === v ? "all" : v)}
             >
               {t}
             </button>
@@ -357,9 +323,18 @@ export function Discover({
             ✦ Gratuitos
           </button>
         </div>
-        <div className="family-filter"><button className={'button secondary '+(childrenOnly?'selected':'')} aria-pressed={childrenOnly} onClick={()=>setChildrenOnly(!childrenOnly)}>Para crianças</button>{childrenOnly&&<small>Somente eventos informados como adequados para crianças. Confira também a classificação indicativa.</small>}</div>
-        {filters && (
+        <div id={advancedFilterId} hidden={!filters}>
           <div className="filter-panel">
+            <label>
+              Período
+              <select aria-label="Período" value={period} onChange={(e) => setPeriod(e.target.value)}>
+                <option value="all">Qualquer dia</option>
+                <option value="today">Hoje</option>
+                <option value="tomorrow">Amanhã</option>
+                <option value="weekend">Fim de semana</option>
+                <option value="week">Próximos 7 dias</option>
+              </select>
+            </label>
             <label>
               Data
               <input
@@ -385,7 +360,40 @@ export function Discover({
               </select>
             </label>
           </div>
-        )}
+          <div className="discovery-categories" onKeyDown={e => {
+            if (e.key === 'Escape' && categoriesOpen) {
+              setCategoriesOpen(false);
+              categoryTrigger.current?.focus();
+            }
+          }}>
+            <button ref={categoryTrigger} className="category-toggle" aria-expanded={categoriesOpen} aria-controls={categoryPanelId} onClick={() => setCategoriesOpen(!categoriesOpen)}>
+              {selectedCategory ? <CategoryIcon name={selectedCategory.icon} /> : <Sparkles size={20} />}
+              <span><small>Tipo de rolê</small>{selectedCategory?.name || 'Todos os rolês'}</span>
+              <ChevronDown size={18} className="category-chevron" />
+            </button>
+          <div className="category-list" id={categoryPanelId} hidden={!categoriesOpen}>
+            <button
+              className={!category ? "selected" : ""}
+              aria-pressed={!category}
+              onClick={() => selectCategory("")}
+            >
+              <Sparkles size={20} /> Todos os rolês
+            </button>
+            {categories.map((c) => (
+              <button
+                key={c.id}
+                className={category === c.id ? "selected" : ""}
+                aria-pressed={category === c.id}
+                onClick={() => selectCategory(c.id)}
+              >
+                <CategoryIcon name={c.icon} />
+                {c.name}
+              </button>
+            ))}
+          </div>
+          </div>
+          <div className="family-filter"><button className={'button secondary '+(childrenOnly?'selected':'')} aria-pressed={childrenOnly} onClick={()=>setChildrenOnly(!childrenOnly)}>Para crianças</button>{childrenOnly&&<small>Somente eventos informados como adequados para crianças. Confira também a classificação indicativa.</small>}</div>
+        </div>
         {error && (
           <p role="alert" className="notice">
             Não conseguimos consultar os eventos agora. Recarregue a página em

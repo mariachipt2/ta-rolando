@@ -1681,3 +1681,46 @@ html:not([data-special-theme]) .editorial-discovery .price-tag {
   .home-spotlight-art .home-spotlight-poster { padding: 4px; }
   .home-spotlight-copy { align-content: center; padding: 12px; border-top: 0; }
 }
+
+.editorial-discovery .discovery-quick-filters {
+  margin: 10px 0 18px;
+  padding: 0;
+  border: 0;
+  gap: 6px;
+}
+.editorial-discovery .discovery-quick-filters button {
+  min-height: 44px;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 6px 13px;
+  font-size: 12px;
+}
+.editorial-discovery .discovery-quick-filters button.active {
+  background: var(--lime);
+  border-color: var(--lime);
+  color: #141019;
+}
+.editorial-discovery .event-date { font-weight: 700; font-size: 14px; }
+.editorial-discovery .card-body > p:not(.event-date) { overflow-wrap: anywhere; }
+.editorial-discovery .card-links .event-details-link {
+  min-height: 44px;
+  padding-inline: 10px;
+  border: 1px solid var(--lime);
+  border-radius: 8px;
+}
+.editorial-discovery .compare-card-control > .button[aria-pressed="false"] {
+  background: transparent;
+  border-color: transparent;
+  color: var(--muted);
+}
+@media (max-width: 700px) {
+  .home-hero { gap: 11px; padding-block: 16px 8px; }
+  .home-hero h1 { font-size: clamp(33px, 9vw, 50px); margin-bottom: 8px; }
+  .home-hero .live-label { margin-bottom: 8px; }
+  .home-hero p { margin-bottom: 9px; }
+  .home-spotlight-art { min-height: 112px; }
+  .home-spotlight-controls { margin-top: 4px; }
+  .home-hero + .editorial-discovery { padding-top: 18px; }
+  .editorial-discovery > .section-heading { margin-bottom: 10px; }
+  .editorial-discovery .search input { min-width: 0; }
+}

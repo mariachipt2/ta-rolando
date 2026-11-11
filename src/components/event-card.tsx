@@ -59,7 +59,7 @@ export function EventCard({ event: e, rank }: { event: Event; rank?: number }) {
           </span>}
           <div className="card-links">
           <InstagramLink url={e.instagram_url} compact/>
-          <Link href={"/evento/" + e.slug}>
+          <Link href={"/evento/" + e.slug} className="event-details-link">
             Ver evento <ArrowUpRight size={18} />
           </Link>
           </div>
