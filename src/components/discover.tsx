@@ -47,6 +47,8 @@ function HeroEvent({ event }: { event: Event }) {
 
 function HomeSpotlight({ events }: { events: Event[] }) {
   const [selected, setSelected] = useState(0);
+  const touchStart = useRef<{ id: number; x: number; y: number } | null>(null);
+  const suppressClick = useRef(false);
   const reduceMotion = useReducedMotion();
   const index = Math.min(selected, events.length - 1);
   const event = events[index];
@@ -61,6 +63,32 @@ function HomeSpotlight({ events }: { events: Event[] }) {
       <LazyMotion features={domAnimation} strict>
         <m.div
           key={event.id}
+          className={events.length > 1 ? "home-spotlight-swipe" : undefined}
+          onPointerDown={e => {
+            suppressClick.current = false;
+            if (e.pointerType === "touch" && e.isPrimary && events.length > 1) {
+              touchStart.current = { id: e.pointerId, x: e.clientX, y: e.clientY };
+            }
+          }}
+          onPointerCancel={() => { touchStart.current = null; }}
+          onPointerUp={e => {
+            const start = touchStart.current;
+            touchStart.current = null;
+            if (!start || start.id !== e.pointerId) return;
+            const dx = e.clientX - start.x;
+            const dy = e.clientY - start.y;
+            if (Math.abs(dx) >= 45 && Math.abs(dx) > 1.4 * Math.abs(dy)) {
+              suppressClick.current = true;
+              move(dx < 0 ? 1 : -1);
+            }
+          }}
+          onClickCapture={e => {
+            if (e.detail && suppressClick.current) {
+              suppressClick.current = false;
+              e.preventDefault();
+              e.stopPropagation();
+            }
+          }}
           initial={reduceMotion ? false : { opacity: 0.6, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: reduceMotion ? 0 : 0.22, ease: "easeOut" }}

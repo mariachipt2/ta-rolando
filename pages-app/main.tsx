@@ -1,7 +1,7 @@
 import {SpecialTheme} from '../src/components/special-theme';
 import {useNow} from '@/lib/use-now';
 import {VenueSubmission} from '@/components/venue-submission';
-import React, { useEffect, useState } from "react";
+import React, { lazy, Suspense, useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { Radio, MapPin, CalendarDays, ArrowLeft } from "lucide-react";
 import {SiteNavigation} from '@/components/site-navigation';
@@ -17,8 +17,6 @@ import {FollowOrganizer} from '@/components/follow-organizer';
 import {SimilarEvents} from '@/components/similar-events';
 import {SharePoster} from '@/components/share-poster';
 import {EventTimeline} from '@/components/event-timeline';
-import { AdminLogin } from "@/components/admin-login";
-import { AdminPanel } from "@/components/admin-panel";
 import { Attendance } from "@/components/attendance";
 import { Share } from "@/components/share";
 import { CalendarDownload } from "@/components/calendar-download";
@@ -32,6 +30,9 @@ import { configureTransport } from "@/lib/transport";
 import { displayDate, upcoming } from "@/lib/dates";
 import type { Event } from "@/lib/types";
 import { transport, loadPublic, loadAdmin, configured } from "./api";
+
+const AdminLogin = lazy(() => import("@/components/admin-login").then(({ AdminLogin }) => ({ default: AdminLogin })));
+const AdminPanel = lazy(() => import("@/components/admin-panel").then(({ AdminPanel }) => ({ default: AdminPanel })));
 import "@/app/globals.css";
 configureTransport(transport);
 const route = () => location.hash.slice(1).split("?")[0] || "/";
@@ -189,7 +190,7 @@ function App() {
         event.preventDefault();
         document
           .getElementById(href.slice(1))
-          ?.scrollIntoView({ behavior: "smooth" });
+          ?.scrollIntoView();
       }
     };
     document.addEventListener("click", click);
@@ -296,14 +297,16 @@ function App() {
           </div>
         ) : path === "/admin" ? (
           <div className="shell page">
-            {admin ? (
-              <AdminPanel key={revision} {...admin} />
-            ) : (
-              <AdminLogin
-                configured={configured}
-                configurationHint="Configure as variáveis públicas do Supabase no GitHub Actions e publique novamente. Consulte o guia GITHUB-PAGES.md do projeto."
-              />
-            )}
+            <Suspense fallback={<p role="status">Carregando área administrativa…</p>}>
+              {admin ? (
+                <AdminPanel key={revision} {...admin} />
+              ) : (
+                <AdminLogin
+                  configured={configured}
+                  configurationHint="Configure as variáveis públicas do Supabase no GitHub Actions e publique novamente. Consulte o guia GITHUB-PAGES.md do projeto."
+                />
+              )}
+            </Suspense>
           </div>
         ) : path === '/enviar-evento' ? (
           <VenueSubmission id={new URLSearchParams(location.hash.split('?')[1]||'').get('local')||''} categories={data?.categories||[]}/>

@@ -17,7 +17,7 @@ export function EventCard({ event: e, rank }: { event: Event; rank?: number }) {
           <img
             src={cover}
             alt={e.title}
-            loading="eager"
+            loading="lazy"
             decoding="async"
           />
         ) : (
