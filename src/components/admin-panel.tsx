@@ -57,6 +57,7 @@ export function AdminPanel({
   const events=allEvents.filter(e=>!e.deleted_at);
   const [historyEvent,setHistoryEvent]=useState<Event|null>(null);
   const [showEnded,setShowEnded]=useState(false);
+  const [openBotOnly,setOpenBotOnly]=useState(false);
   const [previewEvent,setPreviewEvent]=useState<Event|null>(null);
   const router = useRouter();
   const [edit, setEdit] = useState<Partial<Event> | null>(null),
@@ -82,7 +83,7 @@ export function AdminPanel({
   const endedEvents=events.filter(event=>event.status!=='draft'&&!upcoming(event,now));
   const listedEvents=events.filter(event=>{
     const inView=tab==='drafts'?event.status==='draft':showEnded?event.status!=='draft'&&!upcoming(event,now):event.status==='draft'||upcoming(event,now);
-    return inView&&event.title.toLocaleLowerCase('pt-BR').includes(filter.toLocaleLowerCase('pt-BR'));
+    return inView&&(!openBotOnly||tab!=='drafts'||event.slug.startsWith('openbot-'))&&event.title.toLocaleLowerCase('pt-BR').includes(filter.toLocaleLowerCase('pt-BR'));
   });
   const total = events.reduce((n, e) => n + e.interest_count, 0);
   const metricList = metrics.filter((m) => !stats || m.event_id === stats);
@@ -180,6 +181,7 @@ export function AdminPanel({
       {(tab === "events"||tab === "drafts") && (
         <>
           {tab==='drafts'&&<p className="notice">Rascunhos salvos no Supabase. Eles só aparecem aqui; use Editar e publicar, escolha Status: Publicado e salve quando estiver pronto.</p>}
+          {tab==='drafts'&&<button type="button" className="button secondary" aria-pressed={openBotOnly} onClick={()=>setOpenBotOnly(value=>!value)}>{openBotOnly?'Ver todos os rascunhos':'Importados do OpenBot'} ({events.filter(e=>e.status==='draft'&&e.slug.startsWith('openbot-')).length})</button>}
           <div className="search-row">
             <input
               aria-label="Buscar no painel"
@@ -229,6 +231,7 @@ export function AdminPanel({
                         {e.status!=='draft'&&e.status!=='cancelled'&&!upcoming(e,now)&&' · Encerrado'}
                       </span>
                       <h3>{e.title}</h3>
+                      {e.slug.startsWith('openbot-')&&<small>Importado do OpenBot</small>}
                       {eventIssues(e).length>0&&<ul className="pending-reasons">{eventIssues(e).map(issue=><li key={issue.type}>{issue.label}</li>)}</ul>}
                       <p>
                         {e.updated_at
