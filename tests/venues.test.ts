@@ -30,6 +30,21 @@ test('Locais: escrita administrativa, atualização idempotente, recibo e link p
  await db.exec('reset role;set role authenticated');await assert.rejects(()=>save(data));await db.exec(`select set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000001',false)`);
  assert.ok((await save(data)).rows[0].result.saved_at);await save({...data,address:'Rua B'});assert.equal((await db.query('select * from venues')).rows.length,2);
  await assert.rejects(()=>db.query(`select save_venue('00000000-0000-4000-8000-000000000003',$1)`,[JSON.stringify(data)]));
+ await db.exec('reset role');
+ await db.exec(readFileSync('supabase/migrations/017_nightlife_filter.sql','utf8'));
+ await db.exec(`insert into events(slug,title,description,address,category_id,venue_id,venue_name,starts_at,status)
+ select event.slug,event.slug,'Descrição','Rua B',c.id,event.venue_id,event.venue_name,now()+interval '1 day',event.status
+ from categories c cross join (values
+ ('linked','${id}'::uuid,'Nome antigo','published'),
+ ('legacy',null,' boate um ','published'),
+ ('square',null,'Praça','published'),
+ ('draft-nightlife','${id}'::uuid,'Boate Um','draft')
+ ) event(slug,venue_id,venue_name,status)
+ where c.name='Shows e música'`);
+ await db.exec('set role anon');
+ const tagged=await db.query('select slug,nightlife_venue from public_events order by slug');
+ assert.deepEqual(tagged.rows,[{slug:'legacy',nightlife_venue:true},{slug:'linked',nightlife_venue:true},{slug:'square',nightlife_venue:false}]);
+ await db.exec("reset role;delete from events where slug in ('legacy','linked','square','draft-nightlife')");
  await db.exec('reset role;set role anon');const visible=(await db.query<{venue:Record<string,unknown>}>('select submission_venue($1) venue',[id])).rows[0].venue;assert.equal(visible.name,'Boate Um');assert.equal(visible.address,'Rua B');assert.equal('source_key' in visible,false);assert.equal('website' in visible,false);
  await db.exec(`reset role;set role authenticated`);await save({...data,share_enabled:false});await db.exec('reset role;set role anon');assert.equal((await db.query<{venue:unknown}>('select submission_venue($1) venue',[id])).rows[0].venue,null);
  await db.exec('reset role');assert.equal((await db.query<{entity:string}>('select entity from admin_save_state')).rows[0].entity,'venues');assert.equal((await db.query('select * from events')).rows.length,0);

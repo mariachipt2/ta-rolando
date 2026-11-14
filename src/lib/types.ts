@@ -14,6 +14,7 @@ export type Event = {
   starts_at: string;
   ends_at: string | null;
   venue_name: string;
+  nightlife_venue?: boolean;
   address: string;
   neighborhood: string;
   city: string;

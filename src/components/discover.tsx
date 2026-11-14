@@ -1,7 +1,7 @@
 "use client";
 import {useNow} from '@/lib/use-now';
 import Link from 'next/link';
-import { useId, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { LazyMotion, domAnimation, m, useReducedMotion } from "motion/react";
 import {
   Search,
@@ -19,8 +19,10 @@ import {
 import type { Event, Category } from "@/lib/types";
 import { upcoming, inPeriod, day, displayDate } from "@/lib/dates";
 import { EventCard } from "./event-card";
-import {forChildren} from '@/lib/event-discovery';
+import {forChildren,isNightlifeCategory} from '@/lib/event-discovery';
 import { CategoryIcon } from "./category-icon";
+
+const nightlifePreference = "tr:hide-nightlife";
 
 function HeroEvent({ event }: { event: Event }) {
   const cover = event.cover_url || event.gallery?.[0];
@@ -132,10 +134,24 @@ export function Discover({
     [filters, setFilters] = useState(false),
     [limits, setLimits] = useState<Record<string, number>>({});
   const [categoriesOpen, setCategoriesOpen] = useState(false);
+  const [hideNightlife, setHideNightlife] = useState(false);
+  useEffect(() => {
+    try { setHideNightlife(localStorage.getItem(nightlifePreference) === "1"); } catch {}
+  }, []);
+  const updateNightlife = (hidden: boolean) => {
+    setHideNightlife(hidden);
+    if (hidden && isNightlifeCategory(selectedCategory)) setCategory("");
+    try {
+      if (hidden) localStorage.setItem(nightlifePreference, "1");
+      else localStorage.removeItem(nightlifePreference);
+    } catch {}
+  };
   const categoryPanelId = useId();
   const advancedFilterId = useId();
   const categoryTrigger = useRef<HTMLButtonElement>(null);
   const selectedCategory = categories.find(c => c.id === category);
+  const religiousCategory = categories.find(c => c.name === "Eventos religiosos");
+  const nightlifeCategories = useMemo(() => new Set(categories.filter(isNightlifeCategory).map(c => c.id)), [categories]);
   const selectCategory = (id: string) => {
     setCategory(id);
     setCategoriesOpen(false);
@@ -152,8 +168,9 @@ export function Discover({
     date
   );
   const future = useMemo(
-    () => events.filter((e) => upcoming(e,new Date(now)) && e.status !== "cancelled"),
-    [events,now],
+    () => events.filter(e => upcoming(e, new Date(now)) && e.status !== "cancelled" &&
+      (!hideNightlife || (!e.nightlife_venue && !nightlifeCategories.has(e.category_id) && !isNightlifeCategory(e.categories)))),
+    [events, now, hideNightlife, nightlifeCategories],
   );
   const filtered = future.filter(
     (e) =>
@@ -293,7 +310,7 @@ export function Discover({
             />
           </label>
           <button
-            className={"button secondary " + (filters ? "selected" : "")}
+            className={"button secondary " + (filters || hideNightlife ? "selected" : "")}
             onClick={() => setFilters(!filters)}
             aria-expanded={filters}
             aria-controls={advancedFilterId}
@@ -322,6 +339,9 @@ export function Discover({
           >
             ✦ Gratuitos
           </button>
+          {hideNightlife && <button className="active" aria-pressed="true" onClick={() => updateNightlife(false)}>
+            Bares e baladas ocultos <X size={15} aria-hidden="true" />
+          </button>}
         </div>
         <div id={advancedFilterId} hidden={!filters}>
           <div className="filter-panel">
@@ -379,7 +399,7 @@ export function Discover({
             >
               <Sparkles size={20} /> Todos os rolês
             </button>
-            {categories.map((c) => (
+            {categories.filter(c => !hideNightlife || !isNightlifeCategory(c)).map((c) => (
               <button
                 key={c.id}
                 className={category === c.id ? "selected" : ""}
@@ -391,6 +411,15 @@ export function Discover({
               </button>
             ))}
           </div>
+          </div>
+          <div className="family-filter" role="group" aria-label="Preferências de eventos">
+            <button type="button" className="button secondary" aria-pressed={hideNightlife} onClick={() => updateNightlife(!hideNightlife)}>
+              Ocultar bares e baladas
+            </button>
+            {religiousCategory && <button type="button" className="button secondary" aria-pressed={category === religiousCategory.id}
+              onClick={() => setCategory(category === religiousCategory.id ? "" : religiousCategory.id)}>
+              Eventos religiosos
+            </button>}
           </div>
           <div className="family-filter"><button className={'button secondary '+(childrenOnly?'selected':'')} aria-pressed={childrenOnly} onClick={()=>setChildrenOnly(!childrenOnly)}>Para crianças</button>{childrenOnly&&<small>Somente eventos informados como adequados para crianças. Confira também a classificação indicativa.</small>}</div>
         </div>
