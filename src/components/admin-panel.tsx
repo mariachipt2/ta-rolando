@@ -45,6 +45,7 @@ export function AdminPanel({
   metrics,
   submissions,
   saveState,
+  draftId,
 }: {
   events: Event[];
   reports: EventReport[];
@@ -52,6 +53,7 @@ export function AdminPanel({
   metrics: Metric[];
   submissions: EventSubmission[];
   saveState: SaveState;
+  draftId?: string;
 }) {
   const now=new Date(useNow());
   const events=allEvents.filter(e=>!e.deleted_at);
@@ -60,9 +62,10 @@ export function AdminPanel({
   const [openBotOnly,setOpenBotOnly]=useState(false);
   const [previewEvent,setPreviewEvent]=useState<Event|null>(null);
   const router = useRouter();
-  const [edit, setEdit] = useState<Partial<Event> | null>(null),
-    [tab, setTab] = useState(()=>discoveryHasResults()?"discovery":"events"),
-    [error, setError] = useState(""),
+  const linkedDraft = draftId ? events.find(event => event.id === draftId && event.status === "draft" && event.slug.startsWith("openbot-")) : undefined;
+  const [edit, setEdit] = useState<Partial<Event> | null>(linkedDraft ?? null),
+    [tab, setTab] = useState(()=>draftId?"drafts":discoveryHasResults()?"discovery":"events"),
+    [error, setError] = useState(draftId && !linkedDraft ? "Este rascunho não está disponível. Confira a lista de rascunhos abaixo." : ""),
     [busy, setBusy] = useState(false),
     [filter, setFilter] = useState(""),
     [category, setCategory] = useState<Partial<Category> | null>(null),
@@ -70,7 +73,15 @@ export function AdminPanel({
     [reviewId, setReviewId] = useState<string | undefined>(),
     [receipt, setReceipt] = useState(saveState.saved_at),
     [dirty,setDirty]=useState(false);
+  const clearDraftLink = () => {
+    if (draftId && location.hash.startsWith("#/admin?")) {
+      const params = new URLSearchParams(location.hash.split("?")[1]);
+      params.delete("rascunho");
+      history.replaceState(history.state, "", params.size ? `#/admin?${params}` : "#/admin");
+    }
+  };
   const refresh = (savedAt: string) => {
+    clearDraftLink();
     setReceipt(savedAt);
     if(!edit?.id&&edit?.additional_info?.startsWith('Fonte da busca:'))setTab('discovery');
     setHistoryEvent(null);
@@ -208,7 +219,7 @@ export function AdminPanel({
               savedEvents={events}
               initialUnsaved={!edit.id&&!!edit.additional_info?.startsWith('Fonte da busca:')}
               categories={categories}
-              onClose={() => {if(!edit.id&&edit.additional_info?.startsWith('Fonte da busca:'))setTab('discovery');setEdit(null)}}
+              onClose={() => {clearDraftLink();if(!edit.id&&edit.additional_info?.startsWith('Fonte da busca:'))setTab('discovery');setEdit(null)}}
               onSaved={refresh}
               submissionId={reviewId}
               submissionPhoto={submissions.find(s=>s.id===reviewId)?.photo_url}

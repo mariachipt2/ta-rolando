@@ -299,7 +299,7 @@ function App() {
           <div className="shell page">
             <Suspense fallback={<p role="status">Carregando área administrativa…</p>}>
               {admin ? (
-                <AdminPanel key={revision} {...admin} />
+                <AdminPanel key={revision} {...admin} draftId={new URLSearchParams(location.hash.split("?")[1]).get("rascunho") || undefined} />
               ) : (
                 <AdminLogin
                   configured={configured}

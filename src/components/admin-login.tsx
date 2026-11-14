@@ -30,7 +30,7 @@ export function AdminLogin({ configured, configurationHint }: { configured: bool
             });
             const d = await r.json();
             if (!r.ok) throw Error(d.error);
-            navigate("/admin");
+            navigate(location.hash.startsWith("#/admin?") ? location.hash.slice(1) : "/admin");
           } catch (e) {
             setError(e instanceof Error ? e.message : "Falha ao entrar.");
           } finally {
