@@ -2,13 +2,12 @@
 import {useNow} from '@/lib/use-now';
 import Link from 'next/link';
 import { useEffect, useId, useMemo, useRef, useState } from "react";
-import { LazyMotion, domAnimation, m, useReducedMotion } from "motion/react";
+import { LazyMotion, domAnimation, m, useMotionValue, useReducedMotion, useSpring } from "motion/react";
 import {
   Search,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
-  ArrowDown,
   ArrowUpRight,
   SlidersHorizontal,
   Sparkles,
@@ -52,6 +51,10 @@ function HomeSpotlight({ events }: { events: Event[] }) {
   const touchStart = useRef<{ id: number; x: number; y: number } | null>(null);
   const suppressClick = useRef(false);
   const reduceMotion = useReducedMotion();
+  const pointerX = useMotionValue(0);
+  const pointerY = useMotionValue(0);
+  const rotateY = useSpring(pointerX, { stiffness: 190, damping: 25 });
+  const rotateX = useSpring(pointerY, { stiffness: 190, damping: 25 });
   const index = Math.min(selected, events.length - 1);
   const event = events[index];
   if (!event) return null;
@@ -61,8 +64,17 @@ function HomeSpotlight({ events }: { events: Event[] }) {
   };
 
   return (
-    <section className="home-spotlight-panel" aria-label="Eventos em destaque">
+    <section className="home-spotlight-panel" aria-label="Eventos em destaque"
+      onPointerMove={e => {
+        if (reduceMotion || e.pointerType !== "mouse") return;
+        const bounds = e.currentTarget.getBoundingClientRect();
+        pointerX.set(((e.clientX - bounds.left) / bounds.width - .5) * 9);
+        pointerY.set((.5 - (e.clientY - bounds.top) / bounds.height) * 7);
+      }}
+      onPointerLeave={() => { pointerX.set(0); pointerY.set(0); }}>
       <LazyMotion features={domAnimation} strict>
+        <m.div className="spotlight-stage" style={reduceMotion ? undefined : { rotateX, rotateY }}>
+          {events.length > 1 && <div className="spotlight-depth" aria-hidden="true" />}
         <m.div
           key={event.id}
           className={events.length > 1 ? "home-spotlight-swipe" : undefined}
@@ -91,11 +103,12 @@ function HomeSpotlight({ events }: { events: Event[] }) {
               e.stopPropagation();
             }
           }}
-          initial={reduceMotion ? false : { opacity: 0.6, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduceMotion ? 0 : 0.22, ease: "easeOut" }}
+          initial={reduceMotion ? false : { opacity: 0.45, y: 14, scale: .97 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={reduceMotion ? { duration: 0 } : { type: "spring", stiffness: 260, damping: 27 }}
         >
           <HeroEvent event={event} />
+        </m.div>
         </m.div>
       </LazyMotion>
       {events.length > 1 && (
@@ -278,13 +291,129 @@ export function Discover({
           <p>
             Shows, festas, cultura e mais em Ipatinga.
           </p>
-          <div className="home-hero-actions">
-            <a className="button lime-button" href="#explorar">
-              Explorar eventos <ArrowDown size={18} />
-            </a>
-            <Link href="/fim-de-semana" className="button secondary">
-              Fim de semana <ArrowUpRight size={17} />
-            </Link>
+          <div className="search-row" id="categorias">
+            <label className="search">
+              <Search size={21} />
+              <input
+                aria-label="Pesquisar evento"
+                placeholder="Busque seu próximo rolê..."
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+              />
+            </label>
+            <button
+              className={"button secondary " + (filters || hideNightlife ? "selected" : "")}
+              onClick={() => setFilters(!filters)}
+              aria-expanded={filters}
+              aria-controls={advancedFilterId}
+            >
+              <SlidersHorizontal size={18} /> Filtros
+            </button>
+          </div>
+          <div className="period-list discovery-quick-filters" role="group" aria-label="Filtros rápidos">
+            {[
+              ["today", "Hoje"],
+              ["weekend", "Fim de semana"],
+            ].map(([v, t]) => (
+              <button
+                key={v}
+                className={period === v ? "active" : ""}
+                aria-pressed={period === v}
+                onClick={() => setPeriod(period === v ? "all" : v)}
+              >
+                {t}
+              </button>
+            ))}
+            <button
+              className={price === "free" ? "active" : ""}
+              aria-pressed={price === "free"}
+              onClick={() => setPrice(price === "free" ? "all" : "free")}
+            >
+              ✦ Gratuitos
+            </button>
+            {hideNightlife && <button className="active" aria-pressed="true" onClick={() => updateNightlife(false)}>
+              Bares e baladas ocultos <X size={15} aria-hidden="true" />
+            </button>}
+          </div>
+          <div id={advancedFilterId} hidden={!filters}>
+            <div className="filter-panel">
+              <label>
+                Período
+                <select aria-label="Período" value={period} onChange={(e) => setPeriod(e.target.value)}>
+                  <option value="all">Qualquer dia</option>
+                  <option value="today">Hoje</option>
+                  <option value="tomorrow">Amanhã</option>
+                  <option value="weekend">Fim de semana</option>
+                  <option value="week">Próximos 7 dias</option>
+                </select>
+              </label>
+              <label>
+                Data
+                <input
+                  type="date"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                />
+              </label>
+              <label>
+                Local ou bairro
+                <input
+                  value={place}
+                  onChange={(e) => setPlace(e.target.value)}
+                  placeholder="Ex.: Centro"
+                />
+              </label>
+              <label>
+                Entrada
+                <select value={price} onChange={(e) => setPrice(e.target.value)}>
+                  <option value="all">Todas</option>
+                  <option value="free">Gratuitos</option>
+                  <option value="paid">Pagos</option>
+                </select>
+              </label>
+            </div>
+            <div className="discovery-categories" onKeyDown={e => {
+              if (e.key === 'Escape' && categoriesOpen) {
+                setCategoriesOpen(false);
+                categoryTrigger.current?.focus();
+              }
+            }}>
+              <button ref={categoryTrigger} className="category-toggle" aria-expanded={categoriesOpen} aria-controls={categoryPanelId} onClick={() => setCategoriesOpen(!categoriesOpen)}>
+                {selectedCategory ? <CategoryIcon name={selectedCategory.icon} /> : <Sparkles size={20} />}
+                <span><small>Tipo de rolê</small>{selectedCategory?.name || 'Todos os rolês'}</span>
+                <ChevronDown size={18} className="category-chevron" />
+              </button>
+            <div className="category-list" id={categoryPanelId} hidden={!categoriesOpen}>
+              <button
+                className={!category ? "selected" : ""}
+                aria-pressed={!category}
+                onClick={() => selectCategory("")}
+              >
+                <Sparkles size={20} /> Todos os rolês
+              </button>
+              {categories.filter(c => !hideNightlife || !isNightlifeCategory(c)).map((c) => (
+                <button
+                  key={c.id}
+                  className={category === c.id ? "selected" : ""}
+                  aria-pressed={category === c.id}
+                  onClick={() => selectCategory(c.id)}
+                >
+                  <CategoryIcon name={c.icon} />
+                  {c.name}
+                </button>
+              ))}
+            </div>
+            </div>
+            <div className="family-filter" role="group" aria-label="Preferências de eventos">
+              <button type="button" className="button secondary" aria-pressed={hideNightlife} onClick={() => updateNightlife(!hideNightlife)}>
+                Ocultar bares e baladas
+              </button>
+              {religiousCategory && <button type="button" className="button secondary" aria-pressed={category === religiousCategory.id}
+                onClick={() => setCategory(category === religiousCategory.id ? "" : religiousCategory.id)}>
+                Eventos religiosos
+              </button>}
+            </div>
+            <div className="family-filter"><button className={'button secondary '+(childrenOnly?'selected':'')} aria-pressed={childrenOnly} onClick={()=>setChildrenOnly(!childrenOnly)}>Para crianças</button>{childrenOnly&&<small>Somente eventos informados como adequados para crianças. Confira também a classificação indicativa.</small>}</div>
           </div>
         </div>
         <HomeSpotlight events={spotlight} />
@@ -298,130 +427,6 @@ export function Discover({
           <a href="#bombando" className="text-link">
             <Flame size={17} /> Tá bombando <ArrowUpRight size={16} />
           </a>
-        </div>
-        <div className="search-row" id="categorias">
-          <label className="search">
-            <Search size={21} />
-            <input
-              aria-label="Pesquisar evento"
-              placeholder="Busque seu próximo rolê..."
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-            />
-          </label>
-          <button
-            className={"button secondary " + (filters || hideNightlife ? "selected" : "")}
-            onClick={() => setFilters(!filters)}
-            aria-expanded={filters}
-            aria-controls={advancedFilterId}
-          >
-            <SlidersHorizontal size={18} /> Filtros
-          </button>
-        </div>
-        <div className="period-list discovery-quick-filters" role="group" aria-label="Filtros rápidos">
-          {[
-            ["today", "Hoje"],
-            ["weekend", "Fim de semana"],
-          ].map(([v, t]) => (
-            <button
-              key={v}
-              className={period === v ? "active" : ""}
-              aria-pressed={period === v}
-              onClick={() => setPeriod(period === v ? "all" : v)}
-            >
-              {t}
-            </button>
-          ))}
-          <button
-            className={price === "free" ? "active" : ""}
-            aria-pressed={price === "free"}
-            onClick={() => setPrice(price === "free" ? "all" : "free")}
-          >
-            ✦ Gratuitos
-          </button>
-          {hideNightlife && <button className="active" aria-pressed="true" onClick={() => updateNightlife(false)}>
-            Bares e baladas ocultos <X size={15} aria-hidden="true" />
-          </button>}
-        </div>
-        <div id={advancedFilterId} hidden={!filters}>
-          <div className="filter-panel">
-            <label>
-              Período
-              <select aria-label="Período" value={period} onChange={(e) => setPeriod(e.target.value)}>
-                <option value="all">Qualquer dia</option>
-                <option value="today">Hoje</option>
-                <option value="tomorrow">Amanhã</option>
-                <option value="weekend">Fim de semana</option>
-                <option value="week">Próximos 7 dias</option>
-              </select>
-            </label>
-            <label>
-              Data
-              <input
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-              />
-            </label>
-            <label>
-              Local ou bairro
-              <input
-                value={place}
-                onChange={(e) => setPlace(e.target.value)}
-                placeholder="Ex.: Centro"
-              />
-            </label>
-            <label>
-              Entrada
-              <select value={price} onChange={(e) => setPrice(e.target.value)}>
-                <option value="all">Todas</option>
-                <option value="free">Gratuitos</option>
-                <option value="paid">Pagos</option>
-              </select>
-            </label>
-          </div>
-          <div className="discovery-categories" onKeyDown={e => {
-            if (e.key === 'Escape' && categoriesOpen) {
-              setCategoriesOpen(false);
-              categoryTrigger.current?.focus();
-            }
-          }}>
-            <button ref={categoryTrigger} className="category-toggle" aria-expanded={categoriesOpen} aria-controls={categoryPanelId} onClick={() => setCategoriesOpen(!categoriesOpen)}>
-              {selectedCategory ? <CategoryIcon name={selectedCategory.icon} /> : <Sparkles size={20} />}
-              <span><small>Tipo de rolê</small>{selectedCategory?.name || 'Todos os rolês'}</span>
-              <ChevronDown size={18} className="category-chevron" />
-            </button>
-          <div className="category-list" id={categoryPanelId} hidden={!categoriesOpen}>
-            <button
-              className={!category ? "selected" : ""}
-              aria-pressed={!category}
-              onClick={() => selectCategory("")}
-            >
-              <Sparkles size={20} /> Todos os rolês
-            </button>
-            {categories.filter(c => !hideNightlife || !isNightlifeCategory(c)).map((c) => (
-              <button
-                key={c.id}
-                className={category === c.id ? "selected" : ""}
-                aria-pressed={category === c.id}
-                onClick={() => selectCategory(c.id)}
-              >
-                <CategoryIcon name={c.icon} />
-                {c.name}
-              </button>
-            ))}
-          </div>
-          </div>
-          <div className="family-filter" role="group" aria-label="Preferências de eventos">
-            <button type="button" className="button secondary" aria-pressed={hideNightlife} onClick={() => updateNightlife(!hideNightlife)}>
-              Ocultar bares e baladas
-            </button>
-            {religiousCategory && <button type="button" className="button secondary" aria-pressed={category === religiousCategory.id}
-              onClick={() => setCategory(category === religiousCategory.id ? "" : religiousCategory.id)}>
-              Eventos religiosos
-            </button>}
-          </div>
-          <div className="family-filter"><button className={'button secondary '+(childrenOnly?'selected':'')} aria-pressed={childrenOnly} onClick={()=>setChildrenOnly(!childrenOnly)}>Para crianças</button>{childrenOnly&&<small>Somente eventos informados como adequados para crianças. Confira também a classificação indicativa.</small>}</div>
         </div>
         {error && (
           <p role="alert" className="notice">
