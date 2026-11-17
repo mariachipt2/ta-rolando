@@ -10,6 +10,10 @@ import { BotCheck } from "./bot-check";
 import { savedTime } from "./save-confirmation";
 import {AGE_OPTIONS} from '@/lib/age-options';
 import {photoType} from '../../supabase/functions/_shared/photos';
+
+const suggestionWhatsAppUrl =
+  "https://wa.me/5531920113713?text=Ol%C3%A1!%20Gostaria%20de%20divulgar%20um%20evento%20no%20T%C3%A1%20Rolando%20Ipatinga.%20Seguem%20as%20informa%C3%A7%C3%B5es%20e%20o%20cartaz:";
+
 export function SubmitEvent({ categories,initialVenue }: { categories: Category[];initialVenue?:PublicVenue }) {
   const [open, setOpen] = useState(!!initialVenue),
     [busy, setBusy] = useState(false),
@@ -40,17 +44,23 @@ export function SubmitEvent({ categories,initialVenue }: { categories: Category[
           <span className="eyebrow">A CIDADE TAMBÉM É FEITA POR VOCÊ</span>
           <h2>{initialVenue?'Envie a programação de '+initialVenue.name:'Sabe de um evento que vai rolar?'}</h2>
           <p>
-            Envie sua sugestão. A administração confere as informações antes de
-            publicar.
+            {initialVenue
+              ? "Envie sua sugestão. A administração confere as informações antes de publicar."
+              : "Envie as informações e o cartaz pelo WhatsApp. A administração confere a sugestão antes de publicar."}
           </p>
         </div>
-        <button
-          className="button lime-button"
-          onClick={() => setOpen(!open)}
-          aria-expanded={open}
-        >
-          <Send size={18} /> Sugerir um evento
-        </button>
+        {initialVenue ? (
+          <button className="button lime-button" onClick={() => setOpen(!open)} aria-expanded={open}>
+            <Send size={18} /> Sugerir um evento
+          </button>
+        ) : (
+          <a className="button lime-button" href={suggestionWhatsAppUrl} target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 16 16" width="17" height="17" fill="currentColor" aria-hidden="true">
+              <path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232" />
+            </svg>
+            Sugerir um evento
+          </a>
+        )}
       </div>
       {open && (
         <div className="panel">
