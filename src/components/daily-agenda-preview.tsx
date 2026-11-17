@@ -51,9 +51,9 @@ export function DailyAgendaPreview({ events, now }: { events: Event[]; now: numb
             <>
               <article className="daily-preview-feature">
                 {poster && <>
-                  <img className="daily-preview-glow" src={poster} alt="" aria-hidden="true" />
+                  <img className="daily-preview-glow" src={poster} alt="" aria-hidden="true" loading="lazy" decoding="async" fetchPriority="low" />
                   <div className="daily-preview-poster">
-                    <img src={poster} alt={"Cartaz de " + featured.title} />
+                    <img src={poster} alt={"Cartaz de " + featured.title} loading="lazy" decoding="async" />
                     <PosterZoom key={poster} src={poster} title={featured.title} />
                   </div>
                 </>}
@@ -68,7 +68,7 @@ export function DailyAgendaPreview({ events, now }: { events: Event[]; now: numb
                   <li key={event.id}>
                     <Link href={eventLink(event)}>
                       <time dateTime={event.starts_at}>{time.format(new Date(event.starts_at))}</time>
-                      {cover(event) ? <img src={cover(event)} alt="" loading="lazy" /> : <span aria-hidden="true" />}
+                      {cover(event) ? <img src={cover(event)} alt="" loading="lazy" decoding="async" fetchPriority="low" /> : <span aria-hidden="true" />}
                       <span><strong>{event.title}</strong><small>{event.venue_name}</small></span>
                       <ArrowUpRight size={16} aria-hidden="true" />
                     </Link>

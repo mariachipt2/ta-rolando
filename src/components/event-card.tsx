@@ -19,6 +19,7 @@ export function EventCard({ event: e, rank }: { event: Event; rank?: number }) {
             alt={e.title}
             loading="lazy"
             decoding="async"
+            fetchPriority="low"
           />
         ) : (
           <div className="cover-placeholder">

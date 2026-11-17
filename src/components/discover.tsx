@@ -34,8 +34,8 @@ function HeroEvent({ event }: { event: Event }) {
       <div className="home-spotlight-art">
         {cover && !failed ? (
           <>
-            <img className="home-spotlight-glow" src={cover} alt="" aria-hidden="true" />
-            <img className="home-spotlight-poster" src={cover} alt="" decoding="async" onError={() => setFailed(true)} />
+            <img className="home-spotlight-poster" src={cover} alt="" fetchPriority="high" decoding="async" onError={() => setFailed(true)} />
+            <img className="home-spotlight-glow" src={cover} alt="" aria-hidden="true" decoding="async" />
           </>
         ) : <CalendarDays size={46} aria-hidden="true" />}
       </div>
