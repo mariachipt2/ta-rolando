@@ -21,6 +21,7 @@ import { EventCard } from "./event-card";
 import {forChildren,isNightlifeCategory} from '@/lib/event-discovery';
 import { CategoryIcon } from "./category-icon";
 import { PosterZoom } from "./poster-zoom";
+import { DailyAgendaPreview } from "./daily-agenda-preview";
 
 const nightlifePreference = "tr:hide-nightlife";
 
@@ -424,6 +425,7 @@ export function Discover({
         </div>
         <HomeSpotlight events={spotlight} />
       </section>
+      <DailyAgendaPreview events={filtered} now={now} />
       <div className="shell discovery editorial-discovery" id="explorar">
         <div className="section-heading">
           <div>
