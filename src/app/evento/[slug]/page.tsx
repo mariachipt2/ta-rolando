@@ -1,3 +1,4 @@
+import { PosterZoom } from "@/components/poster-zoom";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -95,7 +96,7 @@ export default async function Detail({
       </Link>
       <div className="detail-cover">
         {e.cover_url ? (
-          <Image src={e.cover_url} alt={e.title} fill priority sizes="100vw" />
+          <><Image src={e.cover_url} alt={e.title} fill priority sizes="100vw" /><PosterZoom src={e.cover_url} title={e.title} /></>
         ) : (
           <div className="cover-placeholder">
             <span>tá rolando</span>

@@ -20,6 +20,7 @@ import { upcoming, inPeriod, day, displayDate } from "@/lib/dates";
 import { EventCard } from "./event-card";
 import {forChildren,isNightlifeCategory} from '@/lib/event-discovery';
 import { CategoryIcon } from "./category-icon";
+import { PosterZoom } from "./poster-zoom";
 
 const nightlifePreference = "tr:hide-nightlife";
 
@@ -27,6 +28,7 @@ function HeroEvent({ event }: { event: Event }) {
   const cover = event.cover_url || event.gallery?.[0];
   const [failed, setFailed] = useState(false);
   return (
+    <div className="spotlight-event">
     <Link href={"/evento/" + event.slug} className="home-spotlight">
       <div className="home-spotlight-art">
         {cover && !failed ? (
@@ -43,11 +45,14 @@ function HeroEvent({ event }: { event: Event }) {
         <span className="home-spotlight-action">Ver evento <ArrowUpRight size={16} /></span>
       </div>
     </Link>
+      {cover && !failed && <PosterZoom src={cover} title={event.title} />}
+    </div>
   );
 }
 
 function HomeSpotlight({ events }: { events: Event[] }) {
   const [selected, setSelected] = useState(0);
+  const direction = useRef(1);
   const touchStart = useRef<{ id: number; x: number; y: number } | null>(null);
   const suppressClick = useRef(false);
   const reduceMotion = useReducedMotion();
@@ -60,6 +65,7 @@ function HomeSpotlight({ events }: { events: Event[] }) {
   if (!event) return null;
 
   const move = (step: number) => {
+    direction.current = Math.sign(step) || 1;
     setSelected((index + step + events.length) % events.length);
   };
 
@@ -103,8 +109,8 @@ function HomeSpotlight({ events }: { events: Event[] }) {
               e.stopPropagation();
             }
           }}
-          initial={reduceMotion ? false : { opacity: 0.45, y: 14, scale: .97 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
+          initial={reduceMotion ? false : { opacity: 0, x: direction.current * 24, scale: .98 }}
+          animate={{ opacity: 1, x: 0, scale: 1 }}
           transition={reduceMotion ? { duration: 0 } : { type: "spring", stiffness: 260, damping: 27 }}
         >
           <HeroEvent event={event} />

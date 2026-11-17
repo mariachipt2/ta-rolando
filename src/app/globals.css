@@ -1774,3 +1774,11 @@ html:not([data-special-theme]) .home-hero h1 > span {
   .home-spotlight { transition: none; }
   .home-spotlight:hover { transform: none; }
 }
+
+.spotlight-event { position: relative; }
+.poster-zoom { position: absolute; z-index: 2; inset: 10px 10px auto auto; max-width: calc(100% - 20px); }
+.poster-zoom .button { color: #fff; background: #15121cf5; border-color: #ffffff5c; padding: 8px 10px; font-size: 12px; }
+.poster-zoom span { display: block; margin-top: 6px; padding: 6px 8px; background: #15121c; color: #fff; font-size: 12px; }
+@media (max-width: 700px) {
+  .spotlight-event .poster-zoom { position: static; margin-top: 6px; }
+}

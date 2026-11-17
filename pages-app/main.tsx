@@ -6,6 +6,7 @@ import { createRoot } from "react-dom/client";
 import { Radio, MapPin, CalendarDays, ArrowLeft } from "lucide-react";
 import {SiteNavigation} from '@/components/site-navigation';
 import { Discover } from "@/components/discover";
+import { PosterZoom } from "@/components/poster-zoom";
 import { Agenda } from "@/components/agenda";
 import {CompareTray,CompareButton} from '@/components/compare-selection';
 import {CompareEvents} from '@/components/compare-events';
@@ -45,11 +46,11 @@ function Detail({ event: e,events }: { event: Event;events:Event[] }) {
       </a>
       <div className="detail-cover">
         {e.cover_url ? (
-          <img
+          <><img
             src={e.cover_url}
             alt={e.title}
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
-          />
+          /><PosterZoom src={e.cover_url} title={e.title} /></>
         ) : (
           <div className="cover-placeholder">tá rolando</div>
         )}
