@@ -4,6 +4,7 @@ import {useNow} from '@/lib/use-now';
 import {AdminSpecialTheme} from './admin-special-theme';
 import {AdminNotifications} from './admin-notifications';
 import {AdminVenues} from './admin-venues';
+import {AdminOrganizers} from './admin-organizers';
 import {venueEvent} from '@/lib/venues';
 import { request, navigate } from "@/lib/transport";
 import { useState } from "react";
@@ -184,6 +185,7 @@ export function AdminPanel({
       {historyEvent&&<EventHistory key={historyEvent.id} event={historyEvent} onClose={()=>setHistoryEvent(null)} onSaved={refresh}/>}
       {tab==='export'&&<AdminExport/>}
       {tab==='theme'&&<AdminSpecialTheme events={allEvents} onSaved={setReceipt} onDirtyChange={setDirty}/>}
+      {tab==='organizers'&&<AdminOrganizers events={allEvents} onSaved={setReceipt} onDirtyChange={setDirty}/>}
       {tab==='venues'&&<AdminVenues events={allEvents} onSaved={setReceipt} onDirtyChange={setDirty} onEvent={v=>{setReviewId(undefined);setEdit({...venueEvent(v),status:'draft'});setTab('events')}}/>}
       <div hidden={tab!=='discovery'}><AdminDiscovery onMarked={setReceipt} events={allEvents} categories={categories} onReview={event=>{setReviewId(undefined);setEdit(event);setTab('events')}}/></div>
       {tab==='pending'&&<AdminPending events={events} submissions={submissions} onEdit={event=>openPending(event)} onSubmissions={()=>setTab('submissions')}/>}

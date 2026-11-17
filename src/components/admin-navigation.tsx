@@ -1,11 +1,11 @@
 "use client";
 import {useId,useState} from 'react';
-import {CalendarDays,FilePenLine,Search,ClipboardCheck,Inbox,Flag,Tags,MapPin,Sparkles,ChartNoAxesCombined,Download,Trash2,ChevronDown,PanelLeft,type LucideIcon} from 'lucide-react';
+import {CalendarDays,FilePenLine,Search,ClipboardCheck,Inbox,Flag,Tags,MapPin,Users,Sparkles,ChartNoAxesCombined,Download,Trash2,ChevronDown,PanelLeft,type LucideIcon} from 'lucide-react';
 
 const groups:{label:string;items:{key:string;label:string;icon:LucideIcon}[]}[]=[
   {label:'Agenda',items:[{key:'events',label:'Eventos',icon:CalendarDays},{key:'drafts',label:'Rascunhos',icon:FilePenLine},{key:'discovery',label:'Buscar eventos',icon:Search}]},
   {label:'Revisão',items:[{key:'pending',label:'Pendências',icon:ClipboardCheck},{key:'submissions',label:'Sugestões',icon:Inbox},{key:'reports',label:'Problemas',icon:Flag}]},
-  {label:'Cadastros e aparência',items:[{key:'categories',label:'Categorias',icon:Tags},{key:'venues',label:'Bares e boates',icon:MapPin},{key:'theme',label:'Tema especial',icon:Sparkles}]},
+  {label:'Cadastros e aparência',items:[{key:'categories',label:'Categorias',icon:Tags},{key:'organizers',label:'Organizadores',icon:Users},{key:'venues',label:'Bares e boates',icon:MapPin},{key:'theme',label:'Tema especial',icon:Sparkles}]},
   {label:'Gestão',items:[{key:'stats',label:'Estatísticas',icon:ChartNoAxesCombined},{key:'export',label:'Exportar cadastros',icon:Download},{key:'trash',label:'Lixeira',icon:Trash2}]},
 ];
 export function AdminNavigation({selected,counts,onSelect}:{selected:string;counts:Record<string,number>;onSelect:(key:string)=>boolean}){
