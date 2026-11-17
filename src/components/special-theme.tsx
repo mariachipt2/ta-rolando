@@ -17,7 +17,24 @@ export function HalloweenAtmosphere(){
 }
 
 export function SeasonalAtmosphere({theme}:{theme:'christmas'|'newyear'|'muertos'}){
-  return <div className={'seasonal-atmosphere '+theme+'-atmosphere'} aria-hidden="true"><div className="seasonal-sparkles">{Array.from({length:18},(_,i)=><span key={i} style={{'--spark-x':`${(i*37+9)%100}%`,'--spark-y':`${(i*19+11)%100}%`,'--spark-delay':`${-i*1.3}s`,'--spark-duration':`${9+i%7}s`} as CSSProperties}/>)}</div>{theme==='newyear'&&<div className="seasonal-fireworks"><i/><i/><i/></div>}</div>;
+  return <div className={'seasonal-atmosphere '+theme+'-atmosphere'} aria-hidden="true"><div className="seasonal-sparkles">{Array.from({length:18},(_,i)=><span key={i} style={{'--spark-x':`${(i*37+9)%100}%`,'--spark-y':`${(i*19+11)%100}%`,'--spark-delay':`${-i*1.3}s`,'--spark-duration':`${9+i%7}s`} as CSSProperties}/>)}</div></div>;
+}
+
+function NewYearFireworks() {
+  return (
+    <div className="newyear-fireworks" aria-hidden="true">
+      {[0, 1, 2, 3].map(burst => (
+        <div className="newyear-firework" key={burst}>
+          <span className="newyear-rocket" />
+          <div className="newyear-burst">
+            {Array.from({ length: 18 }, (_, ray) => (
+              <i key={ray} style={{ "--angle": `${ray * 20}deg` } as CSSProperties} />
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 }
 
 export function ThemeAtmosphere({theme}:{theme:ThemeData['settings']['theme']}){
@@ -33,6 +50,7 @@ export function ThemeBanner({data,now,preview=false}:{data:ThemeData;now:Date;pr
   const Heading=preview?'h2':'h1';
   return <section className={'ice-palace-hero'+(halloween?' halloween-mansion-hero':seasonal?' seasonal-hero '+settings.theme+'-hero':'')} aria-label="Evento em destaque">
     <div className={ice?'ice-palace-glow':halloween?'halloween-lantern-glow':'seasonal-hero-glow'} aria-hidden="true"/>
+    {settings.theme==='newyear'&&<NewYearFireworks/>}
     <div className="ice-hero-inner shell"><div className="ice-hero-copy">
       <span className="ice-special-label">{ice?<Snowflake size={23}/>:halloween?<MoonStar size={23}/>:christmas?<TreePine size={23}/>:muertos?<Flower2 size={23}/>:<PartyPopper size={23}/>} {ice?'ESPECIAL NO GELO':halloween?'ESPECIAL HALLOWEEN':christmas?'ESPECIAL DE NATAL':muertos?'DÍA DE LOS MUERTOS':'ESPECIAL DE ANO NOVO'}</span>
       <Heading>{ice?<>Um rolê de<br/><span>arrepiar.</span></>:halloween?<>Seu próximo rolê<br/>é de <span>outro mundo.</span></>:christmas?<>A magia está<br/><span>no encontro.</span></>:muertos?<>Uma noite para<br/><span>celebrar a vida.</span></>:<>Novas histórias.<br/><span>Uma nova virada.</span></>}</Heading>
