@@ -209,6 +209,16 @@ export function Discover({
       (!date ||
         (day(e.starts_at) <= date && day(e.ends_at || e.starts_at) >= date)),
   );
+  const currentDate = new Date(now);
+  const todayEvents = future.filter(event =>
+    inPeriod(event.starts_at, event.ends_at, "today", currentDate),
+  );
+  const tomorrowEvents = future.filter(event =>
+    inPeriod(event.starts_at, event.ends_at, "tomorrow", currentDate),
+  );
+  const weekendEvents = future.filter(event =>
+    inPeriod(event.starts_at, event.ends_at, "weekend", currentDate),
+  );
   const spotlight = useMemo(() => {
     const hasCover = (event: Event) => Boolean(event.cover_url || event.gallery?.[0]);
     return [...future].sort((a, b) =>
@@ -451,6 +461,17 @@ export function Discover({
           </>
         ) : (
           <>
+            {!error && !todayEvents.length && (tomorrowEvents.length > 0 || weekendEvents.length > 0) && (
+              <p className="notice">
+                Tudo calmo hoje em Ipatinga.{" "}
+                <a className="text-link" style={{ display: "inline-flex" }} href={tomorrowEvents.length ? "#vai-rolar-amanha" : "#roles-do-fim-de-semana"}>
+                  {tomorrowEvents.length ? "Veja o que vai rolar amanhã" : "Veja o que vem no fim de semana"} <ArrowUpRight size={16} />
+                </a>
+              </p>
+            )}
+            {todayEvents.length > 0 && section("Tá rolando hoje", "APROVEITE O AGORA", todayEvents)}
+            {tomorrowEvents.length > 0 && section("Vai rolar amanhã", "GUARDE UM ESPAÇO NA AGENDA", tomorrowEvents, "vai-rolar-amanha")}
+            {weekendEvents.length > 0 && section("Rolês do fim de semana", "SAIA DA ROTINA", weekendEvents, "roles-do-fim-de-semana")}
             {future.some((e) => e.featured) &&
               section(
                 "Vale colocar na agenda",
@@ -458,23 +479,6 @@ export function Discover({
                 future.filter((e) => e.featured),
               )}
             {section("Próximos eventos", "JÁ VAI SE PROGRAMANDO", future)}
-            {section(
-              "Tá rolando hoje",
-              "APROVEITE O AGORA",
-              future.filter((e) => inPeriod(e.starts_at, e.ends_at, "today",new Date(now))),
-            )}
-            {section(
-              "Vai rolar amanhã",
-              "GUARDE UM ESPAÇO NA AGENDA",
-              future.filter((e) =>
-                inPeriod(e.starts_at, e.ends_at, "tomorrow",new Date(now)),
-              ),
-            )}
-            {section(
-              "Rolês do fim de semana",
-              "SAIA DA ROTINA",
-              future.filter((e) => inPeriod(e.starts_at, e.ends_at, "weekend",new Date(now))),
-            )}
             <div className="agenda-banner">
               <div>
                 <span className="eyebrow">SEUS PLANOS, DO SEU JEITO</span>
