@@ -1,5 +1,5 @@
 "use client";
-import {request,navigate} from "@/lib/transport";
+import {request} from "@/lib/transport";
 import { useEffect, useState } from "react";
 import { Copy, MessageCircle, ExternalLink } from "lucide-react";
 export function Share({
@@ -41,14 +41,14 @@ export function Share({
           Ingressos oficiais <ExternalLink size={16} />
         </a>
       )}
-      <a
+      {url && <a
         className="button secondary"
         target="_blank"
         rel="noopener noreferrer"
-        href={"https://wa.me/?text=" + encodeURIComponent(title + " — " + url)}
+        href={"https://wa.me/?text=" + encodeURIComponent(`Bora nesse rolê? ${title} - veja os detalhes no Tá Rolando: ${url}`)}
       >
-        <MessageCircle size={16} /> Enviar só o link
-      </a>
+        <MessageCircle size={16} aria-hidden="true" /> Compartilhar no WhatsApp
+      </a>}
       <button
         className="button secondary"
         onClick={async () => {

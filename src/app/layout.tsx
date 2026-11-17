@@ -19,7 +19,14 @@ export const metadata: Metadata = {
     "Não fique de fora. Saiba o que tá rolando! Shows, cultura, gastronomia e encontros em Ipatinga.",
   manifest: "/manifest.webmanifest",
   icons: {icon:'/icons/icon-192.png',apple:'/icons/icon-192.png'},
-  openGraph: {title:'Tá Rolando — Ipatinga',description:'Não fique de fora. Saiba o que tá rolando!',images:['/icons/icon-512.png'],locale:'pt_BR',type:'website'},
+  openGraph: {
+    title: "Tá Rolando — A Agenda de Eventos de Ipatinga",
+    description: "Confira a programação da semana em Ipatinga e descubra shows, festas, feiras e outros rolês perto de você.",
+    images: [{ url: "https://tarolandoipatinga.com.br/icons/icon-512.png", width: 512, height: 512, alt: "Ícone oficial do Tá Rolando" }],
+    url: "https://tarolandoipatinga.com.br/",
+    locale: "pt_BR",
+    type: "website",
+  },
   appleWebApp: {
     capable: true,
     title: "Tá Rolando",
