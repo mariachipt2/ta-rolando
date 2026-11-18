@@ -1,7 +1,7 @@
 "use client";
 import {request} from "@/lib/transport";
 import { useEffect, useState } from "react";
-import { Copy, MessageCircle, ExternalLink } from "lucide-react";
+import { Copy, Share2, ExternalLink } from "lucide-react";
 export function Share({
   title,
   id,
@@ -11,16 +11,43 @@ export function Share({
   id: string;
   ticket: string;
 }) {
-  const [copied, setCopied] = useState(false),
-    [url, setUrl] = useState("");
+  const [copied, setCopied] = useState(false);
+  const [sharing, setSharing] = useState(false);
   useEffect(() => {
-    setUrl(location.href);
+    setCopied(false);
     request("/api/metrics", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ event_id: id, kind: "view" }),
     }).catch(() => {});
   }, [id]);
+  async function copyLink(url: string) {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+    } catch {
+      window.prompt("Copie o link:", url);
+    }
+  }
+
+  async function shareEvent() {
+    const url = location.href;
+    const data = { title, text: `Bora nesse rolê? ${title}`, url };
+    if (!navigator.share || (navigator.canShare && !navigator.canShare(data))) {
+      await copyLink(url);
+      return;
+    }
+    setSharing(true);
+    try {
+      await navigator.share(data);
+    } catch (error) {
+      if (!(error instanceof DOMException && error.name === "AbortError")) {
+        await copyLink(url);
+      }
+    } finally {
+      setSharing(false);
+    }
+  }
   return (
     <div className="share-buttons">
       {ticket && (
@@ -41,28 +68,16 @@ export function Share({
           Ingressos oficiais <ExternalLink size={16} />
         </a>
       )}
-      {url && <a
-        className="button secondary"
-        target="_blank"
-        rel="noopener noreferrer"
-        href={"https://wa.me/?text=" + encodeURIComponent(`Bora nesse rolê? ${title} - veja os detalhes no Tá Rolando: ${url}`)}
-      >
-        <MessageCircle size={16} aria-hidden="true" /> Compartilhar no WhatsApp
-      </a>}
+      <button type="button" className="button secondary" disabled={sharing} onClick={shareEvent}>
+        <Share2 size={16} aria-hidden="true" /> Compartilhar
+      </button>
       <button
         className="button secondary"
-        onClick={async () => {
-          try {
-            await navigator.clipboard.writeText(url);
-            setCopied(true);
-          } catch {
-            setCopied(false);
-            window.prompt("Copie o link:", url);
-          }
-        }}
+        type="button"
+        onClick={() => copyLink(location.href)}
       >
         <Copy size={16} />
-        {copied ? "Link copiado!" : "Copiar link"}
+        <span aria-live="polite">{copied ? "Link copiado!" : "Copiar link"}</span>
       </button>
     </div>
   );

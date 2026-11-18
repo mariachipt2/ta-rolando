@@ -16,7 +16,6 @@ import { Attendance } from "@/components/attendance";
 import {CompareButton} from '@/components/compare-selection';
 import {FollowOrganizer} from '@/components/follow-organizer';
 import {SimilarEvents} from '@/components/similar-events';
-import {SharePoster} from '@/components/share-poster';
 import { Share } from "@/components/share";
 import {EventNotice} from '@/components/event-notice';
 import {ReportEvent} from '@/components/report-event';
@@ -203,7 +202,6 @@ export default async function Detail({
           <a className="button secondary" href={`/api/calendar/${e.id}`}>
             <CalendarDays size={17} /> Adicionar ao calendário
           </a>
-          <SharePoster key={e.updated_at||e.id} event={e}/>
           <Share title={e.title} id={e.id} ticket={e.ticket_url} />
           <ReportEvent id={e.id}/>
         </aside>

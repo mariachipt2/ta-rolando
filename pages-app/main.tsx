@@ -16,7 +16,6 @@ import {OrganizerHub} from '@/components/organizer-hub';
 import {WeekendSummary} from '@/components/weekend-summary';
 import {FollowOrganizer} from '@/components/follow-organizer';
 import {SimilarEvents} from '@/components/similar-events';
-import {SharePoster} from '@/components/share-poster';
 import {EventTimeline} from '@/components/event-timeline';
 import { Attendance } from "@/components/attendance";
 import { Share } from "@/components/share";
@@ -146,7 +145,6 @@ function Detail({ event: e,events }: { event: Event;events:Event[] }) {
             disabled={!upcoming(e) || e.status === "cancelled"}
           />
           <CalendarDownload id={e.id} />
-          <SharePoster key={e.updated_at||e.id} event={e}/>
           <Share title={e.title} id={e.id} ticket={e.ticket_url} />
           <ReportEvent id={e.id}/>
         </aside>
