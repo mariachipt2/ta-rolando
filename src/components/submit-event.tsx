@@ -81,7 +81,7 @@ export function SubmitEvent({ categories,initialVenue }: { categories: Category[
             const data = new FormData(event.currentTarget);
             const fieldValue = (name: string) => String(data.get(name) ?? "").trim();
             const message = [
-              "🎉 *Sugestão de Evento — Tá Rolando Ipatinga*",
+              "*Sugestão de Evento — Tá Rolando Ipatinga*",
               "",
               "*Nome do evento:* " + fieldValue("nome"),
               "*Data e Horário:* " + fieldValue("data_horario"),
