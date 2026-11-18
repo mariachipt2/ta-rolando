@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { LazyMotion, domAnimation, m, useReducedMotion } from "motion/react";
@@ -17,6 +17,9 @@ const eventLink = (event: Event) => "/evento/" + event.slug;
 
 export function DailyAgendaPreview({ events, now }: { events: Event[]; now: number }) {
   const [chosen, setChosen] = useState("");
+  const dayStrip = useRef<HTMLDivElement>(null);
+  const touchStart = useRef<{ id: number; x: number; y: number } | null>(null);
+  const suppressClick = useRef(false);
   const reduceMotion = useReducedMotion();
   const start = Date.parse(day(new Date(now)) + "T12:00:00-03:00");
   const days = Array.from({ length: 7 }, (_, i) => new Date(start + i * 86400000));
@@ -32,7 +35,7 @@ export function DailyAgendaPreview({ events, now }: { events: Event[]; now: numb
   return (
     <section className="shell daily-preview" aria-labelledby="daily-preview-title">
       <h2 id="daily-preview-title">Agenda por dia</h2>
-      <div className="daily-preview-days" role="group" aria-label="Próximos sete dias">
+      <div ref={dayStrip} className="daily-preview-days" role="group" aria-label="Próximos sete dias">
         {days.map((date, index) => {
           const key = day(date);
           return (
@@ -43,6 +46,41 @@ export function DailyAgendaPreview({ events, now }: { events: Event[]; now: numb
           );
         })}
       </div>
+      <div className="daily-preview-swipe"
+        onPointerDown={event => {
+          suppressClick.current = false;
+          touchStart.current = event.pointerType === "touch" && event.isPrimary
+            ? { id: event.pointerId, x: event.clientX, y: event.clientY } : null;
+        }}
+        onPointerCancel={() => { touchStart.current = null; }}
+        onPointerUp={event => {
+          const start = touchStart.current;
+          touchStart.current = null;
+          if (!start || start.id !== event.pointerId) return;
+          const dx = event.clientX - start.x;
+          const dy = event.clientY - start.y;
+          if (Math.abs(dx) < 45 || Math.abs(dx) <= 1.4 * Math.abs(dy)) return;
+          suppressClick.current = true;
+          const nextIndex = days.indexOf(selected) + (dx < 0 ? 1 : -1);
+          const nextDay = days[nextIndex];
+          if (!nextDay) return;
+          setChosen(day(nextDay));
+          const strip = dayStrip.current;
+          const button = strip?.children[nextIndex];
+          if (strip && button instanceof HTMLElement) {
+            const bounds = button.getBoundingClientRect();
+            const stripBounds = strip.getBoundingClientRect();
+            if (bounds.left < stripBounds.left || bounds.right > stripBounds.right) {
+              strip.scrollLeft += bounds.left - stripBounds.left - (strip.clientWidth - button.offsetWidth) / 2;
+            }
+          }
+        }}
+        onClickCapture={event => {
+          if (!event.detail || !suppressClick.current) return;
+          suppressClick.current = false;
+          event.preventDefault();
+          event.stopPropagation();
+        }}>
       <h3 className="daily-preview-date" aria-live="polite">{dateLabel.format(selected)}</h3>
       <LazyMotion features={domAnimation} strict>
         <m.div key={day(selected)} initial={reduceMotion ? false : { opacity: 0.55, y: 8 }}
@@ -79,6 +117,7 @@ export function DailyAgendaPreview({ events, now }: { events: Event[]; now: numb
           ) : <p className="notice">Nenhum evento encontrado para este dia.</p>}
         </m.div>
       </LazyMotion>
+      </div>
     </section>
   );
 }

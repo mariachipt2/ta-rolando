@@ -1791,6 +1791,7 @@ html:not([data-special-theme]) .home-hero h1 > span {
 .daily-preview-feature { position: relative; isolation: isolate; overflow: hidden; display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1fr); gap: clamp(14px, 4vw, 48px); align-items: center; padding: clamp(14px, 3vw, 28px); background: var(--card); border: 1px solid var(--border); border-radius: 20px; }
 .daily-preview-feature .daily-preview-glow { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: blur(44px); opacity: .29; transform: scale(1.18); z-index: -1; }
 .daily-preview-poster { position: relative; }
+.daily-preview-swipe { touch-action: pan-y pinch-zoom; }
 .daily-preview-poster > img { display: block; width: 100%; height: clamp(220px, 36vw, 340px); object-fit: contain; background: #09070c70; border-radius: 12px; }
 .daily-preview-copy h4 { margin: 0 0 8px; font-size: clamp(24px, 4vw, 46px); line-height: 1.07; overflow-wrap: anywhere; }
 .daily-preview-copy p { margin: 0 0 16px; color: var(--text); }
