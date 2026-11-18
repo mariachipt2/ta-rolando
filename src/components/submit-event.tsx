@@ -1,7 +1,7 @@
 "use client";
 import {venueEvent,type PublicVenue} from '@/lib/venues';
 import { useRef, useState, useEffect } from "react";
-import { Send } from "lucide-react";
+import { Send, X } from "lucide-react";
 import type { Category } from "@/lib/types";
 import { request } from "@/lib/transport";
 import { toISO } from "@/lib/dates";
@@ -11,8 +11,13 @@ import { savedTime } from "./save-confirmation";
 import {AGE_OPTIONS} from '@/lib/age-options';
 import {photoType} from '../../supabase/functions/_shared/photos';
 
-const suggestionWhatsAppUrl =
-  "https://wa.me/5531920113713?text=Ol%C3%A1!%20Gostaria%20de%20divulgar%20um%20evento%20no%20T%C3%A1%20Rolando%20Ipatinga.%20Seguem%20as%20informa%C3%A7%C3%B5es%20e%20o%20cartaz:";
+const quickFields = [
+  { name: "nome", label: "Nome do evento", required: true, maxLength: 160 },
+  { name: "data_horario", label: "Data e Horário", placeholder: "Sexta 20/11 às 22h", required: true, maxLength: 100 },
+  { name: "local_bairro", label: "Local e Bairro", placeholder: "Garajão - Novo Centro", required: true, maxLength: 240 },
+  { name: "valor", label: "Valor / Entrada", placeholder: "Entrada gratuita ou R$ 20", maxLength: 100 },
+  { name: "link", label: "Link de Ingresso ou Instagram", placeholder: "Opcional", maxLength: 2048 },
+];
 
 export function SubmitEvent({ categories,initialVenue }: { categories: Category[];initialVenue?:PublicVenue }) {
   const [open, setOpen] = useState(!!initialVenue),
@@ -24,6 +29,7 @@ export function SubmitEvent({ categories,initialVenue }: { categories: Category[
   const [photo,setPhoto]=useState<File|null>(null),[photoPreview,setPhotoPreview]=useState('');
   useEffect(()=>{if(!photo){setPhotoPreview('');return}const url=URL.createObjectURL(photo);setPhotoPreview(url);return()=>URL.revokeObjectURL(url)},[photo]);
   const photoInput=useRef<HTMLInputElement>(null);
+  const quickDialog = useRef<HTMLDialogElement>(null);
   const requestId = useRef<{id:string;payload:string} | null>(null);
   const field = (
     name: string,
@@ -54,14 +60,56 @@ export function SubmitEvent({ categories,initialVenue }: { categories: Category[
             <Send size={18} /> Sugerir um evento
           </button>
         ) : (
-          <a className="button lime-button" href={suggestionWhatsAppUrl} target="_blank" rel="noopener noreferrer">
+          <button type="button" className="button lime-button" aria-haspopup="dialog"
+            aria-controls="quick-event-dialog" onClick={() => quickDialog.current?.showModal()}>
             <svg viewBox="0 0 16 16" width="17" height="17" fill="currentColor" aria-hidden="true">
               <path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232" />
             </svg>
             Sugerir um evento
-          </a>
+          </button>
         )}
       </div>
+      {!initialVenue && (
+        <dialog ref={quickDialog} className="quick-event-dialog" id="quick-event-dialog"
+          aria-labelledby="quick-event-title" aria-describedby="quick-event-description">
+          <button type="button" className="button secondary quick-event-close" aria-label="Fechar"
+            onClick={() => quickDialog.current?.close()}><X size={18} aria-hidden="true" /></button>
+          <h2 id="quick-event-title">Divulgue seu evento no Tá Rolando</h2>
+          <p id="quick-event-description">Preencha os dados abaixo e envie direto para a nossa equipe no WhatsApp</p>
+          <form onSubmit={event => {
+            event.preventDefault();
+            const data = new FormData(event.currentTarget);
+            const fieldValue = (name: string) => String(data.get(name) ?? "").trim();
+            const message = [
+              "🎉 *Sugestão de Evento — Tá Rolando Ipatinga*",
+              "",
+              "*Nome do evento:* " + fieldValue("nome"),
+              "*Data e Horário:* " + fieldValue("data_horario"),
+              "*Local e Bairro:* " + fieldValue("local_bairro"),
+              "*Valor/Entrada:* " + fieldValue("valor"),
+              "*Link/Instagram:* " + fieldValue("link"),
+              "",
+              "(Estou anexando o cartaz/flyer abaixo 👇)",
+            ].join("\n");
+            const link = document.createElement("a");
+            link.href = "https://wa.me/5531920113713?text=" + encodeURIComponent(message);
+            link.target = "_blank";
+            link.rel = "noopener noreferrer";
+            link.click();
+          }}>
+            <div className="quick-event-fields">
+              {quickFields.map(({name, label, required, placeholder, maxLength}) => (
+                <label key={name}>{label}{required ? " *" : ""}
+                  <input name={name} required={required} pattern={required ? ".*\\S.*" : undefined}
+                    placeholder={placeholder} maxLength={maxLength} />
+                </label>
+              ))}
+            </div>
+            <p className="notice quick-event-tip">⚠️ Ao abrir a conversa no WhatsApp, não esqueça de anexar a imagem do cartaz!</p>
+            <button type="submit" className="button lime-button">Enviar dados no WhatsApp</button>
+          </form>
+        </dialog>
+      )}
       {open && (
         <div className="panel">
           {saved ? (

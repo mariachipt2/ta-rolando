@@ -1866,3 +1866,28 @@ html[data-special-theme="newyear"] .logo > svg { color: var(--lime); }
   .newyear-firework:nth-child(3) { top: 78%; left: 29%; }
   .newyear-firework:nth-child(4) { display: none; }
 }
+
+.quick-event-dialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: min(520px, calc(100% - 24px));
+  max-height: calc(100dvh - 24px);
+  overflow: auto;
+  padding: 25px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--card);
+  color: var(--text);
+}
+.quick-event-dialog::backdrop { background: #08070cbd; }
+.quick-event-dialog h2 { padding-right: 44px; line-height: 1.15; margin: 0 0 9px; }
+.quick-event-dialog > p { color: var(--muted); margin: 0 0 18px; }
+.quick-event-close { position: absolute; top: 15px; right: 15px; padding: 8px; }
+.quick-event-fields { display: grid; gap: 12px; }
+.quick-event-fields input { min-width: 0; width: 100%; }
+.quick-event-tip { margin: 14px 0; }
+.quick-event-dialog form > .button { width: 100%; }
+@media (max-width: 600px) {
+  .quick-event-dialog { inset: auto 0 0; margin: 0; width: 100%; max-width: none; max-height: calc(100dvh - 12px); border-radius: 18px 18px 0 0; padding: 20px 16px max(18px, env(safe-area-inset-bottom)); }
+}
