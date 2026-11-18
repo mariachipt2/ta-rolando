@@ -53,13 +53,18 @@ export function DailyAgendaPreview({ events, now }: { events: Event[]; now: numb
             ? { id: event.pointerId, x: event.clientX, y: event.clientY } : null;
         }}
         onPointerCancel={() => { touchStart.current = null; }}
-        onPointerUp={event => {
+        onPointerUp={() => { touchStart.current = null; }}
+        onPointerMove={event => {
           const start = touchStart.current;
-          touchStart.current = null;
           if (!start || start.id !== event.pointerId) return;
           const dx = event.clientX - start.x;
           const dy = event.clientY - start.y;
-          if (Math.abs(dx) < 45 || Math.abs(dx) <= 1.4 * Math.abs(dy)) return;
+          if (Math.abs(dy) > 12 && Math.abs(dy) > Math.abs(dx)) {
+            touchStart.current = null;
+            return;
+          }
+          if (Math.abs(dx) < 24 || Math.abs(dx) <= 1.4 * Math.abs(dy)) return;
+          touchStart.current = null;
           suppressClick.current = true;
           const nextIndex = days.indexOf(selected) + (dx < 0 ? 1 : -1);
           const nextDay = days[nextIndex];
@@ -91,7 +96,7 @@ export function DailyAgendaPreview({ events, now }: { events: Event[]; now: numb
                 {poster && <>
                   <img className="daily-preview-glow" src={poster} alt="" aria-hidden="true" loading="lazy" decoding="async" fetchPriority="low" />
                   <div className="daily-preview-poster">
-                    <img src={poster} alt={"Cartaz de " + featured.title} loading="lazy" decoding="async" />
+                    <img src={poster} alt={"Cartaz de " + featured.title} loading="lazy" decoding="async" draggable={false} />
                     <PosterZoom key={poster} src={poster} title={featured.title} />
                   </div>
                 </>}
