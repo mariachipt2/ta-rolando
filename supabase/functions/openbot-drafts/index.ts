@@ -1,6 +1,7 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { z } from "npm:zod@4";
 import { timingSafeEqual } from "node:crypto";
+import { resolveDraftArtists } from "../_shared/artist-matching.ts";
 import { photoType } from "../_shared/photos.ts";
 
 const secret = Deno.env.get("OPENBOT_DRAFT_TOKEN");
@@ -20,6 +21,7 @@ const schema = z.object({
   neighborhood: line(120).default(""),
   organizer: line(160).default(""),
   artist_ids: z.array(z.string().uuid()).max(20).optional(),
+  artists: z.array(line(160).min(2)).max(20).optional(),
   description: line(5000).default(""),
   price: line(150).default(""),
   is_free: z.boolean().default(false),
@@ -65,7 +67,7 @@ Deno.serve(async (req) => {
     try { body = JSON.parse(raw); } catch { return reply({ error: "JSON inválido." }, 400); }
     const parsed = schema.safeParse(body);
     if (!parsed.success) return reply({ error: "Ficha inválida.", fields: parsed.error.issues.map(issue => issue.path.join(".") || "ficha") }, 400);
-    const { category, source_url, cover_base64, ...fields } = parsed.data;
+    const { category, source_url, cover_base64, artists: artistNames, ...fields } = parsed.data;
     if (fields.ends_at && Date.parse(fields.ends_at) <= Date.parse(fields.starts_at)) {
       return reply({ error: "O término precisa ser depois do início." }, 400);
     }
@@ -74,12 +76,31 @@ Deno.serve(async (req) => {
     const match = categories.data.find(item => normalize(item.name) === normalize(category));
     if (!match) return reply({ error: "Escolha uma categoria ativa.", categories: categories.data.map(item => item.name) }, 422);
 
-    if (fields.artist_ids?.length) {
-      const selected = [...new Set(fields.artist_ids)];
-      const artists = await db.from("artists").select("id").eq("active", true).in("id", selected);
-      if (artists.error) throw artists.error;
-      if (artists.data.length !== selected.length) return reply({ error: "Selecione artistas ativos já cadastrados no painel.", fields: ["artist_ids"] }, 422);
-      fields.artist_ids = selected;
+    let linkedNames: string[] = [];
+    if (fields.artist_ids?.length || artistNames?.length) {
+      const profiles: { id: string; name: string }[] = [];
+      for (let offset = 0; ; offset += 500) {
+        const result = await db.from("artists").select("id,name").eq("active", true).order("id").range(offset, offset + 499);
+        if (result.error) throw result.error;
+        profiles.push(...result.data);
+        if (result.data.length < 500) break;
+      }
+      const resolved = resolveDraftArtists(artistNames || [], fields.artist_ids || [], profiles);
+      if (resolved.unknown.length || resolved.ambiguous.length || resolved.invalidIds.length || resolved.ids.length > 20) {
+        return reply({
+          error: "Não foi possível identificar todos os artistas. Confira os nomes e o cadastro no painel.",
+          unknown_artists: resolved.unknown, ambiguous_artists: resolved.ambiguous,
+          invalid_artist_ids: resolved.invalidIds, fields: ["artists", "artist_ids"],
+        }, 422);
+      }
+      fields.artist_ids = resolved.ids;
+      linkedNames = resolved.names;
+    }
+    async function attachArtists(eventId: string) {
+      if (!fields.artist_ids?.length) return null;
+      const result = await db.rpc("attach_draft_artists", { p_event: eventId, p_artists: fields.artist_ids });
+      if (result.error) throw result.error;
+      return result.data;
     }
 
     const identity = JSON.stringify([normalize(fields.title), new Date(fields.starts_at).toISOString(), normalize(fields.venue_name)]);
@@ -90,8 +111,10 @@ Deno.serve(async (req) => {
     const previous = existing.data;
     const canAttach = previous?.status === "draft" && !previous.deleted_at && !previous.cover_url;
     if (previous && !(cover_base64 && canAttach)) {
+      const linked = await attachArtists(previous.id);
       return reply({
         status: "already_imported",
+        ...(linked ? { artists_linked: linkedNames, saved_at: linked.saved_at } : {}),
         ...(previous.status === "draft" && !previous.deleted_at ? { review_url: reviewUrl(previous.id) } : {}),
       });
     }
@@ -112,11 +135,14 @@ Deno.serve(async (req) => {
     }
 
     if (previous) {
-      const updated = await db.from("events").update({ cover_url: fields.cover_url })
-        .eq("id", previous.id).eq("status", "draft").is("deleted_at", null)
-        .or("cover_url.is.null,cover_url.eq.").select("id,updated_at").maybeSingle();
-      if (updated.error) throw updated.error;
-      if (updated.data) return reply({ status: "draft", ...updated.data, cover_attached: true, review_url: reviewUrl(previous.id) });
+      const result = await db.rpc("attach_draft_artists", {
+        p_event: previous.id, p_artists: fields.artist_ids || [], p_cover_url: fields.cover_url || null,
+      });
+      if (result.error) throw result.error;
+      if (result.data) return reply({
+        status: "draft", id: result.data.id, saved_at: result.data.saved_at,
+        cover_attached: result.data.cover_attached, artists_linked: linkedNames, review_url: reviewUrl(previous.id),
+      });
       return reply({ status: "already_imported" });
     }
     const { data, error } = await db.from("events").upsert({
@@ -130,10 +156,11 @@ Deno.serve(async (req) => {
       additional_info: source_url ? `Fonte da importação: ${source_url}` : "",
     }, { onConflict: "slug", ignoreDuplicates: true }).select("id,updated_at").maybeSingle();
     if (error) throw error;
-    if (data) return reply({ status: "draft", ...data, cover_attached: !!fields.cover_url, review_url: reviewUrl(data.id) }, 201);
+    if (data) return reply({ status: "draft", ...data, artists_linked: linkedNames, cover_attached: !!fields.cover_url, review_url: reviewUrl(data.id) }, 201);
     const concurrent = await db.from("events").select("id").eq("slug", slug).eq("status", "draft").is("deleted_at", null).maybeSingle();
     if (concurrent.error) throw concurrent.error;
-    return reply({ status: "already_imported", ...(concurrent.data ? { review_url: reviewUrl(concurrent.data.id) } : {}) });
+    const linked = concurrent.data ? await attachArtists(concurrent.data.id) : null;
+    return reply({ status: "already_imported", ...(linked ? { artists_linked: linkedNames, saved_at: linked.saved_at } : {}), ...(concurrent.data ? { review_url: reviewUrl(concurrent.data.id) } : {}) });
   } catch {
     return reply({ error: "Não foi possível salvar o rascunho." }, 500);
   }

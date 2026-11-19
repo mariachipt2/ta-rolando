@@ -25,7 +25,7 @@ test('Artistas e eventos são gravados atomicamente, com recorrência, RLS e res
   const db = new PGlite();
   try {
     await db.exec(`create role anon; create role authenticated; create role service_role bypassrls; create schema auth; create table auth.users(id uuid primary key); create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$; grant usage on schema public,auth to anon,authenticated,service_role;`);
-    for (const file of ['001_initial.sql','003_admin_totals.sql','004_event_instagram.sql','005_submissions_save_confirmation.sql','006_private_save_permissions.sql','007_event_management.sql','011_venues.sql','017_nightlife_filter.sql','020_artists.sql']) {
+    for (const file of ['001_initial.sql','003_admin_totals.sql','004_event_instagram.sql','005_submissions_save_confirmation.sql','006_private_save_permissions.sql','007_event_management.sql','011_venues.sql','017_nightlife_filter.sql','020_artists.sql','021_bot_artist_links.sql']) {
       await db.exec(readFileSync('supabase/migrations/' + file, 'utf8'));
     }
     const category = (await db.query<{ id: string }>('select id from categories limit 1')).rows[0].id;
@@ -59,5 +59,24 @@ test('Artistas e eventos são gravados atomicamente, com recorrência, RLS e res
     await db.exec('set role anon');
     assert.equal((await db.query<{ n: number }>('select count(*)::int n from event_artists where event_id=$1', [ids[0]])).rows[0].n, 0);
     assert.equal((await db.query('select * from public_events')).rows.length, 1);
+    await db.exec('reset role');
+    const third='00000000-0000-4000-8000-000000000003';
+    await db.query("insert into artists(id,slug,name,kind) values($1,'terceiro-artista','Terceiro artista','cantor')",[third]);
+    await db.exec('set role authenticated');
+    await assert.rejects(()=>db.query('select attach_draft_artists($1,$2)',[ids[0],[third]]));
+    await db.exec('reset role; set role service_role');
+    const attach=()=>db.query<{result:{artist_ids:string[];cover_attached:boolean}}>('select attach_draft_artists($1,$2,$3) result',[ids[0],[brenda,third],'https://example.com/poster.jpg']);
+    const attached=(await attach()).rows[0].result;
+    assert.equal(attached.artist_ids.length,3);
+    assert.equal(attached.cover_attached,true);
+    assert.equal((await attach()).rows[0].result.cover_attached,false);
+    assert.equal((await db.query<{n:number}>('select count(*)::int n from event_artists where event_id=$1',[ids[0]])).rows[0].n,3);
+    assert.equal((await db.query<{result:unknown}>('select attach_draft_artists($1,$2) result',[ids[1],[third]])).rows[0].result,null);
+    await db.exec('reset role');
+    await db.query("update events set cover_url='' where id=$1",[ids[0]]);
+    await db.exec('set role service_role');
+    await assert.rejects(()=>db.query('select attach_draft_artists($1,$2,$3)',[ids[0],['00000000-0000-4000-8000-000000000099'],'https://example.com/invalid.jpg']));
+    assert.equal((await db.query<{cover_url:string}>('select cover_url from events where id=$1',[ids[0]])).rows[0].cover_url,'');
+
   } finally { await db.close(); }
 });
