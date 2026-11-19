@@ -1,4 +1,5 @@
 "use client";
+import { AgendaSpecialBanner } from './agenda-special-banner';
 import {useNow} from '@/lib/use-now';
 import Link from 'next/link';
 import { useEffect, useId, useMemo, useRef, useState } from "react";
@@ -327,6 +328,7 @@ export function Discover({
               <SlidersHorizontal size={18} /> Filtros
             </button>
           </div>
+          <AgendaSpecialBanner/>
           <div className="period-list discovery-quick-filters" role="group" aria-label="Filtros rápidos">
             {[
               ["today", "Hoje"],

@@ -1,4 +1,5 @@
 "use client";
+import { AdminAgendaSpecial } from './admin-agenda-special';
 import { AdminStatistics } from './admin-statistics';
 import type { EventMetric } from '@/lib/admin-statistics';
 import {AdminNavigation} from './admin-navigation';
@@ -170,6 +171,7 @@ export function AdminPanel({
       {previewEvent&&<AdminEventPreview event={previewEvent} onClose={()=>setPreviewEvent(null)} onEdit={()=>{setReviewId(undefined);setEdit(previewEvent);setPreviewEvent(null);setTab('events')}}/>}
       {historyEvent&&<EventHistory key={historyEvent.id} event={historyEvent} onClose={()=>setHistoryEvent(null)} onSaved={refresh}/>}
       {tab==='export'&&<AdminExport/>}
+      {tab==='specials'&&<AdminAgendaSpecial onSaved={setReceipt} onDirtyChange={setDirty}/>}
       {tab==='theme'&&<AdminSpecialTheme events={allEvents} onSaved={setReceipt} onDirtyChange={setDirty}/>}
       {tab==='organizers'&&<AdminOrganizers events={allEvents} onSaved={setReceipt} onDirtyChange={setDirty}/>}
       {tab==='venues'&&<AdminVenues events={allEvents} onSaved={setReceipt} onDirtyChange={setDirty} onEvent={v=>{setReviewId(undefined);setEdit({...venueEvent(v),status:'draft'});setTab('events')}}/>}
