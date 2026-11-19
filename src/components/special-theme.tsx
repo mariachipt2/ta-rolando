@@ -37,12 +37,20 @@ function NewYearFireworks() {
   );
 }
 
+export function GtaAtmosphere(){
+  return <div className="gta-atmosphere" aria-hidden="true"><span/><span/></div>;
+}
+
 export function ThemeAtmosphere({theme}:{theme:ThemeData['settings']['theme']}){
-  return theme==='ice'?<IceAtmosphere/>:theme==='halloween'?<HalloweenAtmosphere/>:<SeasonalAtmosphere theme={theme}/>;
+  return theme==='gta'?<GtaAtmosphere/>:theme==='ice'?<IceAtmosphere/>:theme==='halloween'?<HalloweenAtmosphere/>:<SeasonalAtmosphere theme={theme}/>;
 }
 
 export function ThemeBanner({data,now,preview=false}:{data:ThemeData;now:Date;preview?:boolean}){
   const {settings,event}=data;
+  if(settings.theme==='gta'){
+    if(!event&&!preview)return null;
+    return <section className="gta-feature" aria-label={event?'Evento em destaque':'Prévia do tema GTA VI'}><div className="shell gta-feature-copy"><span className="eyebrow">SOL, NEON E BOAS HISTÓRIAS</span><h2>{event?event.title:<>A cidade acende.<br/><span>O rolê começa.</span></>}</h2>{event?<><p>{displayDate(event.starts_at)} · {event.venue_name}</p><ThemeCountdown event={event}/>{preview?<span className="button lime-button">Ver evento <ArrowUpRight size={18}/></span>:<Link className="button lime-button" href={'/evento/'+event.slug}>Ver evento <ArrowUpRight size={18}/></Link>}</>:<p>O clima de Vice City na sua agenda de Ipatinga.</p>}</div></section>;
+  }
   if(!event)return null;
   const ice=settings.theme==='ice';
   const halloween=settings.theme==='halloween',christmas=settings.theme==='christmas',muertos=settings.theme==='muertos';

@@ -1,13 +1,15 @@
 import {z} from 'zod';
 import type {Event} from './types';
 import {day,upcoming} from './dates';
-export const themeLabels={ice:'Gelo / Frozen',halloween:'Halloween',christmas:'Natal',newyear:'Ano Novo',muertos:'Día de los Muertos'};
-export const specialThemeSchema=z.object({enabled:z.boolean(),theme:z.enum(['ice','halloween','christmas','newyear','muertos']),motion:z.enum(['off','soft','full']),event_id:z.string().uuid().nullable(),starts_at:z.string().datetime({offset:true}).nullable(),ends_at:z.string().datetime({offset:true}).nullable()}).refine(v=>!v.enabled||!!v.event_id,{message:'Selecione o evento destacado.'}).refine(v=>!v.starts_at||!v.ends_at||Date.parse(v.ends_at)>Date.parse(v.starts_at),{message:'O término do tema deve ser depois do início.'});
+export const themeLabels={ice:'Gelo / Frozen',halloween:'Halloween',christmas:'Natal',newyear:'Ano Novo',muertos:'Día de los Muertos',gta:'GTA VI / Vice City'};
+export const specialThemeSchema=z.object({enabled:z.boolean(),theme:z.enum(['ice','halloween','christmas','newyear','muertos','gta']),motion:z.enum(['off','soft','full']),event_id:z.string().uuid().nullable(),starts_at:z.string().datetime({offset:true}).nullable(),ends_at:z.string().datetime({offset:true}).nullable()}).refine(v=>!v.enabled||v.theme==='gta'||!!v.event_id,{message:'Selecione o evento destacado.'}).refine(v=>!v.starts_at||!v.ends_at||Date.parse(v.ends_at)>Date.parse(v.starts_at),{message:'O término do tema deve ser depois do início.'});
 export type SpecialTheme=z.infer<typeof specialThemeSchema>&{updated_at?:string};
 export type ThemeData={settings:SpecialTheme;event:Event|null};
 export const defaultTheme:SpecialTheme={enabled:false,theme:'ice',motion:'soft',event_id:null,starts_at:null,ends_at:null};
 export function themeActive(settings:SpecialTheme,event:Event|null,now:Date){
-  return settings.enabled&&!!event&&!event.deleted_at&&event.status!=='draft'&&event.status!=='cancelled'&&(!event.publish_at||event.status!=='scheduled'||Date.parse(event.publish_at)<=+now)&&upcoming(event,now)&&(!settings.starts_at||Date.parse(settings.starts_at)<=+now)&&(!settings.ends_at||Date.parse(settings.ends_at)>+now);
+  if(!settings.enabled||(settings.starts_at&&Date.parse(settings.starts_at)>+now)||(settings.ends_at&&Date.parse(settings.ends_at)<=+now))return false;
+  if(settings.theme==='gta'&&!settings.event_id)return true;
+  return !!event&&!event.deleted_at&&event.status!=='draft'&&event.status!=='cancelled'&&(!event.publish_at||event.status!=='scheduled'||Date.parse(event.publish_at)<=+now)&&upcoming(event,now);
 }
 export function themeCountdown(event:Event,now:Date){
   if(Date.parse(event.starts_at)<=+now)return 'Está rolando!';
