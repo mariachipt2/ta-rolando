@@ -1,3 +1,4 @@
+import { EventArtists } from '@/components/artist-agenda';
 import { PosterZoom } from "@/components/poster-zoom";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -142,6 +143,7 @@ export default async function Detail({
           <InstagramLink url={e.instagram_url}/>
           <FollowOrganizer event={e}/>
           <CompareButton id={e.id} title={e.title}/>
+          <EventArtists event={e}/>
           <h2>Sobre esse rolê</h2>
           <p className="description">{e.description}</p>
           {e.additional_info && (

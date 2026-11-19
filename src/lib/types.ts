@@ -1,3 +1,4 @@
+import type { Artist } from './artists';
 export type Category = {
   id: string;
   name: string;
@@ -20,6 +21,8 @@ export type Event = {
   city: string;
   state: string;
   organizer: string;
+  artist_ids?: string[];
+  artists?: Artist[];
   family_friendly?:boolean|null;
   deleted_at?:string|null;
   change_notice?:string;

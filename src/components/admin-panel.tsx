@@ -1,4 +1,5 @@
 "use client";
+import { AdminArtists } from "./admin-artists";
 import { AdminAgendaSpecial } from './admin-agenda-special';
 import { AdminStatistics } from './admin-statistics';
 import type { EventMetric } from '@/lib/admin-statistics';
@@ -173,6 +174,7 @@ export function AdminPanel({
       {tab==='export'&&<AdminExport/>}
       {tab==='specials'&&<AdminAgendaSpecial onSaved={setReceipt} onDirtyChange={setDirty}/>}
       {tab==='theme'&&<AdminSpecialTheme events={allEvents} onSaved={setReceipt} onDirtyChange={setDirty}/>}
+      {tab==='artists'&&<AdminArtists onSaved={setReceipt} onDirtyChange={setDirty}/>}
       {tab==='organizers'&&<AdminOrganizers events={allEvents} onSaved={setReceipt} onDirtyChange={setDirty}/>}
       {tab==='venues'&&<AdminVenues events={allEvents} onSaved={setReceipt} onDirtyChange={setDirty} onEvent={v=>{setReviewId(undefined);setEdit({...venueEvent(v),status:'draft'});setTab('events')}}/>}
       <div hidden={tab!=='discovery'}><AdminDiscovery onMarked={setReceipt} events={allEvents} categories={categories} onReview={event=>{setReviewId(undefined);setEdit(event);setTab('events')}}/></div>

@@ -1,4 +1,5 @@
 "use client";
+import { ArtistPicker } from "./artist-picker";
 import { discoverySourceCover } from "@/lib/discovery-draft";
 import {VenuePicker} from './venue-picker';
 import {OrganizerPicker} from './organizer-picker';
@@ -61,6 +62,7 @@ export function EventForm({
       city: e.city || "Ipatinga",
       state: e.state || "MG",
       organizer: e.organizer || "",
+      artist_ids: e.artist_ids || [],
       instagram_url: e.instagram_url || "",
       is_free: e.is_free ?? true,
       price: e.price || "",
@@ -224,6 +226,7 @@ export function EventForm({
       <p>Horários de Brasília. Campos com * são obrigatórios.</p>
       <SaveConfirmation at={e.updated_at} dirty={dirty} busy={busy} />
       <OrganizerPicker events={savedEvents} onSelect={values=>{for(const key of Object.keys(values) as (keyof typeof values)[])setValue(key,values[key],{shouldDirty:true,shouldValidate:true})}}/>
+      <ArtistPicker value={v.artist_ids || []} onChange={ids => setValue("artist_ids", ids, { shouldDirty: true, shouldValidate: true })}/>
       <VenuePicker onSelect={venue=>{const values=venueEvent(venue);for(const key of Object.keys(values) as (keyof typeof values)[])setValue(key,values[key],{shouldDirty:true,shouldValidate:true})}}/>
       <div className="form-grid">
         {field("title", "Título", true)}

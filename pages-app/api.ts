@@ -1,3 +1,4 @@
+import { loadArtists, saveArtist } from '@/lib/artist-actions';
 import { loadAgendaSpecial, saveAgendaSpecial } from '@/lib/agenda-special-actions';
 import { loadStatistics } from '@/lib/admin-statistics';
 import {publicClock} from '@/lib/public-clock';
@@ -189,6 +190,7 @@ export async function transport(
         503,
       );
     if(path.startsWith('/api/venues?'))return json(await publicVenue(db,new URL(path,'https://local').searchParams.get('local')||''));
+    if(path==='/api/artists')return json(await loadArtists(db));
     if(path==='/api/agenda-special')return json(await loadAgendaSpecial(db));
     if(path==='/api/special-theme')return json(await loadSpecialTheme(db));
     if (path === "/api/admin/login") {
@@ -205,6 +207,7 @@ export async function transport(
       return json({ ok: true });
     }
     if (!(await isAdmin())) return json({ error: "Acesso negado." }, 401);
+    if(path==='/api/admin/artists')return json(init.method==='POST'?await saveArtist(db,body):await loadArtists(db,true));
     if(path==='/api/admin/agenda-special')return json(init.method==='POST'?await saveAgendaSpecial(db,body):await loadAgendaSpecial(db));
     if(path==='/api/admin/statistics')return json(await loadStatistics(db));
     if(path==='/api/admin/special-theme')return json(init.method==='POST'?await saveSpecialTheme(db,body):await loadSpecialTheme(db,true));

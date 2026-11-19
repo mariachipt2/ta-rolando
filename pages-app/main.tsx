@@ -1,3 +1,4 @@
+import { ArtistAgenda, EventArtists } from '@/components/artist-agenda';
 import { AgendaSpecialPage } from '@/components/agenda-special-page';
 import {SpecialTheme} from '../src/components/special-theme';
 import {useNow} from '@/lib/use-now';
@@ -91,6 +92,7 @@ function Detail({ event: e,events }: { event: Event;events:Event[] }) {
           <InstagramLink url={e.instagram_url}/>
           <FollowOrganizer event={e}/>
           <CompareButton id={e.id} title={e.title}/>
+          <EventArtists event={e}/>
           <h2>Sobre esse rolê</h2>
           <p className="description">{e.description}</p>
           {e.additional_info && (
@@ -330,6 +332,8 @@ function App() {
           <SharedProgram events={data?.events||[]} error={data?.error} ids={new URLSearchParams(location.hash.split('?')[1]||'').get('eventos')} title={new URLSearchParams(location.hash.split('?')[1]||'').get('titulo')}/>
         ) : path === '/organizadores' ? (
           <OrganizerHub events={data?.events||[]} error={data?.error}/>
+        ) : path === '/artistas' || path.startsWith('/artista/') ? (
+          <ArtistAgenda key={revision} events={data?.events||[]} error={data?.error} slug={path.startsWith('/artista/') ? decodeURIComponent(path.slice('/artista/'.length)) : undefined}/>
         ) : path === '/especial' ? (
           <AgendaSpecialPage key={revision} events={data?.events||[]} error={data?.error} selection={Object.fromEntries(new URLSearchParams(location.hash.split('?')[1]||''))}/>
         ) : path === '/fim-de-semana' ? (

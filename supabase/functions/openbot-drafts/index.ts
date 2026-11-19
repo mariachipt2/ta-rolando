@@ -19,6 +19,7 @@ const schema = z.object({
   address: line(240).default(""),
   neighborhood: line(120).default(""),
   organizer: line(160).default(""),
+  artist_ids: z.array(z.string().uuid()).max(20).optional(),
   description: line(5000).default(""),
   price: line(150).default(""),
   is_free: z.boolean().default(false),
@@ -72,6 +73,14 @@ Deno.serve(async (req) => {
     if (categories.error) throw categories.error;
     const match = categories.data.find(item => normalize(item.name) === normalize(category));
     if (!match) return reply({ error: "Escolha uma categoria ativa.", categories: categories.data.map(item => item.name) }, 422);
+
+    if (fields.artist_ids?.length) {
+      const selected = [...new Set(fields.artist_ids)];
+      const artists = await db.from("artists").select("id").eq("active", true).in("id", selected);
+      if (artists.error) throw artists.error;
+      if (artists.data.length !== selected.length) return reply({ error: "Selecione artistas ativos já cadastrados no painel.", fields: ["artist_ids"] }, 422);
+      fields.artist_ids = selected;
+    }
 
     const identity = JSON.stringify([normalize(fields.title), new Date(fields.starts_at).toISOString(), normalize(fields.venue_name)]);
     const digest = await crypto.subtle.digest("SHA-256", encoder.encode(identity));

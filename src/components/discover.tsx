@@ -1,4 +1,5 @@
 "use client";
+import { artistName } from '@/lib/artists';
 import { AgendaSpecialBanner } from './agenda-special-banner';
 import {useNow} from '@/lib/use-now';
 import Link from 'next/link';
@@ -196,9 +197,8 @@ export function Discover({
   const filtered = future.filter(
     (e) =>
       (!query ||
-        e.title
-          .toLocaleLowerCase("pt-BR")
-          .includes(query.toLocaleLowerCase("pt-BR"))) &&
+        artistName([e.title, ...(e.artists || []).map(artist => artist.name)].join(' '))
+          .includes(artistName(query))) &&
       (!childrenOnly || forChildren(e)) &&
       (!category || e.category_id === category) &&
       (period === "all" || inPeriod(e.starts_at, e.ends_at, period,new Date(now))) &&
