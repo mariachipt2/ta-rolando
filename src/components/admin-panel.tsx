@@ -1,4 +1,6 @@
 "use client";
+import { AdminStatistics } from './admin-statistics';
+import type { EventMetric } from '@/lib/admin-statistics';
 import {AdminNavigation} from './admin-navigation';
 import {useNow} from '@/lib/use-now';
 import {AdminSpecialTheme} from './admin-special-theme';
@@ -19,7 +21,7 @@ import {
   BarChart3,
 } from "lucide-react";
 import type { Event, Category, EventSubmission, SaveState, EventReport } from "@/lib/types";
-import { displayDate, upcoming, day } from "@/lib/dates";
+import { displayDate, upcoming } from "@/lib/dates";
 import { EventForm } from "./event-form";
 import {AdminEventPreview} from './admin-event-preview';
 import { SubmissionList } from "./submission-list";
@@ -31,19 +33,12 @@ import {AdminExport} from './admin-export';
 import {AdminPending} from './admin-pending';
 import {eventIssues} from '@/lib/event-discovery';
 import {AdminReports} from './admin-reports';
-type Metric = {
-  event_id: string;
-  day: string;
-  views: number;
-  ticket_clicks: number;
-  interests_added: number;
-  interests_removed: number;
-};
 export function AdminPanel({
   events:allEvents,
   reports,
   categories,
   metrics,
+  metricsRetrievedAt,
   submissions,
   saveState,
   draftId,
@@ -51,7 +46,8 @@ export function AdminPanel({
   events: Event[];
   reports: EventReport[];
   categories: Category[];
-  metrics: Metric[];
+  metrics: EventMetric[];
+  metricsRetrievedAt: string;
   submissions: EventSubmission[];
   saveState: SaveState;
   draftId?: string;
@@ -98,16 +94,6 @@ export function AdminPanel({
     return inView&&(!openBotOnly||tab!=='drafts'||event.slug.startsWith('openbot-'))&&event.title.toLocaleLowerCase('pt-BR').includes(filter.toLocaleLowerCase('pt-BR'));
   });
   const total = events.reduce((n, e) => n + e.interest_count, 0);
-  const metricList = metrics.filter((m) => !stats || m.event_id === stats);
-  const days = Array.from({ length: 14 }, (_, i) =>
-    day(new Date(Date.now() - (13 - i) * 86400000)),
-  );
-  const values = days.map((d) =>
-    metricList
-      .filter((m) => m.day === d)
-      .reduce((n, m) => n + m.interests_added, 0),
-  );
-  const max = Math.max(1, ...values);
   async function remove(e: Event) {
     if (
       !confirm(
@@ -441,77 +427,13 @@ export function AdminPanel({
         />
       )}
       {tab === "stats" && (
-        <>
-          <label>
-            Estatísticas
-            <select
-              value={stats || ""}
-              onChange={(e) => setStats(e.target.value || null)}
-            >
-              <option value="">Todos os eventos</option>
-              {events.map((e) => (
-                <option value={e.id} key={e.id}>
-                  {e.title}
-                </option>
-              ))}
-            </select>
-          </label>
-          <div className="stats-grid">
-            <div className="stat">
-              <span>Visualizações registradas</span>
-              <strong>{metricList.reduce((n, m) => n + m.views, 0)}</strong>
-            </div>
-            <div className="stat">
-              <span>Cliques em ingressos</span>
-              <strong>
-                {metricList.reduce((n, m) => n + m.ticket_clicks, 0)}
-              </strong>
-            </div>
-            <div className="stat">
-              <span>Marcações retiradas</span>
-              <strong>
-                {metricList.reduce((n, m) => n + m.interests_removed, 0)}
-              </strong>
-            </div>
-          </div>
-          <section className="panel">
-            <h2>Interesse nos últimos 14 dias</h2>
-            <p>Novas marcações por dia · horário de Brasília</p>
-            <div
-              className="chart"
-              role="img"
-              aria-label={days
-                .map((d, i) => `${d}: ${values[i]} marcações`)
-                .join("; ")}
-            >
-              {days.map((d, i) => (
-                <div key={d}>
-                  <span>{values[i]}</span>
-                  <i style={{ height: Math.max(2, (values[i] / max) * 150) }} />
-                  <small>
-                    {d.slice(8)}/{d.slice(5, 7)}
-                  </small>
-                </div>
-              ))}
-            </div>
-          </section>
-          <h2>Eventos mais populares</h2>
-          <div className="admin-list">
-            {[...events]
-              .sort((a, b) => b.interest_count - a.interest_count)
-              .slice(0, 10)
-              .map((e) => (
-                <div className="admin-row" key={e.id}>
-                  <span>{e.title}</span>
-                  <strong>{e.interest_count} marcações</strong>
-                </div>
-              ))}
-          </div>
-          <p className="muted">
-            Visualizações e cliques são limitados a um registro por navegador,
-            evento e tipo a cada hora. Não representam pessoas únicas.
-          </p>
-        </>
+        <AdminStatistics
+          events={allEvents}
+          metrics={metrics}
+          retrievedAt={metricsRetrievedAt}
+          selectedEvent={stats}
+          onSelectEvent={setStats}
+        />
       )}
       </div>
       </div>

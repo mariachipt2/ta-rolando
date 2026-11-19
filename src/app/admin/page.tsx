@@ -1,3 +1,4 @@
+import { loadStatistics } from '@/lib/admin-statistics';
 import {signedSubmissions} from '@/lib/admin-actions';
 import { admin, configured } from "@/lib/supabase";
 import { readAll } from "@/lib/pagination";
@@ -29,21 +30,7 @@ export default async function Page() {
     readAll<Category>((from, to) =>
       db.from("categories").select("*").order("name").range(from, to),
     ),
-    readAll<{
-      event_id: string;
-      day: string;
-      views: number;
-      ticket_clicks: number;
-      interests_added: number;
-      interests_removed: number;
-    }>((from, to) =>
-      db
-        .from("event_metrics")
-        .select("*")
-        .order("day")
-        .order("event_id")
-        .range(from, to),
-    ),
+    loadStatistics(db),
     readAll<EventSubmission>((from, to) =>
       db
         .from("event_submissions")
@@ -67,7 +54,7 @@ export default async function Page() {
       <AdminPanel
         events={events}
         categories={categories}
-        metrics={metrics}
+        {...metrics}
         submissions={await signedSubmissions(db,submissions)} reports={reports}
         saveState={state.data as SaveState}
       />

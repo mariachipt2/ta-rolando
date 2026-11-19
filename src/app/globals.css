@@ -1892,3 +1892,55 @@ html[data-special-theme="newyear"] .logo > svg { color: var(--lime); }
 @media (max-width: 600px) {
   .quick-event-dialog { inset: auto 0 0; margin: 0; width: 100%; max-width: none; max-height: calc(100dvh - 12px); border-radius: 18px 18px 0 0; padding: 20px 16px max(18px, env(safe-area-inset-bottom)); }
 }
+
+/* Administrative statistics */
+.admin-statistics { min-width: 0; }
+.statistics-heading { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+.statistics-heading > div, .statistics-heading label { min-width: 0; }
+.statistics-heading h2, .statistics-heading h3 { margin: 0; }
+.statistics-heading p { font-size: 12px; margin: 8px 0 0; overflow-wrap: anywhere; }
+.statistics-heading .button { display: inline-flex; align-items: center; gap: 8px; }
+.statistics-filters { display: grid; grid-template-columns: minmax(160px, 1fr) minmax(0, 2fr); gap: 14px; margin-top: 22px; }
+.statistics-filters label, .statistics-measure label, .statistics-heading label { display: grid; gap: 7px; font-size: 13px; }
+.statistics-filters select, .statistics-filters input, .statistics-measure select, .statistics-heading select { width: 100%; min-width: 0; max-width: 100%; margin: 0; }
+.statistics-range { margin: 14px 0; font-size: 12px; }
+.statistics-summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 18px 0 24px; }
+.statistics-summary .stat { min-width: 0; padding: 18px; }
+.statistics-summary .stat strong { font-size: 30px; font-variant-numeric: tabular-nums; }
+.statistics-summary small { display: block; color: var(--muted); font-size: 11px; line-height: 1.6; margin-top: 5px; }
+.statistics-measure { max-width: 330px; margin-bottom: 18px; }
+.statistics-chart-panel, .statistics-ranking-panel { min-width: 0; margin-bottom: 20px; }
+.statistics-chart-panel h3 { margin-top: 0; }
+.statistics-chart-panel p, .statistics-ranking-panel p { font-size: 13px; }
+.statistics-bars { display: flex; gap: 5px; height: 205px; padding-top: 12px; margin: 20px 0 10px; }
+.statistics-bar-column { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+.statistics-bar-space { height: 160px; display: flex; align-items: flex-end; background: color-mix(in srgb, var(--muted) 6%, transparent); border-radius: 4px; }
+.statistics-bar-space i { display: block; width: 100%; background: var(--lime); border-radius: 4px 4px 0 0; }
+.statistics-bar-column > span { height: 24px; white-space: nowrap; font-size: 10px; color: var(--muted); }
+.statistics-bar-column:last-child > span { align-self: flex-end; }
+.statistics-details summary { cursor: pointer; font-size: 13px; padding: 10px 0; }
+.statistics-table-wrap { max-height: 360px; overflow: auto; }
+.statistics-table-wrap table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.statistics-table-wrap caption { text-align: left; padding: 12px 0; color: var(--muted); }
+.statistics-table-wrap td, .statistics-table-wrap th { padding: 10px 4px; border-bottom: 1px solid var(--border); text-align: left; }
+.statistics-table-wrap td:last-child, .statistics-table-wrap th:last-child { text-align: right; }
+.statistics-ranking { margin: 16px 0; padding: 0; list-style: none; }
+.statistics-ranking li { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 16px 0; border-bottom: 1px solid var(--border); }
+.statistics-ranking li > div { min-width: 0; }
+.statistics-ranking strong { display: block; font-size: 14px; overflow-wrap: anywhere; }
+.statistics-ranking small { display: block; font-size: 11px; color: var(--muted); line-height: 1.7; margin-top: 5px; }
+.statistics-ranking li > span { color: var(--lime); font-size: 22px; font-weight: 650; text-align: right; flex-shrink: 0; max-width: 42%; font-variant-numeric: tabular-nums; }
+.statistics-ranking li > span small { font-weight: 400; }
+.statistics-notes { font-size: 12px; line-height: 1.8; }
+@media (max-width: 600px) {
+  .statistics-filters { grid-template-columns: minmax(0, 1fr); }
+  .statistics-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+  .statistics-summary .stat { padding: 13px; }
+  .statistics-summary .stat strong { font-size: 26px; }
+  .statistics-bars { gap: 3px; }
+  .statistics-bar-column > span { font-size: 9px; writing-mode: vertical-rl; height: 36px; }
+  .statistics-chart-panel, .statistics-ranking-panel { padding: 16px; }
+  .statistics-heading label { width: 100%; }
+  .statistics-ranking li { gap: 12px; align-items: flex-start; }
+  .statistics-ranking li > span { font-size: 20px; }
+}

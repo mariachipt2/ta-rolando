@@ -1,3 +1,4 @@
+import { loadStatistics } from '@/lib/admin-statistics';
 import {publicClock} from '@/lib/public-clock';
 import {loadSpecialTheme,saveSpecialTheme} from '@/lib/special-theme-actions';
 import {siteClock} from '@/lib/site-clock';
@@ -79,21 +80,7 @@ export async function loadAdmin() {
       readAll<Category>((a, b) =>
         db!.from("categories").select("*").order("name").range(a, b),
       ),
-      readAll<{
-        event_id: string;
-        day: string;
-        views: number;
-        ticket_clicks: number;
-        interests_added: number;
-        interests_removed: number;
-      }>((a, b) =>
-        db!
-          .from("event_metrics")
-          .select("*")
-          .order("day")
-          .order("event_id")
-          .range(a, b),
-      ),
+      loadStatistics(db),
       readAll<EventSubmission>((a, b) =>
         db!
           .from("event_submissions")
@@ -115,7 +102,7 @@ export async function loadAdmin() {
   return {
     events,
     categories,
-    metrics,
+    ...metrics,
     submissions:await signedSubmissions(db,submissions),
     reports,
     saveState: saveState.data as SaveState,
@@ -216,6 +203,7 @@ export async function transport(
       return json({ ok: true });
     }
     if (!(await isAdmin())) return json({ error: "Acesso negado." }, 401);
+    if(path==='/api/admin/statistics')return json(await loadStatistics(db));
     if(path==='/api/admin/special-theme')return json(init.method==='POST'?await saveSpecialTheme(db,body):await loadSpecialTheme(db,true));
     if(path==='/api/admin/notifications')return json(init.method==='POST'?await readPublicationNotice(db,body):await publicationInbox(db));
     if(path==='/api/admin/venues')return json(init.method==='POST'?await saveVenue(db,body):await loadVenues(db));
