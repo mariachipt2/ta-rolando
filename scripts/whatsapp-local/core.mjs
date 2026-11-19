@@ -24,7 +24,7 @@ export function dailyDue(settings,state,now=new Date()){
 export function eventsForDay(rows,now=new Date()){
  const {start,end}=brasiliaDay(now),seen=new Set();
  return rows.filter(e=>{if(seen.has(e.id)||e.status==='cancelled'||e.status==='draft'||e.deleted_at||e.categories?.active===false)return false;
- const starts=Date.parse(e.starts_at),ends=Date.parse(e.ends_at||e.starts_at);
+ const starts=Date.parse(e.starts_at),ends=Date.parse(e.time_tbd?brasiliaDay(new Date(e.starts_at)).end:e.ends_at||e.starts_at);
  if(!Number.isFinite(starts)||!Number.isFinite(ends)||ends<=now.getTime()||starts>=Date.parse(end)||ends<Date.parse(start)||(ends===Date.parse(start)&&starts<Date.parse(start)))return false;
  seen.add(e.id);return true}).sort((a,b)=>Date.parse(a.starts_at)-Date.parse(b.starts_at)||a.title.localeCompare(b.title,'pt-BR'));
 }
@@ -32,6 +32,6 @@ export function dailyMessage(rows,now=new Date()){
  const events=eventsForDay(rows,now);if(!events.length)return null;
  const date=new Intl.DateTimeFormat('pt-BR',{timeZone:'America/Sao_Paulo',dateStyle:'short'}).format(now),time=new Intl.DateTimeFormat('pt-BR',{timeZone:'America/Sao_Paulo',hour:'2-digit',minute:'2-digit',hourCycle:'h23'});
  const clean=(text,max)=>String(text||'').replace(/[\r\n\t]+/g,' ').slice(0,max);
- const lines=events.slice(0,15).map(e=>'• '+(Date.parse(e.starts_at)<Date.parse(brasiliaDay(now).start)?'Em andamento':time.format(new Date(e.starts_at)))+' — '+clean(e.title,90)+' — '+clean(e.venue_name,60));
+ const lines=events.slice(0,15).map(e=>'• '+(e.time_tbd?'Horário a confirmar':Date.parse(e.starts_at)<Date.parse(brasiliaDay(now).start)?'Em andamento':time.format(new Date(e.starts_at)))+' — '+clean(e.title,90)+' — '+clean(e.venue_name,60));
  return '📅 Hoje no Tá Rolando · '+date+'\n'+lines.join('\n')+(events.length>15?'\n+ '+(events.length-15)+' outros eventos na agenda.':'')+'\n\nHorários de Brasília. Confira alterações e detalhes:\nhttps://mariachipt2.github.io/ta-rolando/#/';
 }

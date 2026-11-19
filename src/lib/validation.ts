@@ -1,5 +1,6 @@
 import { z } from "zod";
 import {instagramProfile} from './instagram';
+import {day,toISO} from './dates';
 export const instagramUrl=z.string().trim().max(2048).refine(v=>instagramProfile(v)!==null,'Use o link HTTPS do perfil, como https://www.instagram.com/organizador/.').transform(v=>instagramProfile(v)!);
 export const safeUrl = z
   .string()
@@ -22,6 +23,7 @@ export const eventSchema = z
     description: z.string().trim().min(10).max(20000),
     category_id: z.string().uuid(),
     starts_at: z.string().datetime({ offset: true }),
+    time_tbd: z.boolean().optional(),
     ends_at: z.string().datetime({ offset: true }).nullable(),
     venue_name: z.string().trim().min(2).max(160),
     address: z.string().trim().min(3).max(300),
@@ -44,6 +46,7 @@ export const eventSchema = z
     publish_at: z.string().datetime({ offset: true }).nullable(),
     featured: z.boolean(),
   })
+  .refine(v=>!v.time_tbd||!v.ends_at,{message:'Deixe o encerramento vazio enquanto o horário estiver a confirmar.',path:['ends_at']})
   .refine((v) => !v.ends_at || new Date(v.ends_at) > new Date(v.starts_at), {
     message: "O encerramento deve ser após o início.",
     path: ["ends_at"],
@@ -51,7 +54,7 @@ export const eventSchema = z
   .refine((v) => v.status !== "scheduled" || !!v.publish_at, {
     message: "Informe a data de publicação.",
     path: ["publish_at"],
-  });
+  }).transform(v=>v.time_tbd?{...v,starts_at:toISO(day(v.starts_at)+'T00:00')}:v);
 export function slugify(s: string) {
   return s
     .normalize("NFD")

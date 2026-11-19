@@ -3,9 +3,10 @@ import type {Event} from '@/lib/types';
 import {useNow} from '@/lib/use-now';
 import {eventCountdown} from '@/lib/event-countdown';
 
-export function ThemeCountdown({event}:{event:Pick<Event,'starts_at'|'ends_at'>}){
+export function ThemeCountdown({event}:{event:Pick<Event,'starts_at'|'ends_at'|'time_tbd'>}){
   // Only this small display updates every second, not the event list or page.
   const now=useNow(1000),count=eventCountdown(event.starts_at,now);
+  if(event.time_tbd)return <p className="event-countdown-state">Horário a confirmar</p>;
   if(!count)return null;
   if(count.started){
     const ended=event.ends_at&&Date.parse(event.ends_at)<=now;

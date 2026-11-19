@@ -242,7 +242,7 @@ export function AdminPanel({
                           : "Data de salvamento não disponível."}
                       </p>
                       <p>
-                        {displayDate(e.starts_at)} · {e.interest_count}{" "}
+                        {displayDate(e.starts_at, e.time_tbd)} · {e.interest_count}{" "}
                         marcações
                       </p>
                     </div>

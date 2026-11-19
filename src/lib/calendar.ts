@@ -1,3 +1,4 @@
+import {day} from './dates';
 import type { Event } from "./types";
 const escape = (s: string) =>
   s
@@ -27,6 +28,8 @@ function fold(s: string) {
   return lines + line;
 }
 export function calendar(e: Event) {
+  const nextDay=new Date(day(e.starts_at)+"T12:00:00Z");
+  nextDay.setUTCDate(nextDay.getUTCDate()+1);
   return (
     [
       "BEGIN:VCALENDAR",
@@ -36,12 +39,12 @@ export function calendar(e: Event) {
       "BEGIN:VEVENT",
       `UID:${e.id}@ta-rolando`,
       `DTSTAMP:${stamp(new Date().toISOString())}`,
-      `DTSTART:${stamp(e.starts_at)}`,
-      ...(e.ends_at ? [`DTEND:${stamp(e.ends_at)}`] : []),
+      e.time_tbd ? `DTSTART;VALUE=DATE:${day(e.starts_at).replace(/-/g, "")}` : `DTSTART:${stamp(e.starts_at)}`,
+      ...(e.time_tbd ? [`DTEND;VALUE=DATE:${nextDay.toISOString().slice(0,10).replace(/-/g, "")}`] : e.ends_at ? [`DTEND:${stamp(e.ends_at)}`] : []),
       `SUMMARY:${escape(e.title)}`,
-      `DESCRIPTION:${escape(e.description)}`,
+      `DESCRIPTION:${escape((e.time_tbd?'Horário a confirmar. Confira as atualizações no Tá Rolando.\n\n':'')+e.description)}`,
       `LOCATION:${escape(e.venue_name + " - " + e.address)}`,
-      `STATUS:${e.status === "cancelled" ? "CANCELLED" : "CONFIRMED"}`,
+      `STATUS:${e.status === "cancelled" ? "CANCELLED" : e.time_tbd ? "TENTATIVE" : "CONFIRMED"}`,
       "END:VEVENT",
       "END:VCALENDAR",
     ]

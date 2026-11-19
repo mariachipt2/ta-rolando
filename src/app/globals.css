@@ -2200,3 +2200,5 @@ html[data-special-theme="gta"] .home-hero .gta-theme-title>.gta-theme-six,
 [data-special-theme="gta"] .gta-identity-preview .gta-theme-six {
   font-family:Arial Black,Arial,sans-serif; letter-spacing:.015em; font-size:1.45em;
 }
+
+.monthly-time.pending-time { font-size:11px; line-height:1.4; overflow-wrap:anywhere; }

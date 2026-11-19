@@ -1,3 +1,4 @@
+import {day} from '@/lib/dates';
 import { EventArtists } from '@/components/artist-agenda';
 import { PosterZoom } from "@/components/poster-zoom";
 import { notFound } from "next/navigation";
@@ -60,7 +61,7 @@ export default async function Detail({
     "@context": "https://schema.org",
     "@type": "Event",
     name: e.title,
-    startDate: e.starts_at,
+    startDate: e.time_tbd ? day(e.starts_at) : e.starts_at,
     ...(e.ends_at ? { endDate: e.ends_at } : {}),
     description: e.description,
     image: e.cover_url ? [e.cover_url] : undefined,
@@ -119,7 +120,7 @@ export default async function Detail({
           <div className="event-facts">
             <p>
               <CalendarDays />
-              {displayDate(e.starts_at)}
+              {displayDate(e.starts_at, e.time_tbd)}
               {e.ends_at && " até " + displayDate(e.ends_at)}
             </p>
             <p>

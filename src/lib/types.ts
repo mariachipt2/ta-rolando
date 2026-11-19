@@ -13,6 +13,7 @@ export type Event = {
   description: string;
   category_id: string;
   starts_at: string;
+  time_tbd?: boolean;
   ends_at: string | null;
   venue_name: string;
   nightlife_venue?: boolean;

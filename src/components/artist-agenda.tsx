@@ -59,7 +59,7 @@ export function ArtistAgenda({ events, error: eventsError = false, slug }: { eve
       {eventsError && <p className="notice" role="alert">A contagem das apresentações está indisponível. Atualize a página para conferir a agenda.</p>}
       <div className="artist-directory">{list.slice(0, limit).map(artist => {
         const next = artistEvents(events, artist.id, now);
-        return <Link className="artist-directory-card" href={'/artista/' + artist.slug} key={artist.id}><ArtistPhoto key={artist.photo_url} artist={artist}/><div><h2>{artist.name}</h2><p>{artistKinds[artist.kind]}{artist.genre && ` · ${artist.genre}`}</p><small>{eventsError ? 'Agenda indisponível no momento' : next[0] ? `${next.length} ${next.length === 1 ? 'apresentação' : 'apresentações'} · Próxima ${displayDate(next[0].starts_at)}` : 'Agenda em breve'}</small></div><ArrowUpRight size={20} aria-hidden="true"/></Link>;
+        return <Link className="artist-directory-card" href={'/artista/' + artist.slug} key={artist.id}><ArtistPhoto key={artist.photo_url} artist={artist}/><div><h2>{artist.name}</h2><p>{artistKinds[artist.kind]}{artist.genre && ` · ${artist.genre}`}</p><small>{eventsError ? 'Agenda indisponível no momento' : next[0] ? `${next.length} ${next.length === 1 ? 'apresentação' : 'apresentações'} · Próxima ${displayDate(next[0].starts_at, next[0].time_tbd)}` : 'Agenda em breve'}</small></div><ArrowUpRight size={20} aria-hidden="true"/></Link>;
       })}</div>
       {!list.length && <p className="empty">Nenhum artista encontrado nesta busca.</p>}
       {list.length > limit && <button className="button secondary load-more" onClick={() => setLimit(value => value + 12)}>Mostrar mais artistas</button>}

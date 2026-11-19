@@ -3,6 +3,7 @@ import { z } from "npm:zod@4";
 import { timingSafeEqual } from "node:crypto";
 import { resolveDraftArtists } from "../_shared/artist-matching.ts";
 import { photoType } from "../_shared/photos.ts";
+import { normalizeDraftStart } from "../_shared/draft-time.ts";
 
 const secret = Deno.env.get("OPENBOT_DRAFT_TOKEN");
 const db = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, {
@@ -14,7 +15,8 @@ const date = z.iso.datetime({ offset: true });
 const schema = z.object({
   title: line(160).min(3),
   category: line(100).min(1),
-  starts_at: date,
+  starts_at: z.union([date,z.iso.date()]),
+  time_tbd: z.boolean().default(false),
   ends_at: date.optional(),
   venue_name: line(160).min(1),
   address: line(240).default(""),
@@ -31,7 +33,10 @@ const schema = z.object({
   ticket_url: https.optional(),
   instagram_url: z.string().regex(/^https:\/\/(www\.)?instagram\.com\/[A-Za-z0-9._]{1,30}\/?$/).optional(),
   source_url: https.optional(),
-}).strict();
+}).strict().superRefine((value,ctx)=>{
+  if(!value.time_tbd&&!value.starts_at.includes('T'))ctx.addIssue({code:'custom',path:['starts_at'],message:'Informe o horário ou marque time_tbd.'});
+  if(value.time_tbd&&value.ends_at)ctx.addIssue({code:'custom',path:['ends_at'],message:'O encerramento deve ficar vazio enquanto o horário estiver a confirmar.'});
+}).transform(value=>({...value,starts_at:normalizeDraftStart(value.starts_at,value.time_tbd)}));
 
 const encoder = new TextEncoder();
 const normalize = (value: string) => value.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();

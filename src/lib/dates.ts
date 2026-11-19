@@ -4,8 +4,11 @@ export const TZ = "America/Sao_Paulo";
 export function day(d: Date | string = new Date(clockNow())) {
   return formatInTimeZone(d, TZ, "yyyy-MM-dd");
 }
-export function displayDate(d: string) {
-  return formatInTimeZone(d, TZ, "dd/MM/yyyy · HH:mm");
+export function displayDate(d: string, timeTbd = false) {
+  return timeTbd ? formatInTimeZone(d, TZ, "dd/MM/yyyy")+' · Horário a confirmar' : formatInTimeZone(d, TZ, "dd/MM/yyyy · HH:mm");
+}
+export function eventTime(e:{starts_at:string;time_tbd?:boolean}) {
+  return e.time_tbd?'A confirmar':formatInTimeZone(e.starts_at,TZ,'HH:mm');
 }
 export function localInput(d: string) {
   return formatInTimeZone(d, TZ, "yyyy-MM-dd'T'HH:mm");
@@ -14,10 +17,10 @@ export function toISO(d: string) {
   return fromZonedTime(d, TZ).toISOString();
 }
 export function upcoming(
-  e: { starts_at: string; ends_at: string | null },
+  e: { starts_at: string; ends_at: string | null; time_tbd?: boolean },
   now = new Date(clockNow()),
 ) {
-  return new Date(e.ends_at || e.starts_at) > now;
+  return e.time_tbd ? day(e.starts_at)>=day(now) : new Date(e.ends_at || e.starts_at) > now;
 }
 export function inPeriod(
   start: string,

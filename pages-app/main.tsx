@@ -72,7 +72,7 @@ function Detail({ event: e,events }: { event: Event;events:Event[] }) {
           <div className="event-facts">
             <p>
               <CalendarDays />
-              {displayDate(e.starts_at)}
+              {displayDate(e.starts_at, e.time_tbd)}
               {e.ends_at && " até " + displayDate(e.ends_at)}
             </p>
             <p>

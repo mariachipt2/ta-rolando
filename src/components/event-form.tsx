@@ -11,7 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import type { Event, Category } from "@/lib/types";
 import { eventSchema } from "@/lib/validation";
-import { localInput, toISO, displayDate } from "@/lib/dates";
+import { day, localInput, toISO, displayDate } from "@/lib/dates";
 import { InstagramLink } from "./instagram-link";
 import { SaveConfirmation } from "./save-confirmation";
 import {AGE_OPTIONS} from '@/lib/age-options';
@@ -55,6 +55,7 @@ export function EventForm({
       description: e.description || "",
       category_id: e.category_id || categories.find((c) => c.active)?.id || "",
       starts_at: e.starts_at || "",
+      time_tbd: e.time_tbd || false,
       ends_at: e.ends_at || null,
       venue_name: e.venue_name || "",
       address: e.address || "",
@@ -247,8 +248,9 @@ export function EventForm({
             <small className="error-text">{errors.description.message}</small>
           )}
         </label>
-        {datetime("starts_at", "Início *")}
-        {datetime("ends_at", "Encerramento")}
+        <label className="check full"><input type="checkbox" checked={!!v.time_tbd} onChange={ev=>{setValue('time_tbd',ev.target.checked,{shouldDirty:true,shouldValidate:true});if(ev.target.checked){setValue('ends_at',null,{shouldDirty:true});if(v.starts_at)setValue('starts_at',toISO(day(v.starts_at)+'T00:00'),{shouldDirty:true})}}}/>Horário a confirmar</label>
+        {v.time_tbd?<label>Data do evento *<input type="date" required value={v.starts_at?day(v.starts_at):''} onChange={ev=>setValue('starts_at',ev.target.value?toISO(ev.target.value+'T00:00'):'',{shouldDirty:true,shouldValidate:true})}/><small>O site mostra a data e “Horário a confirmar”. Quando souber o horário, desmarque a opção e preencha o início.</small>{errors.starts_at&&<small className="error-text">Informe a data do evento.</small>}</label>:datetime("starts_at", "Início *")}
+        {!v.time_tbd&&datetime("ends_at", "Encerramento")}
         {field("venue_name", "Nome do local", true)}
         {field("address", "Endereço", true)}
         {field("neighborhood", "Bairro")}
@@ -394,7 +396,7 @@ export function EventForm({
           {v.cover_url && <img src={v.cover_url} alt="Prévia da capa" />}
           <h1>{v.title || "Título do evento"}</h1>
           <p>
-            {v.starts_at ? displayDate(v.starts_at) : "Informe a data"} ·{" "}
+            {v.starts_at ? displayDate(v.starts_at, v.time_tbd) : "Informe a data"} ·{" "}
             {v.venue_name}
           </p>
           <p>

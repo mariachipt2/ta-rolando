@@ -46,7 +46,7 @@ export function EventCard({ event: e, rank }: { event: Event; rank?: number }) {
         </Link>
         <p className="event-date">
           <CalendarDays size={15} />
-          {displayDate(e.starts_at)}
+          {displayDate(e.starts_at, e.time_tbd)}
         </p>
         <p>
           <MapPin size={15} />

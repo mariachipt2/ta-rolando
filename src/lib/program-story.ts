@@ -55,7 +55,7 @@ export async function createProgramStory(events:Event[],title:string,link:string
     const badge=e.status==='cancelled'?'CANCELADO':!upcoming(e,now)?'ENCERRADO':e.change_notice?'EVENTO ALTERADO':e.categories?.name||'NA MINHA PROGRAMAÇÃO';
     write(ctx,badge.toLocaleUpperCase('pt-BR'),textX,y+(solo?530:42),textWidth,17,1,e.status==='cancelled'?'#ffa89f':'#b3ff4a',700);
     write(ctx,e.title,textX,y+(solo?580:88),textWidth,solo?42:32,3,'#ffffff',800);
-    write(ctx,displayDate(e.starts_at),textX,y+(solo?800:cardHeight-87),textWidth,26,1,'#d6c6f5',700);
+    write(ctx,displayDate(e.starts_at, e.time_tbd),textX,y+(solo?800:cardHeight-87),textWidth,26,1,'#d6c6f5',700);
     write(ctx,[e.venue_name,e.neighborhood||e.city].filter(Boolean).join(' · '),textX,y+(solo?850:cardHeight-47),textWidth,23,2,'#c9c4d7',400);
   });
   const footerY=1510;

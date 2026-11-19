@@ -51,7 +51,7 @@ export function ThemeBanner({data,now,preview=false}:{data:ThemeData;now:Date;pr
   if(settings.theme==='gta'){
     if(!event&&!preview)return null;
     if(!event)return <section className="gta-feature gta-identity-preview" aria-label="Prévia do tema GTA VI"><GtaThemeRibbon/><div className="shell gta-feature-copy"><GtaThemeIdentity/></div></section>;
-    return <section className="gta-feature" aria-label={event?'Evento em destaque':'Prévia do tema GTA VI'}><div className="shell gta-feature-copy"><span className="eyebrow">SOL, NEON E BOAS HISTÓRIAS</span><h2>{event?event.title:<>A cidade acende.<br/><span>O rolê começa.</span></>}</h2>{event?<><p>{displayDate(event.starts_at)} · {event.venue_name}</p><ThemeCountdown event={event}/>{preview?<span className="button lime-button">Ver evento <ArrowUpRight size={18}/></span>:<Link className="button lime-button" href={'/evento/'+event.slug}>Ver evento <ArrowUpRight size={18}/></Link>}</>:<p>O clima de Vice City na sua agenda de Ipatinga.</p>}</div></section>;
+    return <section className="gta-feature" aria-label={event?'Evento em destaque':'Prévia do tema GTA VI'}><div className="shell gta-feature-copy"><span className="eyebrow">SOL, NEON E BOAS HISTÓRIAS</span><h2>{event?event.title:<>A cidade acende.<br/><span>O rolê começa.</span></>}</h2>{event?<><p>{displayDate(event.starts_at, event.time_tbd)} · {event.venue_name}</p><ThemeCountdown event={event}/>{preview?<span className="button lime-button">Ver evento <ArrowUpRight size={18}/></span>:<Link className="button lime-button" href={'/evento/'+event.slug}>Ver evento <ArrowUpRight size={18}/></Link>}</>:<p>O clima de Vice City na sua agenda de Ipatinga.</p>}</div></section>;
   }
   if(!event)return null;
   const ice=settings.theme==='ice';
@@ -66,7 +66,7 @@ export function ThemeBanner({data,now,preview=false}:{data:ThemeData;now:Date;pr
       <Heading>{ice?<>Um rolê de<br/><span>arrepiar.</span></>:halloween?<>Seu próximo rolê<br/>é de <span>outro mundo.</span></>:christmas?<>A magia está<br/><span>no encontro.</span></>:muertos?<>Uma noite para<br/><span>celebrar a vida.</span></>:<>Novas histórias.<br/><span>Uma nova virada.</span></>}</Heading>
       <p className="ice-hero-subtitle">{ice?`A magia do gelo está chegando a ${event.city||'Ipatinga'}.`:halloween?'A noite mais sombria do ano está chegando.':christmas?'Luzes, risadas e bons momentos para celebrar.':muertos?'Flores, cores e encontros que ficam na memória.':'Um novo ano começa com um encontro inesquecível.'}</p>
       <p className="ice-event-title">{event.title}</p>
-      <div className="ice-event-details"><span><CalendarDays size={16}/>{displayDate(event.starts_at)}</span><span><MapPin size={16}/>{event.venue_name}</span></div>
+      <div className="ice-event-details"><span><CalendarDays size={16}/>{displayDate(event.starts_at, event.time_tbd)}</span><span><MapPin size={16}/>{event.venue_name}</span></div>
       <div className="ice-hero-actions"><ThemeCountdown event={event}/>
       {preview?<span className="button ice-event-button">Ver evento <ArrowUpRight size={20}/></span>:<Link className="button ice-event-button" href={'/evento/'+event.slug}>Ver evento <ArrowUpRight size={20}/></Link>}
       </div>

@@ -45,7 +45,7 @@ function HeroEvent({ event }: { event: Event }) {
       <div className="home-spotlight-copy">
         <span className="eyebrow">{event.featured ? "Em destaque" : "Na agenda"}</span>
         <strong>{event.title}</strong>
-        <span className="home-spotlight-date">{displayDate(event.starts_at)}</span>
+        <span className="home-spotlight-date">{displayDate(event.starts_at, event.time_tbd)}</span>
         <span className="home-spotlight-action">Ver evento <ArrowUpRight size={16} /></span>
       </div>
     </Link>

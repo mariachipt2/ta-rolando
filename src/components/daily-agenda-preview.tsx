@@ -4,14 +4,13 @@ import { useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { LazyMotion, domAnimation, m, useReducedMotion } from "motion/react";
-import { day } from "@/lib/dates";
+import { day, eventTime } from "@/lib/dates";
 import type { Event } from "@/lib/types";
 import { PosterZoom } from "./poster-zoom";
 
 const zone = "America/Sao_Paulo";
 const weekday = new Intl.DateTimeFormat("pt-BR", { weekday: "short", timeZone: zone });
 const dateLabel = new Intl.DateTimeFormat("pt-BR", { weekday: "long", day: "numeric", month: "long", timeZone: zone });
-const time = new Intl.DateTimeFormat("pt-BR", { hour: "2-digit", minute: "2-digit", timeZone: zone });
 const cover = (event: Event) => event.cover_url || event.gallery?.[0];
 const eventLink = (event: Event) => "/evento/" + event.slug;
 
@@ -102,7 +101,7 @@ export function DailyAgendaPreview({ events, now }: { events: Event[]; now: numb
                 </>}
                 <div className="daily-preview-copy">
                   <h4>{featured.title}</h4>
-                  <p>{time.format(new Date(featured.starts_at))} · {featured.venue_name}</p>
+                  <p>{eventTime(featured)} · {featured.venue_name}</p>
                   <Link href={eventLink(featured)} className="button lime-button">Ver evento <ArrowUpRight size={16} /></Link>
                 </div>
               </article>
@@ -110,7 +109,7 @@ export function DailyAgendaPreview({ events, now }: { events: Event[]; now: numb
                 {list.map(event => (
                   <li key={event.id}>
                     <Link href={eventLink(event)}>
-                      <time dateTime={event.starts_at}>{time.format(new Date(event.starts_at))}</time>
+                      <time dateTime={event.starts_at}>{eventTime(event)}</time>
                       {cover(event) ? <img src={cover(event)} alt="" loading="lazy" decoding="async" fetchPriority="low" /> : <span aria-hidden="true" />}
                       <span><strong>{event.title}</strong><small>{event.venue_name}</small></span>
                       <ArrowUpRight size={16} aria-hidden="true" />

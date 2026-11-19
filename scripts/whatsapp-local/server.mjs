@@ -37,7 +37,7 @@ async function tick(){if(working||!settings.enabled)return;working=true;try{
  }
  if(dailyDue(settings,state)){
  const today=brasiliaDay();let offset=0,dayRows=[];
- while(true){const {data,error}=await db.from('public_events').select('id,title,starts_at,ends_at,venue_name,status').neq('status','cancelled').lt('starts_at',today.end).or('starts_at.gte.'+today.start+',ends_at.gt.'+today.start).order('starts_at').order('id').range(offset,offset+499);if(error)throw Error('Falha ao consultar os eventos do resumo diário.');dayRows.push(...data);if(data.length<500)break;offset+=500}
+ while(true){const {data,error}=await db.from('public_events').select('id,title,starts_at,ends_at,time_tbd,venue_name,status').neq('status','cancelled').lt('starts_at',today.end).or('starts_at.gte.'+today.start+',ends_at.gt.'+today.start).order('starts_at').order('id').range(offset,offset+499);if(error)throw Error('Falha ao consultar os eventos do resumo diário.');dayRows.push(...data);if(data.length<500)break;offset+=500}
  const now=new Date();
  // Recheck the date and pause switches after fetching; never send yesterday's digest after midnight.
  if(brasiliaDay(now).day===today.day&&dailyDue(settings,state,now)){
