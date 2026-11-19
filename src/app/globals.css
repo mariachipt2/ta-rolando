@@ -2016,3 +2016,8 @@ html[data-special-theme="newyear"] .logo > svg { color: var(--lime); }
   .agenda-special-banner { transition: none; }
   .agenda-special-banner:hover { transform: none; }
 }
+
+.discovery-poster { margin: 14px 0 18px; max-width: 300px; }
+.discovery-poster a { display: block; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: #0b0b12; }
+.discovery-poster img { display: block; width: 100%; height: 260px; object-fit: contain; }
+.discovery-poster p { margin: 0; font-size: 13px; }

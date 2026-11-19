@@ -1,4 +1,5 @@
 "use client";
+import { discoverySourceCover } from "@/lib/discovery-draft";
 import {VenuePicker} from './venue-picker';
 import {OrganizerPicker} from './organizer-picker';
 import {venueEvent} from '@/lib/venues';
@@ -38,7 +39,8 @@ export function EventForm({
   const [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
     [preview, setPreview] = useState(false),
-    [uploading, setUploading] = useState(false);
+    [uploading, setUploading] = useState(false),
+    [failedCover, setFailedCover] = useState("");
   const {
     register,
     handleSubmit,
@@ -293,9 +295,13 @@ export function EventForm({
             onChange={(e) => upload(e.target.files, true)}
           />
         </label>
+        {!v.cover_url && discoverySourceCover(e) && <div className="full">
+          <button type="button" className="button secondary" onClick={() => setValue("cover_url", discoverySourceCover(e), { shouldDirty: true })}>Carregar cartaz da fonte como capa</button>
+        </div>}
         {v.cover_url && (
           <div className="image-edit">
-            <img src={v.cover_url} alt="Capa selecionada" />
+            {failedCover === v.cover_url ? <p role="status">Não foi possível carregar esta capa. Abra o cartaz na fonte ou envie a imagem pelo campo de upload.</p> : <img src={v.cover_url} alt="Capa selecionada" referrerPolicy="no-referrer" onError={() => setFailedCover(v.cover_url)} />}
+            <a href={v.cover_url} target="_blank" rel="noopener noreferrer">Abrir imagem da capa ↗</a>
             <button
               type="button"
               onClick={() => setValue("cover_url", "", { shouldDirty: true })}
