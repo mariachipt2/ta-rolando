@@ -1,5 +1,6 @@
 "use client";
 import { artistName } from '@/lib/artists';
+import {GtaThemeIdentity,GtaThemeRibbon} from './gta-theme-identity';
 import { AgendaSpecialBanner } from './agenda-special-banner';
 import {useNow} from '@/lib/use-now';
 import Link from 'next/link';
@@ -294,7 +295,9 @@ export function Discover({
   return (
     <>
       <section className="hero shell home-hero">
+        <GtaThemeRibbon/>
         <div className="hero-copy">
+          <GtaThemeIdentity/>
           <span className="live-label">
             <i /> AGENDA DE IPATINGA
           </span>

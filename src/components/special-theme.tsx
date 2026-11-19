@@ -7,6 +7,7 @@ import {useNow} from '@/lib/use-now';
 import {themeActive,type ThemeData} from '@/lib/special-theme';
 import {ThemeCountdown} from './theme-countdown';
 import {displayDate} from '@/lib/dates';
+import {GtaThemeIdentity,GtaThemeRibbon} from './gta-theme-identity';
 
 export function IceAtmosphere(){
   return <div className="ice-atmosphere" aria-hidden="true"><div className="ice-frost-frame"/><div className="ice-snowfall">{Array.from({length:24},(_,i)=><span key={i} style={{'--snow-x':`${(i*43+7)%100}%`,'--snow-size':`${2+i%4}px`,'--snow-duration':`${13+i%9}s`,'--snow-delay':`${-i*1.7}s`,'--snow-drift':`${i%2?50:-40}px`} as CSSProperties}/>)}</div></div>;
@@ -49,6 +50,7 @@ export function ThemeBanner({data,now,preview=false}:{data:ThemeData;now:Date;pr
   const {settings,event}=data;
   if(settings.theme==='gta'){
     if(!event&&!preview)return null;
+    if(!event)return <section className="gta-feature gta-identity-preview" aria-label="Prévia do tema GTA VI"><GtaThemeRibbon/><div className="shell gta-feature-copy"><GtaThemeIdentity/></div></section>;
     return <section className="gta-feature" aria-label={event?'Evento em destaque':'Prévia do tema GTA VI'}><div className="shell gta-feature-copy"><span className="eyebrow">SOL, NEON E BOAS HISTÓRIAS</span><h2>{event?event.title:<>A cidade acende.<br/><span>O rolê começa.</span></>}</h2>{event?<><p>{displayDate(event.starts_at)} · {event.venue_name}</p><ThemeCountdown event={event}/>{preview?<span className="button lime-button">Ver evento <ArrowUpRight size={18}/></span>:<Link className="button lime-button" href={'/evento/'+event.slug}>Ver evento <ArrowUpRight size={18}/></Link>}</>:<p>O clima de Vice City na sua agenda de Ipatinga.</p>}</div></section>;
   }
   if(!event)return null;
