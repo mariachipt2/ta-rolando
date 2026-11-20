@@ -2202,3 +2202,17 @@ html[data-special-theme="gta"] .home-hero .gta-theme-title>.gta-theme-six,
 }
 
 .monthly-time.pending-time { font-size:11px; line-height:1.4; overflow-wrap:anywhere; }
+
+.agenda-view-controls { display:flex; flex-wrap:wrap; gap:8px; margin:18px 0; }
+.agenda-view-controls button { min-height:44px; padding:10px 15px; color:var(--muted); background:var(--card); border:1px solid var(--border); border-radius:24px; font:inherit; font-size:13px; cursor:pointer; }
+.agenda-view-controls button.active { color:var(--bg); background:var(--lime); border-color:var(--lime); }
+.agenda-date-picker { display:flex; flex-wrap:wrap; align-items:center; gap:12px; margin:16px 0; font-size:12px; color:var(--muted); }
+.agenda-date-picker input { width:auto; max-width:100%; min-height:44px; }
+.daily-preview-date small { font-size:12px; font-weight:400; color:var(--muted); white-space:nowrap; }
+.daily-preview-list time { overflow-wrap:anywhere; }
+.daily-preview-list time small { display:block; color:var(--muted); font-size:11px; margin-bottom:3px; }
+.agenda-filter-summary { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px; padding-top:20px; font-size:13px; }
+.compare-card-control.is-compact { margin-top:3px; }
+.compare-card-control.is-compact>.button { width:auto; justify-self:end; min-height:44px; padding:6px 2px; border:0; background:transparent; box-shadow:none; font-size:11px; color:var(--muted); }
+.compare-card-control.is-compact>.button[aria-pressed="true"] { color:var(--lime); }
+@media(max-width:600px) { .agenda-view-controls { gap:6px; } .agenda-view-controls button { padding:9px 11px; font-size:12px; } .daily-preview-date { line-height:1.5; } .agenda-date-picker { align-items:flex-start; flex-direction:column; gap:6px; } }

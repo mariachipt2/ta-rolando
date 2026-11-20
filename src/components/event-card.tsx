@@ -65,7 +65,7 @@ export function EventCard({ event: e, rank }: { event: Event; rank?: number }) {
           </Link>
           </div>
         </div>
-        <CompareButton id={e.id} title={e.title}/>
+        <CompareButton id={e.id} title={e.title} compact/>
       </div>
     </article>
   );

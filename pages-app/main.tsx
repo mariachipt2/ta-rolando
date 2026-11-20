@@ -262,7 +262,7 @@ function App() {
         : path === '/organizadores' ? 'Organizadores | Tá Rolando'
         : path === '/fim-de-semana' ? 'Resumo do fim de semana | Tá Rolando'
         : path === '/linha-do-tempo'
-          ? 'Linha do tempo | Tá Rolando'
+          ? 'Calendário de eventos | Tá Rolando'
         : "Tá Rolando — Ipatinga";
   }, [path, event]);
   return (

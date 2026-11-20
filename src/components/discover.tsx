@@ -212,16 +212,6 @@ export function Discover({
       (!date ||
         (day(e.starts_at) <= date && day(e.ends_at || e.starts_at) >= date)),
   );
-  const currentDate = new Date(now);
-  const todayEvents = future.filter(event =>
-    inPeriod(event.starts_at, event.ends_at, "today", currentDate),
-  );
-  const tomorrowEvents = future.filter(event =>
-    inPeriod(event.starts_at, event.ends_at, "tomorrow", currentDate),
-  );
-  const weekendEvents = future.filter(event =>
-    inPeriod(event.starts_at, event.ends_at, "weekend", currentDate),
-  );
   const spotlight = useMemo(() => {
     const hasCover = (event: Event) => Boolean(event.cover_url || event.gallery?.[0]);
     return [...future].sort((a, b) =>
@@ -442,81 +432,17 @@ export function Discover({
         </div>
         <HomeSpotlight events={spotlight} />
       </section>
-      <DailyAgendaPreview events={filtered} now={now} />
-      <div className="shell discovery editorial-discovery" id="explorar">
-        <div className="section-heading">
-          <div>
-            <span className="eyebrow">A CIDADE É SUA</span>
-            <h2><span className="discovery-normal-title">Qual é a boa?</span><span className="discovery-theme-title">Encontre seu próximo <span>rolê.</span></span></h2>
-          </div>
-          {trending.length>0&&<a href="#bombando" className="text-link">
-            <Flame size={17} /> Tá bombando <ArrowUpRight size={16} />
-          </a>}
-        </div>
-        {error && (
-          <p role="alert" className="notice">
-            Não conseguimos consultar os eventos agora. Recarregue a página em
-            alguns instantes.
-          </p>
-        )}
-        {active ? (
-          <>
-            <button className="clear" onClick={clear}>
-              <X size={15} /> Limpar filtros
-            </button>
-            {section("Seu próximo rolê", "RESULTADOS DA BUSCA", filtered)}
-          </>
-        ) : (
-          <>
-            {!error && !todayEvents.length && (tomorrowEvents.length > 0 || weekendEvents.length > 0) && (
-              <p className="notice">
-                Tudo calmo hoje em Ipatinga.{" "}
-                <a className="text-link" style={{ display: "inline-flex" }} href={tomorrowEvents.length ? "#vai-rolar-amanha" : "#roles-do-fim-de-semana"}>
-                  {tomorrowEvents.length ? "Veja o que vai rolar amanhã" : "Veja o que vem no fim de semana"} <ArrowUpRight size={16} />
-                </a>
-              </p>
-            )}
-            {todayEvents.length > 0 && section("Tá rolando hoje", "APROVEITE O AGORA", todayEvents)}
-            {tomorrowEvents.length > 0 && section("Vai rolar amanhã", "GUARDE UM ESPAÇO NA AGENDA", tomorrowEvents, "vai-rolar-amanha")}
-            {weekendEvents.length > 0 && section("Rolês do fim de semana", "SAIA DA ROTINA", weekendEvents, "roles-do-fim-de-semana")}
-            {future.some((e) => e.featured) &&
-              section(
-                "Vale colocar na agenda",
-                "DESTAQUES DA CIDADE",
-                future.filter((e) => e.featured),
-              )}
-            {section("Próximos eventos", "JÁ VAI SE PROGRAMANDO", future)}
-            <div className="agenda-banner">
-              <div>
-                <span className="eyebrow">SEUS PLANOS, DO SEU JEITO</span>
-                <h2>Curtiu? Marca “Eu vou!”.</h2>
-                <p>Seu rolê salvo na agenda, sem cadastro e sem complicação.</p>
-              </div>
-              <Link href="/agenda" className="button lime-button">
-                Minha agenda <ArrowUpRight size={18} />
-              </Link>
-            </div>
-            {section(
-              "Eventos gratuitos",
-              "BOAS HISTÓRIAS NÃO PRECISAM CUSTAR",
-              future.filter((e) => e.is_free),
-            )}
-            {trending.length>0&&section(
-              "Tá Bombando!",
-              "VISUALIZAÇÕES E CLIQUES · ÚLTIMOS 7 DIAS",
-              trending.slice(0, 3),
-              "bombando",
-            )}
-            {section(
-              "Top 10 mais aguardados",
-              "IPATINGA JÁ ESTÁ FAZENDO PLANOS",
-              ranking.slice(0, 10),
-              "top10",
-              true,
-            )}
-          </>
-        )}
+      <div id="explorar">
+        {error&&<p className="shell notice" role="alert">Não conseguimos consultar os eventos agora. Recarregue a página em alguns instantes.</p>}
+        {active&&<div className="shell agenda-filter-summary"><p role="status">{filtered.length} {filtered.length===1?'evento encontrado':'eventos encontrados'} com os filtros selecionados.</p><button className="clear" onClick={clear}><X size={15}/> Limpar filtros</button></div>}
+        <DailyAgendaPreview key={JSON.stringify([query,category,price,place,childrenOnly,hideNightlife])} initialView={query.trim()?'all':'day'} events={filtered} now={now} period={period} dateFilter={date} onViewChange={()=>{setPeriod('all');setDate('')}}/>
       </div>
+      {!active&&<div className="shell discovery editorial-discovery">
+        {future.some(e=>e.featured)&&section("Destaques da semana","VALE COLOCAR NA AGENDA",future.filter(e=>e.featured).slice(0,3))}
+        {trending.length>0&&section("Tá Bombando!","VISUALIZAÇÕES E CLIQUES · ÚLTIMOS 7 DIAS",trending.slice(0,3),"bombando")}
+        {ranking.length>0&&section("Mais aguardados","OS ROLÊS QUE A GALERA QUER",ranking.slice(0,3),"top10",true)}
+      </div>}
+
     </>
   );
 }
