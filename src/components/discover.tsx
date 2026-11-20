@@ -1,5 +1,6 @@
 "use client";
 import { artistName } from '@/lib/artists';
+import {trendingEvents} from '@/lib/trending';
 import {GtaThemeIdentity,GtaThemeRibbon} from './gta-theme-identity';
 import { AgendaSpecialBanner } from './agenda-special-banner';
 import {useNow} from '@/lib/use-now';
@@ -229,6 +230,7 @@ export function Discover({
       Date.parse(a.starts_at) - Date.parse(b.starts_at)
     ).slice(0, 4);
   }, [future]);
+  const trending = trendingEvents(future,new Date(now));
   const ranking = [...future]
     .sort(
       (a, b) =>
@@ -447,9 +449,9 @@ export function Discover({
             <span className="eyebrow">A CIDADE É SUA</span>
             <h2><span className="discovery-normal-title">Qual é a boa?</span><span className="discovery-theme-title">Encontre seu próximo <span>rolê.</span></span></h2>
           </div>
-          <a href="#bombando" className="text-link">
+          {trending.length>0&&<a href="#bombando" className="text-link">
             <Flame size={17} /> Tá bombando <ArrowUpRight size={16} />
-          </a>
+          </a>}
         </div>
         {error && (
           <p role="alert" className="notice">
@@ -499,10 +501,10 @@ export function Discover({
               "BOAS HISTÓRIAS NÃO PRECISAM CUSTAR",
               future.filter((e) => e.is_free),
             )}
-            {section(
+            {trending.length>0&&section(
               "Tá Bombando!",
-              "OS ROLÊS QUE A GALERA QUER",
-              ranking.slice(0, 3),
+              "VISUALIZAÇÕES E CLIQUES · ÚLTIMOS 7 DIAS",
+              trending.slice(0, 3),
               "bombando",
             )}
             {section(

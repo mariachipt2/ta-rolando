@@ -47,6 +47,8 @@ export type Event = {
   interest_count: number;
   views?: number;
   ticket_clicks?: number;
+  recent_views?: number;
+  recent_ticket_clicks?: number;
 };
 export type EventSubmission={id:string;event_data:Partial<Event>;status:'pending'|'approved'|'rejected';submitted_at:string;updated_at:string;reviewed_at:string|null;approved_event_id:string|null;photo_path?:string|null;photo_url?:string};
 export type EventVersion={id:string;event_id:string;snapshot:Partial<Event>;changes:Record<string,{before:unknown;after:unknown}>;action:string;created_at:string};
