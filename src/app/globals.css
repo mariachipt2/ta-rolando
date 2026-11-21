@@ -1798,7 +1798,7 @@ html:not([data-special-theme]) .home-hero h1 > span {
 .daily-preview-copy p { margin: 0 0 16px; color: var(--text); }
 .daily-preview-copy .button { width: fit-content; }
 .daily-preview-list { padding: 0; margin: 17px 0 0; list-style: none; }
-.daily-preview-list a { display: grid; grid-template-columns: 4ch 54px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 9px 3px; border-bottom: 1px solid var(--border); }
+.daily-preview-list a { display: grid; grid-template-columns: 6ch 54px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 9px 3px; border-bottom: 1px solid var(--border); }
 .daily-preview-list a:hover { color: var(--lime); }
 .daily-preview-list img { width: 54px; height: 43px; object-fit: cover; border-radius: 7px; }
 .daily-preview-list small { display: block; color: var(--muted); }
@@ -2209,7 +2209,9 @@ html[data-special-theme="gta"] .home-hero .gta-theme-title>.gta-theme-six,
 .agenda-date-picker { display:flex; flex-wrap:wrap; align-items:center; gap:12px; margin:16px 0; font-size:12px; color:var(--muted); }
 .agenda-date-picker input { width:auto; max-width:100%; min-height:44px; }
 .daily-preview-date small { font-size:12px; font-weight:400; color:var(--muted); white-space:nowrap; }
-.daily-preview-list time { overflow-wrap:anywhere; }
+.daily-preview-list time { white-space:nowrap; overflow-wrap:normal; word-break:normal; font-variant-numeric:tabular-nums; }
+.daily-preview-list .agenda-clock { display:block; white-space:nowrap; }
+.daily-preview-list .is-time-pending .agenda-clock { white-space:normal; font-size:11px; line-height:1.35; }
 .daily-preview-list time small { display:block; color:var(--muted); font-size:11px; margin-bottom:3px; }
 .agenda-filter-summary { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px; padding-top:20px; font-size:13px; }
 .compare-card-control.is-compact { margin-top:3px; }

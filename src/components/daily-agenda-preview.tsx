@@ -113,7 +113,7 @@ export function DailyAgendaPreview({ events, now,period='all',dateFilter='',onVi
                 {list.slice(0,limit).map(event => (
                   <li key={event.id}>
                     <Link href={eventLink(event)}>
-                      <time dateTime={event.time_tbd?day(event.starts_at):event.starts_at}>{mode!=='day'&&<small>{shortDate.format(new Date(event.starts_at))}</small>}{eventTime(event)}</time>
+                      <time className={event.time_tbd?'is-time-pending':undefined} dateTime={event.time_tbd?day(event.starts_at):event.starts_at}>{mode!=='day'&&<small>{shortDate.format(new Date(event.starts_at))}</small>}<span className="agenda-clock">{eventTime(event)}</span></time>
                       {cover(event) ? <img src={cover(event)} alt="" loading="lazy" decoding="async" fetchPriority="low" /> : <span aria-hidden="true" />}
                       <span><strong>{event.title}</strong><small>{event.venue_name}</small></span>
                       <ArrowUpRight size={16} aria-hidden="true" />
