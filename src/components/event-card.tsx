@@ -5,6 +5,7 @@ import { MapPin, ArrowUpRight, Users, CalendarDays } from "lucide-react";
 import type { Event } from "@/lib/types";
 import { displayDate,upcoming } from "@/lib/dates";
 import {CompareButton} from './compare-selection';
+import {EnvironmentBadge} from './environment-badge';
 import {EventNotice} from "./event-notice";
 import {InstagramLink} from './instagram-link';
 export function EventCard({ event: e, rank }: { event: Event; rank?: number }) {
@@ -52,6 +53,7 @@ export function EventCard({ event: e, rank }: { event: Event; rank?: number }) {
           <MapPin size={15} />
           {e.venue_name} · {e.neighborhood || e.city}
         </p>
+        <EnvironmentBadge value={e.environment} compact/>
         <div className="card-bottom">
           {e.interest_count>0&&<span>
             <Users size={15} />

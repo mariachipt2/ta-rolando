@@ -1,4 +1,4 @@
-import {environmentLabels} from '@/lib/venue-directory';
+import {EnvironmentBadge} from '@/components/environment-badge';
 import { ArtistAgenda, EventArtists } from '@/components/artist-agenda';
 import { AgendaSpecialPage } from '@/components/agenda-special-page';
 import {SpecialTheme} from '../src/components/special-theme';
@@ -87,7 +87,7 @@ function Detail({ event: e,events }: { event: Event;events:Event[] }) {
               · Classificação: {e.age_rating || "Não informada"}
             </p>
             <p>Organização: {e.organizer || "Não informada"}</p>
-            {e.environment&&<p>Ambiente: {environmentLabels[e.environment]}</p>}
+            <EnvironmentBadge value={e.environment}/>
           </div>
           <p className="family-info">{childrenLabel(e.family_friendly)}</p>
           <EventNotice event={e}/>
