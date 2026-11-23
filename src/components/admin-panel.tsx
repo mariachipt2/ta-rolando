@@ -33,7 +33,7 @@ import {EventTrash} from './event-trash';
 import {AdminDiscovery,discoveryHasResults} from './admin-discovery';
 import {AdminExport} from './admin-export';
 import {AdminPending} from './admin-pending';
-import {eventIssues} from '@/lib/event-discovery';
+import {eventIssues,pendingEventItems} from '@/lib/event-discovery';
 import {AdminReports} from './admin-reports';
 export function AdminPanel({
   events:allEvents,
@@ -88,7 +88,7 @@ export function AdminPanel({
     setReviewId(undefined);
     router.refresh();
   };
-  const pendingEvents=events.filter(e=>eventIssues(e).length),pendingSuggestions=submissions.filter(s=>s.status==='pending').length;
+  const pendingEvents=pendingEventItems(events,now),pendingSuggestions=submissions.filter(s=>s.status==='pending').length;
   const openPending=(event?:Event)=>{if(dirty&&!confirm('Há alterações não salvas. Sair sem salvar?'))return;setReviewId(undefined);setEdit(event||null);setTab(event?'events':'pending')};
   const endedEvents=events.filter(event=>event.status!=='draft'&&!upcoming(event,now));
   const listedEvents=events.filter(event=>{
@@ -178,7 +178,7 @@ export function AdminPanel({
       {tab==='organizers'&&<AdminOrganizers events={allEvents} onSaved={setReceipt} onDirtyChange={setDirty}/>}
       {tab==='venues'&&<AdminVenues events={allEvents} onSaved={setReceipt} onDirtyChange={setDirty} onEvent={v=>{setReviewId(undefined);setEdit({...venueEvent(v),status:'draft'});setTab('events')}}/>}
       <div hidden={tab!=='discovery'}><AdminDiscovery onMarked={setReceipt} events={allEvents} categories={categories} onReview={event=>{setReviewId(undefined);setEdit(event);setTab('events')}}/></div>
-      {tab==='pending'&&<AdminPending events={events} submissions={submissions} onEdit={event=>openPending(event)} onSubmissions={()=>setTab('submissions')}/>}
+      {tab==='pending'&&<AdminPending events={events} submissions={submissions} onEdit={event=>openPending(event)} onTrash={event=>void remove(event)} busy={busy} onSubmissions={()=>setTab('submissions')}/>}
       {tab==='trash'&&<EventTrash events={allEvents.filter(e=>!!e.deleted_at)} onSaved={refresh} onHistory={setHistoryEvent}/>}
       {tab==='reports'&&<AdminReports reports={reports} events={allEvents} onSaved={refresh} onEdit={e=>{setReviewId(undefined);setEdit(e);setTab('events')}}/>}
       {(tab === "events"||tab === "drafts") && (
