@@ -1,9 +1,10 @@
 "use client";
 import { ArtistPicker } from "./artist-picker";
 import { discoverySourceCover } from "@/lib/discovery-draft";
-import {VenuePicker} from './venue-picker';
+import {VenueAutocomplete,EnvironmentPicker} from './venue-autocomplete';
+import {venueOptions,type VenueOption} from '@/lib/venue-directory';
+import type {Venue} from '@/lib/venues';
 import {OrganizerPicker} from './organizer-picker';
-import {venueEvent} from '@/lib/venues';
 import { request, navigate } from "@/lib/transport";
 import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
@@ -57,6 +58,7 @@ export function EventForm({
       starts_at: e.starts_at || "",
       time_tbd: e.time_tbd || false,
       ends_at: e.ends_at || null,
+      environment:e.environment??null,
       venue_name: e.venue_name || "",
       address: e.address || "",
       neighborhood: e.neighborhood || "",
@@ -82,6 +84,15 @@ export function EventForm({
   const [frequency,setFrequency]=useState('none'),[count,setCount]=useState(4),[usePhoto,setUsePhoto]=useState(!!submissionPhoto),[extraDirty,setExtraDirty]=useState(initialUnsaved);
   const requestId=useRef<{id:string;payload:string}|null>(null);
   const v = watch();
+  const [savedVenues,setSavedVenues]=useState<Venue[]>([]);
+  useEffect(()=>{let active=true;request('/api/admin/venues').then(async r=>{if(r.ok){const data=await r.json();if(active)setSavedVenues(data.venues||[])}}).catch(()=>{});return()=>{active=false}},[]);
+  const locations=venueOptions(savedVenues,savedEvents);
+  function selectVenue(venue:VenueOption){
+    const values={venue_name:venue.name,neighborhood:venue.neighborhood,environment:venue.environment,city:venue.city,state:venue.state,address:venue.address||''};
+    for(const key of Object.keys(values) as (keyof typeof values)[])setValue(key,values[key],{shouldDirty:true,shouldValidate:key!=='address'||!!values.address});
+    if(venue.organizer)setValue('organizer',venue.organizer,{shouldDirty:true});
+    if(venue.instagram_url)setValue('instagram_url',venue.instagram_url,{shouldDirty:true});
+  }
   const dirty=isDirty||extraDirty;
   useEffect(()=>{onDirtyChange?.(dirty);return()=>onDirtyChange?.(false)},[dirty,onDirtyChange]);
   useEffect(() => {
@@ -228,7 +239,6 @@ export function EventForm({
       <SaveConfirmation at={e.updated_at} dirty={dirty} busy={busy} />
       <OrganizerPicker events={savedEvents} onSelect={values=>{for(const key of Object.keys(values) as (keyof typeof values)[])setValue(key,values[key],{shouldDirty:true,shouldValidate:true})}}/>
       <ArtistPicker value={v.artist_ids || []} onChange={ids => setValue("artist_ids", ids, { shouldDirty: true, shouldValidate: true })}/>
-      <VenuePicker onSelect={venue=>{const values=venueEvent(venue);for(const key of Object.keys(values) as (keyof typeof values)[])setValue(key,values[key],{shouldDirty:true,shouldValidate:true})}}/>
       <div className="form-grid">
         {field("title", "Título", true)}
         <label>
@@ -251,7 +261,8 @@ export function EventForm({
         <label className="check full"><input type="checkbox" checked={!!v.time_tbd} onChange={ev=>{setValue('time_tbd',ev.target.checked,{shouldDirty:true,shouldValidate:true});if(ev.target.checked){setValue('ends_at',null,{shouldDirty:true});if(v.starts_at)setValue('starts_at',toISO(day(v.starts_at)+'T00:00'),{shouldDirty:true})}}}/>Horário a confirmar</label>
         {v.time_tbd?<label>Data do evento *<input type="date" required value={v.starts_at?day(v.starts_at):''} onChange={ev=>setValue('starts_at',ev.target.value?toISO(ev.target.value+'T00:00'):'',{shouldDirty:true,shouldValidate:true})}/><small>O site mostra a data e “Horário a confirmar”. Quando souber o horário, desmarque a opção e preencha o início.</small>{errors.starts_at&&<small className="error-text">Informe a data do evento.</small>}</label>:datetime("starts_at", "Início *")}
         {!v.time_tbd&&datetime("ends_at", "Encerramento")}
-        {field("venue_name", "Nome do local", true)}
+        <VenueAutocomplete error={errors.venue_name?.message} value={v.venue_name} options={locations} onSelect={selectVenue} onChange={name=>{setValue('venue_name',name,{shouldDirty:true,shouldValidate:true});setValue('environment',null,{shouldDirty:true});setValue('neighborhood','',{shouldDirty:true});setValue('address','',{shouldDirty:true})}}/>
+        <EnvironmentPicker value={v.environment??null} onChange={value=>setValue('environment',value,{shouldDirty:true,shouldValidate:true})}/>
         {field("address", "Endereço", true)}
         {field("neighborhood", "Bairro")}
         {field("city", "Cidade", true)}

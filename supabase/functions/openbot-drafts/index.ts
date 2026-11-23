@@ -3,6 +3,7 @@ import { z } from "npm:zod@4";
 import { timingSafeEqual } from "node:crypto";
 import { resolveDraftArtists } from "../_shared/artist-matching.ts";
 import { photoType } from "../_shared/photos.ts";
+import { findBaseVenue } from '../_shared/venue-directory.ts';
 import { normalizeDraftStart } from "../_shared/draft-time.ts";
 
 const secret = Deno.env.get("OPENBOT_DRAFT_TOKEN");
@@ -19,6 +20,7 @@ const schema = z.object({
   time_tbd: z.boolean().default(false),
   ends_at: date.optional(),
   venue_name: line(160).min(1),
+  environment: z.enum(['coberto','ao_ar_livre','misto']).nullable().optional(),
   address: line(240).default(""),
   neighborhood: line(120).default(""),
   organizer: line(160).default(""),
@@ -73,6 +75,14 @@ Deno.serve(async (req) => {
     const parsed = schema.safeParse(body);
     if (!parsed.success) return reply({ error: "Ficha inválida.", fields: parsed.error.issues.map(issue => issue.path.join(".") || "ficha") }, 400);
     const { category, source_url, cover_base64, artists: artistNames, ...fields } = parsed.data;
+    const baseVenue=findBaseVenue(fields.venue_name);
+    if(baseVenue){fields.venue_name=baseVenue.nome;if(!fields.neighborhood)fields.neighborhood=baseVenue.bairro;}
+    // Read the admin-maintained directory, not a guessed classification by venue type.
+    const venues=await db.from('venues').select('name,neighborhood,environment').eq('active',true).eq('city','Ipatinga');
+    if(venues.error)throw venues.error;
+    const venueMatches=venues.data.filter(v=>normalize(v.name)===normalize(fields.venue_name));
+    if(venueMatches.length===1){const venue=venueMatches[0];if(!fields.neighborhood)fields.neighborhood=venue.neighborhood;if(fields.environment===undefined)fields.environment=venue.environment;}
+    else if(fields.environment===undefined)fields.environment=baseVenue?.ambiente??null;
     if (fields.ends_at && Date.parse(fields.ends_at) <= Date.parse(fields.starts_at)) {
       return reply({ error: "O término precisa ser depois do início." }, 400);
     }
@@ -113,7 +123,12 @@ Deno.serve(async (req) => {
     const slug = "openbot-" + Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, "0")).join("");
     const existing = await db.from("events").select("id,status,cover_url,deleted_at").eq("slug", slug).maybeSingle();
     if (existing.error) throw existing.error;
-    const previous = existing.data;
+    // Keep idempotency for drafts imported before place names were standardized.
+    const candidates=await db.from('events').select('id,status,cover_url,deleted_at,title,venue_name').eq('starts_at',fields.starts_at).like('slug','openbot-%');
+    if(candidates.error)throw candidates.error;
+    const same=candidates.data.filter(e=>normalize(e.title)===normalize(fields.title)&&normalize(findBaseVenue(e.venue_name)?.nome||e.venue_name)===normalize(fields.venue_name));
+    if(!existing.data&&same.length>1)return reply({error:'Há mais de um cadastro semelhante. Revise os rascunhos antes de reenviar.'},422);
+    const previous = existing.data||same[0];
     const canAttach = previous?.status === "draft" && !previous.deleted_at && !previous.cover_url;
     if (previous && !(cover_base64 && canAttach)) {
       const linked = await attachArtists(previous.id);

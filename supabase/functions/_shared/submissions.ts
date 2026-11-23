@@ -1,3 +1,4 @@
+import {environmentLabels,type Environment} from './venue-directory.ts';
 export type SubmissionData = {
   title: string;
   description: string;
@@ -5,6 +6,7 @@ export type SubmissionData = {
   starts_at: string;
   ends_at: string | null;
   venue_name: string;
+  environment: Environment|null;
   address: string;
   neighborhood: string;
   city: string;
@@ -25,6 +27,7 @@ export function validateSubmission(
   if (!input || typeof input !== "object")
     throw Error("Preencha os dados do evento.");
   const v = input as Record<string, unknown>;
+  if(v.environment!==undefined&&v.environment!==null&&v.environment!==''&&(typeof v.environment!=='string'||!Object.hasOwn(environmentLabels,v.environment)))throw Error('Escolha um ambiente válido.');
   if(v.family_friendly!==undefined&&v.family_friendly!==null&&typeof v.family_friendly!=='boolean')throw Error('Escolha uma opção válida sobre crianças.');
   const labels:Record<string,string>={title:'nome do evento',description:'descrição',category_id:'categoria',starts_at:'início',ends_at:'encerramento',venue_name:'local',address:'endereço',neighborhood:'bairro',organizer:'organizador',price:'preço',ticket_url:'ingressos',instagram_url:'Instagram',age_rating:'classificação indicativa',additional_info:'informações adicionais'};
   const text = (key: string, min: number, max: number) => {
@@ -101,6 +104,7 @@ export function validateSubmission(
     category_id,
     starts_at: new Date(start).toISOString(),
     ends_at: ends_at ? new Date(ends_at).toISOString() : null,
+    environment:(v.environment||null) as Environment|null,
     venue_name: text("venue_name", 2, 160),
     address: text("address", 3, 300),
     neighborhood: text("neighborhood", 0, 100),

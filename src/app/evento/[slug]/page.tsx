@@ -1,3 +1,4 @@
+import {environmentLabels} from '@/lib/venue-directory';
 import {day} from '@/lib/dates';
 import { EventArtists } from '@/components/artist-agenda';
 import { PosterZoom } from "@/components/poster-zoom";
@@ -139,6 +140,7 @@ export default async function Detail({
               Organização: {e.organizer || "Não informada"}
             </p>
           </div>
+          {e.environment&&<p>Ambiente: {environmentLabels[e.environment]}</p>}
           <p className="family-info">{childrenLabel(e.family_friendly)}</p>
           <EventNotice event={e}/>
           <InstagramLink url={e.instagram_url}/>

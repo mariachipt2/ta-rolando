@@ -31,7 +31,7 @@ export function OrganizerPicker({events,onSelect}:{events:Event[];onSelect:(valu
         const selected=presets.find(item=>item.organizer.key===value);
         setKey(value);setLocationId('');
         const profile=profiles.find(item=>'profile:'+item.id===value);
-        if(profile)onSelect({organizer:profile.name,instagram_url:profile.instagram_url,
+        if(profile)onSelect({environment:null,organizer:profile.name,instagram_url:profile.instagram_url,
           venue_name:profile.venue_name,address:profile.address,neighborhood:profile.neighborhood,city:profile.city,state:profile.state});
         if(selected)selectLocation(selected.locations[0].id,selected);
       }}>

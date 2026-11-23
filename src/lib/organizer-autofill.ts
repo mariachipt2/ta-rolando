@@ -20,6 +20,7 @@ export function organizerEvent(event:Event, instagram:string) {
   return {
     organizer:event.organizer.trim(),
     instagram_url:event.instagram_url?.trim()||instagram,
+    environment:event.environment??null,
     venue_name:event.venue_name||'',
     address:event.address||'',
     neighborhood:event.neighborhood||'',

@@ -5,7 +5,7 @@ import {publicClock} from '@/lib/public-clock';
 import {loadSpecialTheme,saveSpecialTheme} from '@/lib/special-theme-actions';
 import {siteClock} from '@/lib/site-clock';
 import {publicationInbox,readPublicationNotice} from '@/lib/publication-notifications';
-import {loadVenues,saveVenue,publicVenue} from '@/lib/venue-actions';
+import {loadVenues,saveVenue,publicVenue,publicVenueDirectory} from '@/lib/venue-actions';
 import {loadOrganizerProfiles,saveOrganizerProfile} from '@/lib/organizer-profiles';
 import {loadDiscoveryMarks,saveDiscoveryMark} from '@/lib/discovery-mark-actions';
 import {loadRegistryExport} from '@/lib/admin-export';
@@ -189,6 +189,7 @@ export async function transport(
         },
         503,
       );
+    if(path==='/api/venues')return json(await publicVenueDirectory(db));
     if(path.startsWith('/api/venues?'))return json(await publicVenue(db,new URL(path,'https://local').searchParams.get('local')||''));
     if(path==='/api/artists')return json(await loadArtists(db));
     if(path==='/api/agenda-special')return json(await loadAgendaSpecial(db));

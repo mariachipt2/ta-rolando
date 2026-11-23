@@ -1,6 +1,9 @@
 "use client";
+import {VenueAutocomplete,EnvironmentPicker} from './venue-autocomplete';
+import {venueOptions,environmentLabels} from '@/lib/venue-directory';
+import type {Venue} from '@/lib/venues';
 import {venueEvent,type PublicVenue} from '@/lib/venues';
-import { useRef, useState, useEffect } from "react";
+import { Fragment, useRef, useState, useEffect } from "react";
 import { Send, X } from "lucide-react";
 import type { Category } from "@/lib/types";
 import { request } from "@/lib/transport";
@@ -14,7 +17,6 @@ import {photoType} from '../../supabase/functions/_shared/photos';
 const quickFields = [
   { name: "nome", label: "Nome do evento", required: true, maxLength: 160 },
   { name: "data_horario", label: "Data e Horário", placeholder: "Sexta 20/11 às 22h", required: true, maxLength: 100 },
-  { name: "local_bairro", label: "Local e Bairro", placeholder: "Garajão - Novo Centro", required: true, maxLength: 240 },
   { name: "valor", label: "Valor / Entrada", placeholder: "Entrada gratuita ou R$ 20", maxLength: 100 },
   { name: "link", label: "Link de Ingresso ou Instagram", placeholder: "Opcional", maxLength: 2048 },
 ];
@@ -28,6 +30,15 @@ export function SubmitEvent({ categories,initialVenue }: { categories: Category[
     [botVersion, setBotVersion] = useState(0);
   const [photo,setPhoto]=useState<File|null>(null),[photoPreview,setPhotoPreview]=useState('');
   useEffect(()=>{if(!photo){setPhotoPreview('');return}const url=URL.createObjectURL(photo);setPhotoPreview(url);return()=>URL.revokeObjectURL(url)},[photo]);
+  const initialPlace={name:initialVenue?.name||'',neighborhood:initialVenue?.neighborhood||'',environment:initialVenue?.environment??null};
+  const [place,setPlace]=useState(initialPlace),[quickPlace,setQuickPlace]=useState(initialPlace);
+  const [locations,setLocations]=useState(()=>venueOptions());
+  useEffect(()=>{let active=true;request('/api/venues').then(async r=>{if(!r.ok)return;const d=await r.json();if(active&&Array.isArray(d.venues))setLocations(venueOptions(d.venues.map((v:Venue)=>({...v,active:true}))))}).catch(()=>{});return()=>{active=false}},[]);
+  function locationFields(quick=false){const selected=quick?quickPlace:place;const update=quick?setQuickPlace:setPlace;return <>
+    <VenueAutocomplete name={quick?'local':'venue_name'} value={selected.name} options={locations} onChange={name=>update({name,neighborhood:'',environment:null})} onSelect={v=>update({name:v.name,neighborhood:v.neighborhood,environment:v.environment})}/>
+    <label>Bairro<input name={quick?'bairro':'neighborhood'} maxLength={100} value={selected.neighborhood} onChange={e=>update({...selected,neighborhood:e.target.value})}/></label>
+    <EnvironmentPicker name="environment" value={selected.environment} onChange={environment=>update({...selected,environment})}/>
+  </>};
   const photoInput=useRef<HTMLInputElement>(null);
   const quickDialog = useRef<HTMLDialogElement>(null);
   const requestId = useRef<{id:string;payload:string} | null>(null);
@@ -85,7 +96,8 @@ export function SubmitEvent({ categories,initialVenue }: { categories: Category[
               "",
               "*Nome do evento:* " + fieldValue("nome"),
               "*Data e Horário:* " + fieldValue("data_horario"),
-              "*Local e Bairro:* " + fieldValue("local_bairro"),
+              "*Local e Bairro:* " + [fieldValue("local"),fieldValue("bairro")].filter(Boolean).join(" — "),
+              "*Ambiente:* " + (quickPlace.environment?environmentLabels[quickPlace.environment]:"A confirmar"),
               "*Valor/Entrada:* " + fieldValue("valor"),
               "*Link/Instagram:* " + fieldValue("link"),
               "",
@@ -98,11 +110,12 @@ export function SubmitEvent({ categories,initialVenue }: { categories: Category[
             link.click();
           }}>
             <div className="quick-event-fields">
-              {quickFields.map(({name, label, required, placeholder, maxLength}) => (
-                <label key={name}>{label}{required ? " *" : ""}
+              {quickFields.map(({name, label, required, placeholder, maxLength},index) => (
+                <Fragment key={name}>{index===2&&locationFields(true)}
+                <label>{label}{required ? " *" : ""}
                   <input name={name} required={required} pattern={required ? ".*\\S.*" : undefined}
                     placeholder={placeholder} maxLength={maxLength} />
-                </label>
+                </label></Fragment>
               ))}
             </div>
             <p className="notice quick-event-tip">⚠️ Ao abrir a conversa no WhatsApp, não esqueça de anexar a imagem do cartaz!</p>
@@ -216,9 +229,8 @@ export function SubmitEvent({ categories,initialVenue }: { categories: Category[
                   false,
                   "datetime-local",
                 )}
-                {field("venue_name", "Local", true)}
+                {locationFields()}
                 {field("address", "Endereço", true)}
-                {field("neighborhood", "Bairro")}
                 {field("organizer", "Organizador")}
                 {field("instagram_url", "Perfil no Instagram", false, "url")}
                 <label>

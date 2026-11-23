@@ -16,6 +16,7 @@ export type Event = {
   time_tbd?: boolean;
   ends_at: string | null;
   venue_name: string;
+  environment?: 'coberto' | 'ao_ar_livre' | 'misto' | null;
   nightlife_venue?: boolean;
   address: string;
   neighborhood: string;
