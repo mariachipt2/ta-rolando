@@ -12,7 +12,7 @@ test('Locais canônicos tratam acentos e aliases sem confundir cidades ou supor 
  assert.equal(findBaseVenue('Mais Eventos - Ipatinga')?.nome,'Mais Eventos');
  assert.equal(findBaseVenue('Garajão novo'),undefined);
  assert.equal(baseVenues.find(v=>v.nome==='Estação do Chopp')?.bairro,'');
- assert.equal(baseVenues.find(v=>v.nome==='Garajão')?.ambiente,null);
+ assert.equal(baseVenues.find(v=>v.nome==='Garajão')?.ambiente,'coberto');
  const events=[{venue_name:'Garajão - Ipatinga',city:'Ipatinga'},{venue_name:'Garajão',city:'Timóteo',neighborhood:'Centro',state:'MG'}] as Event[];
  const options=venueOptions([],events);
  assert.equal(options.filter(v=>v.name==='Garajão'&&v.city==='Ipatinga').length,1);
@@ -31,7 +31,9 @@ test('Sugestões aceitam os três ambientes ou desconhecido e rejeitam valores e
 test('Supabase salva cobertura em série, edição, histórico, restauração, views e local sem ampliar escrita pública',async()=>{
  const db=new PGlite();try{
  await db.exec(`create role anon;create role authenticated;create role service_role bypassrls;create schema auth;create table auth.users(id uuid primary key);create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;grant usage on schema public,auth to anon,authenticated,service_role;`);
- for(const name of ['001_initial.sql','003_admin_totals.sql','004_event_instagram.sql','005_submissions_save_confirmation.sql','006_private_save_permissions.sql','007_event_management.sql','011_venues.sql','017_nightlife_filter.sql','020_artists.sql','023_event_time_tbd.sql','025_venue_environment.sql'])await db.exec(readFileSync('supabase/migrations/'+name,'utf8'));
+ for(const name of ['001_initial.sql','003_admin_totals.sql','004_event_instagram.sql','005_submissions_save_confirmation.sql','006_private_save_permissions.sql','007_event_management.sql','011_venues.sql','017_nightlife_filter.sql','020_artists.sql','023_event_time_tbd.sql','018_organizer_profiles.sql','025_venue_environment.sql','026_organizer_environment_confirmed.sql'])await db.exec(readFileSync('supabase/migrations/'+name,'utf8'));
+ const organizerDefaults=(await db.query<{name:string;environment:string}>("select name,environment from organizer_profiles order by name")).rows;
+ assert.deepEqual(organizerDefaults,[{name:'Estação do Chopp',environment:'misto'},{name:'Garajão',environment:'coberto'}]);
  const category=(await db.query<{id:string}>('select id from categories limit 1')).rows[0].id;
  const data={title:'Teste ambiente',description:'Descrição completa',category_id:category,starts_at:'2030-11-28T20:00:00-03:00',time_tbd:false,ends_at:null,venue_name:'Local',address:'Rua A, 10',neighborhood:'Centro',city:'Ipatinga',state:'MG',organizer:'',instagram_url:'',is_free:false,price:'',ticket_url:'',age_rating:'Livre',cover_url:'',gallery:[],additional_info:'',status:'published',publish_at:null,featured:false,family_friendly:null,change_notice:'',environment:'coberto'};
  assert.equal(eventSchema.parse(data).environment,'coberto');assert.equal(eventSchema.safeParse({...data,environment:'chuva'}).success,false);

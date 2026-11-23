@@ -3,8 +3,8 @@ export type Environment = keyof typeof environmentLabels;
 export type VenuePreset = { nome: string; bairro: string; ambiente: Environment | null; aliases: string[]; fonte?: string };
 // Null means unconfirmed; it must never be interpreted as sheltered from rain.
 export const baseVenues: VenuePreset[] = [
-  { nome:'Garajão', bairro:'Novo Centro', ambiente:null, aliases:['Garajão - Ipatinga'] },
-  { nome:'Estação do Chopp', bairro:'', ambiente:null, aliases:[] },
+  { nome:'Garajão', bairro:'Novo Centro', ambiente:'coberto', aliases:['Garajão - Ipatinga'] },
+  { nome:'Estação do Chopp', bairro:'', ambiente:'misto', aliases:[] },
   { nome:'Mansão Music Hall', bairro:'Veneza', ambiente:null, aliases:['Mansão','Mansão Music Hall - Ipatinga'] },
   { nome:'Dedo de Prosa Casa Bistrô', bairro:'Iguaçu', ambiente:null, aliases:['Dedo de Prosa'] },
   { nome:'Mais Eventos', bairro:'Cidade Nobre', ambiente:null, aliases:['+Mais Eventos','Mais Eventos - Ipatinga'] },

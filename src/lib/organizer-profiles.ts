@@ -8,6 +8,7 @@ const profileSchema = z.object({
   source_key: z.string().max(300).nullable(),
   name: z.string().trim().min(2).max(160),
   instagram_url: instagramUrl,
+  environment:z.enum(['coberto','ao_ar_livre','misto']).nullable().optional(),
   venue_name: z.string().trim().max(160),
   address: z.string().trim().max(300),
   neighborhood: z.string().trim().max(100),

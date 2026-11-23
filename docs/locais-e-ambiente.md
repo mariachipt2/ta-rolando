@@ -18,7 +18,7 @@ Admin → Locais permite revisar bairro, cobertura e demais dados reutilizados. 
 
 Exemplo de campos adicionais (preserve os demais campos obrigatórios da ficha):
 ```json
-{"venue_name":"Garajão","neighborhood":"Novo Centro","environment":null}
+{"venue_name":"Garajão","neighborhood":"Novo Centro","environment":"coberto"}
 ```
 
 ## Base inicial e limites
@@ -30,3 +30,7 @@ Referências para a cobertura dos espaços públicos/culturais: [Parque Ipanema 
 ## Implantação
 
 Migração: `025_venue_environment.sql`. Acrescenta `environment` em events/venues, views, gravação, recorrência, histórico e restauração. Mantém permissões administrativas e expõe apenas nome, bairro, ambiente, cidade e UF de locais ativos autorizados para compartilhamento. Funções `openbot-drafts` e `public-events` atualizadas no Supabase. O frontend precisa ser publicado pelo app do GitHub.
+
+
+## Confirmação da Maria — 23/11/2026
+Garajão: coberto. Estação do Chopp: misto. Classificação aplicada aos eventos não excluídos e aos cadastros de locais e organizadores. Selecionar o organizador reutiliza o ambiente, editável no evento.

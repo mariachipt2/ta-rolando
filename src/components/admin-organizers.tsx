@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from 'react';
+import {EnvironmentPicker} from './venue-autocomplete';
+import {environmentLabels} from '@/lib/venue-directory';
 import type { Event } from '@/lib/types';
 import type { OrganizerProfile } from '@/lib/organizer-profiles';
 import { organizerEvent, organizerPresets } from '@/lib/organizer-autofill';
@@ -52,7 +54,7 @@ export function AdminOrganizers({ events, onSaved, onDirtyChange }: {
   }));
   function open(profile: Partial<OrganizerProfile> = {}) {
     setEdit({ id: crypto.randomUUID(), name: '', source_key: null, instagram_url: '', venue_name: '',
-      address: '', neighborhood: '', city: 'Ipatinga', state: 'MG', ...profile });
+      environment:null,address: '', neighborhood: '', city: 'Ipatinga', state: 'MG', ...profile });
     setDirty(false);
     setError('');
   }
@@ -88,6 +90,7 @@ export function AdminOrganizers({ events, onSaved, onDirtyChange }: {
             type={key === 'instagram_url' ? 'url' : 'text'}
             onChange={event => { setEdit({ ...edit, [key]: event.target.value }); setDirty(true); }} />
         </label>)}
+        <EnvironmentPicker value={edit.environment??null} onChange={environment=>{setEdit({...edit,environment});setDirty(true)}}/>
       </fieldset>
       <div className="share-buttons">
         <button className="button lime-button" disabled={busy}>Salvar organizador</button>
@@ -105,6 +108,7 @@ export function AdminOrganizers({ events, onSaved, onDirtyChange }: {
         {profiles.filter(profile => matches(profile.name)).map(profile => <article className="venue-card" key={profile.id}>
           <h3>{profile.name}</h3>
           <p>{[profile.venue_name, profile.neighborhood, profile.city].filter(Boolean).join(' · ')}</p>
+          {profile.environment&&<p>Ambiente: {environmentLabels[profile.environment]}</p>}
           {profile.instagram_url && <a href={profile.instagram_url} target="_blank" rel="noreferrer">Instagram ↗</a>}
           {profile.updated_at && <p className="muted">Salvo em {savedTime(profile.updated_at)} · Brasília</p>}
           <button type="button" className="button secondary" onClick={() => open(profile)}>Editar organizador</button>
