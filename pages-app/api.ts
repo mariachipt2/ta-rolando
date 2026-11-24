@@ -1,6 +1,7 @@
 import { loadArtists, saveArtist } from '@/lib/artist-actions';
 import { loadAgendaSpecial, saveAgendaSpecial } from '@/lib/agenda-special-actions';
 import { loadStatistics } from '@/lib/admin-statistics';
+import {ignoreBrowserTraffic} from '@/lib/analytics-traffic';
 import {publicClock} from '@/lib/public-clock';
 import {loadSpecialTheme,saveSpecialTheme} from '@/lib/special-theme-actions';
 import {siteClock} from '@/lib/site-clock';
@@ -135,6 +136,7 @@ function visitor() {
 }
 async function edge(action: string, payload: Record<string, unknown> = {}) {
   if (!db) return json({ error: "O Supabase ainda não foi configurado." }, 503);
+  const session=action==='metric'?(await db.auth.getSession()).data.session:null;
   const response = await fetch(
     __SUPABASE_URL__ + "/functions/v1/public-events",
     {
@@ -142,6 +144,7 @@ async function edge(action: string, payload: Record<string, unknown> = {}) {
       headers: {
         "Content-Type": "application/json",
         apikey: __SUPABASE_PUBLIC_KEY__,
+        ...(session?{Authorization:'Bearer '+session.access_token}:{}),
       },
       body: JSON.stringify({ action, visitor: visitor(), ...payload }),
       signal: AbortSignal.timeout(20000),
@@ -169,7 +172,7 @@ export async function transport(
         return json({ ids: [] });
       return await edge(init.method === "POST" ? "attendance" : "agenda", body);
     }
-    if (path === "/api/metrics") return await edge("metric", body);
+    if (path === "/api/metrics") return ignoreBrowserTraffic()?json({ok:true,ignored:true}):await edge("metric", body);
     if (path === '/api/submissions') return init.body instanceof FormData?await edgePhoto(init.body):await edge('submission',body);
     if(path==='/api/reports')return await edge('report',body);
     if (path.startsWith("/api/calendar/")) {

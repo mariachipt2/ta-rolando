@@ -2,13 +2,14 @@ import {createClient} from 'npm:@supabase/supabase-js@2';
 import {validateSubmission} from '../_shared/submissions.ts';
 import {photoType} from '../_shared/photos.ts';
 import {validateReport} from '../_shared/reports.ts';
+import {internalTraffic} from '../_shared/traffic.ts';
 const db=createClient(Deno.env.get('SUPABASE_URL')!,Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,{auth:{persistSession:false}});
 const allowed=(Deno.env.get('ALLOWED_ORIGINS')||'').split(',').map(v=>v.trim()).filter(Boolean);
 const secret=Deno.env.get('VISITOR_SECRET')||'';
 async function hash(value:string){const key=await crypto.subtle.importKey('raw',new TextEncoder().encode(secret),{name:'HMAC',hash:'SHA-256'},false,['sign']);const bytes=await crypto.subtle.sign('HMAC',key,new TextEncoder().encode(value));return Array.from(new Uint8Array(bytes),x=>x.toString(16).padStart(2,'0')).join('');}
 async function limit(key:string,max:number,seconds:number){const {data,error}=await db.rpc('consume_limit',{p_key:key,p_max:max,p_seconds:seconds});if(error)throw error;return data===true;}
 Deno.serve(async req=>{
- const origin=req.headers.get('origin')||'';const cors={'Access-Control-Allow-Origin':origin,'Access-Control-Allow-Headers':'authorization, apikey, content-type, x-client-info','Access-Control-Allow-Methods':'POST, OPTIONS','Vary':'Origin','Cache-Control':'no-store'};
+ const origin=req.headers.get('origin')||'';const cors={'Access-Control-Allow-Origin':origin,'Access-Control-Allow-Headers':'authorization, apikey, content-type, x-client-info, x-ta-rolando-traffic','Access-Control-Allow-Methods':'POST, OPTIONS','Vary':'Origin','Cache-Control':'no-store'};
  const reply=(value:unknown,status=200)=>Response.json(value,{status,headers:cors});
  if(!allowed.includes(origin))return new Response('Origem não autorizada',{status:403});
  if(req.method==='OPTIONS')return new Response(null,{status:204,headers:cors});
@@ -20,6 +21,14 @@ Deno.serve(async req=>{
   let body;let photo:File|null=null;
   if(multipart){const form=await req.formData();const raw=String(form.get('payload')||'');if(raw.length>30000)return reply({error:'Dados muito grandes.'},413);body=JSON.parse(raw);const file=form.get('photo');if(file instanceof File&&file.size>0)photo=file;}
   else{const raw=await req.text();if(raw.length>30000)return reply({error:'Requisição muito grande.'},413);body=JSON.parse(raw);}
+  if(body.action==='metric'){
+   if(internalTraffic(req.headers))return reply({ok:true,ignored:true});
+   const token=req.headers.get('authorization')?.match(/^Bearer (.+)$/i)?.[1];
+   if(token){
+    const {data:{user}}=await db.auth.getUser(token);
+    if(user){const profile=await db.from('admin_profiles').select('user_id').eq('user_id',user.id).eq('active',true).maybeSingle();if(profile.error)throw profile.error;if(profile.data)return reply({ok:true,ignored:true});}
+   }
+  }
   if(typeof body.visitor!=='string'||!/^[a-f0-9]{64}$/.test(body.visitor))return reply({error:'Identificador inválido.'},400);
   const visitor=await hash('pages:'+body.visitor);
   if(!await limit('pages:requests:'+visitor,60,60))return reply({error:'Muitas tentativas. Aguarde um minuto.'},429);

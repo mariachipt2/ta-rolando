@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import {excludeThisBrowser,setExcludeThisBrowser} from '@/lib/analytics-traffic';
 import { RefreshCw } from 'lucide-react';
 import { day } from '@/lib/dates';
 import { useNow } from '@/lib/use-now';
@@ -44,6 +45,9 @@ export function AdminStatistics({ events, metrics: initialMetrics, retrievedAt, 
   const [measure, setMeasure] = useState<keyof MetricTotals>('views');
   const [group, setGroup] = useState<StatisticsGroup>('event');
   const [expanded, setExpanded] = useState(false);
+  const [excludeBrowser,setExcludeBrowser]=useState(false);
+  const [preferenceError,setPreferenceError]=useState('');
+  useEffect(()=>setExcludeBrowser(excludeThisBrowser()),[]);
   const earliest = metrics.reduce((first, row) => row.day < first ? row.day : first, today);
   const from = period === 'custom' ? customFrom : period === 'all' ? earliest : shiftStatisticsDay(today, 1 - Number(period));
   const to = period === 'custom' ? customTo : today;
@@ -85,6 +89,11 @@ export function AdminStatistics({ events, metrics: initialMetrics, retrievedAt, 
       <button className="button secondary" onClick={refresh} disabled={busy}><RefreshCw size={16}/>{busy ? 'Consultando…' : 'Atualizar dados'}</button>
     </div>
     {error && <p className="notice" role="alert">{error} Os dados exibidos são da última consulta bem-sucedida.</p>}
+    <div className="analytics-traffic-settings">
+      <label><input type="checkbox" checked={excludeBrowser} onChange={event=>{const value=event.target.checked;if(setExcludeThisBrowser(value)){setExcludeBrowser(value);setPreferenceError('')}else setPreferenceError('O navegador não permitiu salvar esta preferência.');}}/> Excluir meus acessos neste navegador, mesmo após sair do administrador</label>
+      <small>A preferência vale neste navegador e domínio. Com sessão de administradora ativa, visualizações e cliques em ingressos são excluídos automaticamente. Robôs identificáveis também são filtrados. Os totais antigos podem incluir testes; visualizações não representam visitantes únicos.</small>
+      {preferenceError&&<p role="alert">{preferenceError}</p>}
+    </div>
     <div className="statistics-filters">
       <label>Período<select value={period} onChange={event => { setPeriod(event.target.value); setExpanded(false); }}>
         <option value="7">Últimos 7 dias</option><option value="30">Últimos 30 dias</option>
