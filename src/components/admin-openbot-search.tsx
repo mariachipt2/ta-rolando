@@ -121,7 +121,7 @@ export function AdminOpenBotSearch({
       </div>
       <small>
         O computador, o OpenBot e o conector local precisam estar ligados.
-        Nenhum resultado é publicado automaticamente.
+        A coleta pode levar alguns minutos. Nenhum resultado é publicado automaticamente.
       </small>
       {job && (
         <div className="openbot-search-status" role="status">
@@ -142,6 +142,7 @@ export function AdminOpenBotSearch({
               ` · Atualizado em ${savedTime(job.finished_at)}`}
           </span>
           {job.error && <p>{job.error}</p>}
+          {waiting && <small>Cancelar impede receber os resultados deste pedido. Uma tarefa já iniciada pode terminar no OpenBot.</small>}
           {waiting && (
             <button
               className="button secondary"

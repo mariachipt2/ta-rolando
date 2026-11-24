@@ -55,7 +55,7 @@ export function searchResult(
       title,
       starts_at: new Date(stamp).toISOString(),
       ends_at:
-        end && Number.isFinite(Date.parse(end)) && Date.parse(end) > stamp
+        end && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}.*(?:Z|[+-]\d{2}:\d{2})$/.test(end) && Number.isFinite(Date.parse(end)) && Date.parse(end) > stamp
           ? new Date(end).toISOString()
           : null,
       venue_name: text("venue_name", 160),

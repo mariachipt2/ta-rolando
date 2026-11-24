@@ -24,6 +24,7 @@ test("Resultados do OpenBot exigem cidade, fonte e data confirmadas e sinalizam 
   assert.equal(r.items.length, 1);
   assert.equal(r.items[0].is_free, null);
   assert.equal(r.items[0].ticket_url, "");
+  assert.equal(searchResult({items:[{...valid,ends_at:'2030-12-19'}]},'socialyte',now).items[0].ends_at,null);
   assert.ok(r.items[0].missing.includes("Pago ou gratuito"));
   assert.deepEqual(r.warnings, ["Conferir preco"]);
   for (const extra of [
