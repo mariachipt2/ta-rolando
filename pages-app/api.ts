@@ -211,6 +211,7 @@ export async function transport(
       return json({ ok: true });
     }
     if (!(await isAdmin())) return json({ error: "Acesso negado." }, 401);
+    if(path==='/api/admin/openbot-search'){const {data:{session}}=await db.auth.getSession();if(!session)return json({error:'Sessão expirada.'},401);return fetch(__SUPABASE_URL__+'/functions/v1/openbot-search',{method:'POST',headers:{apikey:__SUPABASE_PUBLIC_KEY__,Authorization:'Bearer '+session.access_token,'Content-Type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(20000)})}
     if(path==='/api/admin/artists')return json(init.method==='POST'?await saveArtist(db,body):await loadArtists(db,true));
     if(path==='/api/admin/agenda-special')return json(init.method==='POST'?await saveAgendaSpecial(db,body):await loadAgendaSpecial(db));
     if(path==='/api/admin/statistics')return json(await loadStatistics(db));
