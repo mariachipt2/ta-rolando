@@ -3,7 +3,7 @@ import { AdminArtists } from "./admin-artists";
 import { AdminAgendaSpecial } from './admin-agenda-special';
 import { AdminStatistics } from './admin-statistics';
 import type { EventMetric } from '@/lib/admin-statistics';
-import {AdminNavigation} from './admin-navigation';
+import {AdminNavigation,adminSection} from './admin-navigation';
 import {useNow} from '@/lib/use-now';
 import {AdminSpecialTheme} from './admin-special-theme';
 import {AdminNotifications} from './admin-notifications';
@@ -126,7 +126,7 @@ export function AdminPanel({
         <div>
           <span className="eyebrow">PAINEL ADMINISTRATIVO</span>
           <h1>
-            A cidade em movimento<span className="lime">.</span>
+            Sua agenda, no controle<span className="lime">.</span>
           </h1>
         </div>
         <div className="admin-header-actions"><AdminNotifications/><button
@@ -168,6 +168,7 @@ export function AdminPanel({
       <div className="admin-workspace">
       <AdminNavigation selected={tab} counts={{drafts:events.filter(e=>e.status==='draft').length,pending:pendingEvents.length+pendingSuggestions,submissions:pendingSuggestions,reports:reports.filter(r=>r.status==='pending').length,trash:allEvents.filter(e=>e.deleted_at).length}} onSelect={value=>{if(value===tab)return true;if(dirty&&!confirm('Há alterações não salvas. Sair sem salvar?'))return false;setEdit(null);setReviewId(undefined);setShowEnded(false);setTab(value);return true}}/>
       <div className="admin-workspace-content">
+      <AdminSectionHeading section={tab}/>
       {error && <p role="alert">{error}</p>}
       {previewEvent&&<AdminEventPreview event={previewEvent} onClose={()=>setPreviewEvent(null)} onEdit={()=>{setReviewId(undefined);setEdit(previewEvent);setPreviewEvent(null);setTab('events')}}/>}
       {historyEvent&&<EventHistory key={historyEvent.id} event={historyEvent} onClose={()=>setHistoryEvent(null)} onSaved={refresh}/>}
@@ -449,4 +450,7 @@ export function AdminPanel({
 
 
 
+
+
+function AdminSectionHeading({section}:{section:string}){const item=adminSection(section);if(!item)return null;const Icon=item.icon;return <header className="admin-section-heading"><span className="admin-section-heading-icon"><Icon size={21}/></span><div><small>{item.group}</small><h2>{item.label}</h2><p>{item.description}</p></div></header>}
 
