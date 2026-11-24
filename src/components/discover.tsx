@@ -192,7 +192,7 @@ export function Discover({
     date
   );
   const future = useMemo(
-    () => events.filter(e => upcoming(e, new Date(now)) && e.status !== "cancelled" &&
+    () => events.filter(e => !e.sold_out && upcoming(e, new Date(now)) && e.status !== "cancelled" &&
       (!hideNightlife || (!e.nightlife_venue && !nightlifeCategories.has(e.category_id) && !isNightlifeCategory(e.categories)))),
     [events, now, hideNightlife, nightlifeCategories],
   );

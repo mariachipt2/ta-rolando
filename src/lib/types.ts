@@ -32,6 +32,7 @@ export type Event = {
   recurrence_group?:string|null;
   recurrence_index?:number|null;
   instagram_url?: string;
+  sold_out?: boolean;
   is_free: boolean;
   price: string;
   ticket_url: string;

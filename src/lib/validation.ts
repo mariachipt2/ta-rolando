@@ -36,6 +36,7 @@ export const eventSchema = z
     family_friendly:z.boolean().nullable(),
     change_notice:z.string().trim().max(1000),
     instagram_url: instagramUrl,
+    sold_out:z.boolean().optional(),
     is_free: z.boolean(),
     price: z.string().max(100),
     ticket_url: safeUrl,

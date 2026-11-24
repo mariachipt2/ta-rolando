@@ -31,7 +31,7 @@ test('Sugestões aceitam os três ambientes ou desconhecido e rejeitam valores e
 test('Supabase salva cobertura em série, edição, histórico, restauração, views e local sem ampliar escrita pública',async()=>{
  const db=new PGlite();try{
  await db.exec(`create role anon;create role authenticated;create role service_role bypassrls;create schema auth;create table auth.users(id uuid primary key);create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;grant usage on schema public,auth to anon,authenticated,service_role;`);
- for(const name of ['001_initial.sql','003_admin_totals.sql','004_event_instagram.sql','005_submissions_save_confirmation.sql','006_private_save_permissions.sql','007_event_management.sql','011_venues.sql','017_nightlife_filter.sql','020_artists.sql','023_event_time_tbd.sql','018_organizer_profiles.sql','025_venue_environment.sql','026_organizer_environment_confirmed.sql'])await db.exec(readFileSync('supabase/migrations/'+name,'utf8'));
+ for(const name of ['001_initial.sql','003_admin_totals.sql','004_event_instagram.sql','005_submissions_save_confirmation.sql','006_private_save_permissions.sql','007_event_management.sql','011_venues.sql','017_nightlife_filter.sql','020_artists.sql','023_event_time_tbd.sql','018_organizer_profiles.sql','025_venue_environment.sql','026_organizer_environment_confirmed.sql','027_sold_out.sql'])await db.exec(readFileSync('supabase/migrations/'+name,'utf8'));
  const organizerDefaults=(await db.query<{name:string;environment:string}>("select name,environment from organizer_profiles order by name")).rows;
  assert.deepEqual(organizerDefaults,[{name:'Estação do Chopp',environment:'misto'},{name:'Garajão',environment:'coberto'}]);
  const category=(await db.query<{id:string}>('select id from categories limit 1')).rows[0].id;
@@ -42,9 +42,13 @@ test('Supabase salva cobertura em série, edição, histórico, restauração, v
  const created=(await db.query<{result:{ids:string[];saved_at:string}}>('select create_event_series($1,$2,$3,$4) result',['00000000-0000-4000-8000-000000000002',JSON.stringify(data),'weekly',2])).rows[0].result;
  assert.ok(created.saved_at);assert.equal((await db.query("select id from admin_events where environment='coberto'")).rows.length,2);
  const id=created.ids[0];
+ await db.query('update events set sold_out=true where id=$1',[id]);
+ assert.equal((await db.query<{sold_out:boolean}>('select sold_out from public_events where id=$1',[id])).rows[0].sold_out,true);
+ assert.equal((await db.query<{sold_out:boolean}>('select sold_out from admin_events where id=$1',[id])).rows[0].sold_out,true);
  const version=(await db.query<{id:string}>('select id from event_versions where event_id=$1 order by created_at limit 1',[id])).rows[0].id;
  await db.query("update events set environment='ao_ar_livre' where id=$1",[id]);
  await db.query('select restore_event_version($1)',[version]);
+ assert.equal((await db.query<{sold_out:boolean}>('select sold_out from public_events where id=$1',[id])).rows[0].sold_out,false);
  assert.equal((await db.query<{environment:string}>('select environment from public_events where id=$1',[id])).rows[0].environment,'coberto');
  await assert.rejects(()=>db.query("update events set environment='indefinido' where id=$1",[id]));
  const venueId=(await db.query<{id:string}>("select id from venues where name='Garajão'")).rows[0].id;

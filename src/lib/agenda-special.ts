@@ -64,7 +64,7 @@ export function specialEvents(events: Event[], settings: AgendaSpecial, now: Dat
     const start = Date.parse(event.starts_at);
     const finish = Date.parse(event.ends_at || event.starts_at);
     const overlaps = start < high && (event.ends_at ? finish > low : start >= low);
-    return !event.deleted_at && published && overlaps && (ended ? finish <= +now : finish > +now);
+    return !event.sold_out&&!event.deleted_at && published && overlaps && (ended ? finish <= +now : finish > +now);
   }).sort((a, b) => Date.parse(a.starts_at) - Date.parse(b.starts_at) || a.id.localeCompare(b.id));
 }
 

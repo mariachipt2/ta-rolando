@@ -19,7 +19,7 @@ export type Artist = z.infer<typeof artistSchema> & { slug: string; updated_at?:
 export const artistName = (value: string) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('pt-BR').replace(/\s+/g, ' ').trim();
 
 export function artistEvents(events: Event[], artistId: string, now: Date) {
-  return events.filter(event => event.artist_ids?.includes(artistId) && !event.deleted_at && upcoming(event, now)
+  return events.filter(event => event.artist_ids?.includes(artistId) && !event.sold_out&&!event.deleted_at && upcoming(event, now)
     && (event.status === 'published' || (event.status === 'scheduled' && !!event.publish_at && Date.parse(event.publish_at) <= +now)))
     .sort((a, b) => Date.parse(a.starts_at) - Date.parse(b.starts_at) || a.id.localeCompare(b.id));
 }

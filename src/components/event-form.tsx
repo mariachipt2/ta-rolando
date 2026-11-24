@@ -67,6 +67,7 @@ export function EventForm({
       organizer: e.organizer || "",
       artist_ids: e.artist_ids || [],
       instagram_url: e.instagram_url || "",
+      sold_out:e.sold_out??false,
       is_free: e.is_free ?? true,
       price: e.price || "",
       ticket_url: e.ticket_url || "",
@@ -285,6 +286,8 @@ export function EventForm({
         <label className="check">
           <input type="checkbox" {...register("is_free")} /> Entrada gratuita
         </label>
+        <label className="check full"><input type="checkbox" {...register('sold_out')}/>Ingressos esgotados</label>
+        <small className="full muted">Retira o evento da página inicial, agenda por dia, fim de semana e recomendações. A página do evento continua acessível com o aviso. Desmarque se os ingressos voltarem a ficar disponíveis.</small>
         {field("price", "Preço ou faixa de preço")}
         {field("ticket_url", "Link HTTPS dos ingressos", false, "url")}
         <label>Classificação indicativa<select {...register('age_rating')}>{!AGE_OPTIONS.includes(v.age_rating)&&<option>{v.age_rating}</option>}{AGE_OPTIONS.map(a=><option key={a}>{a}</option>)}</select></label>

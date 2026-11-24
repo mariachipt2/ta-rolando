@@ -233,7 +233,7 @@ export function AdminPanel({
                         }
                         {e.status!=='draft'&&e.status!=='cancelled'&&!upcoming(e,now)&&' · Encerrado'}
                       </span>
-                      <h3>{e.title}</h3>
+                      <h3>{e.title}</h3>{e.sold_out&&<span className="discovery-badge">Ingressos esgotados</span>}
                       {e.slug.startsWith('openbot-')&&<small>Importado do OpenBot</small>}
                       {eventIssues(e).length>0&&<ul className="pending-reasons">{eventIssues(e).map(issue=><li key={issue.type}>{issue.label}</li>)}</ul>}
                       <p>
@@ -268,6 +268,7 @@ export function AdminPanel({
                             slug: undefined,
                             title: e.title + " (cópia)",
                             status: "draft",
+                            sold_out:false,
                             updated_at: undefined,
                             recurrence_group:undefined,change_notice:"",change_at:undefined,
                           })

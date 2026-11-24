@@ -207,7 +207,7 @@ export default async function Detail({
           <a className="button secondary" href={`/api/calendar/${e.id}`}>
             <CalendarDays size={17} /> Adicionar ao calendário
           </a>
-          <Share title={e.title} id={e.id} ticket={e.ticket_url} />
+          <Share title={e.title} id={e.id} ticket={e.sold_out?"":e.ticket_url} />
           <ReportEvent id={e.id}/>
         </aside>
       </div>

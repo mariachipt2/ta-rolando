@@ -150,7 +150,7 @@ function Detail({ event: e,events }: { event: Event;events:Event[] }) {
             disabled={!upcoming(e) || e.status === "cancelled"}
           />
           <CalendarDownload id={e.id} />
-          <Share title={e.title} id={e.id} ticket={e.ticket_url} />
+          <Share title={e.title} id={e.id} ticket={e.sold_out?"":e.ticket_url} />
           <ReportEvent id={e.id}/>
         </aside>
       </div>

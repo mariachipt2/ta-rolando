@@ -33,6 +33,8 @@ export function EventCard({ event: e, rank }: { event: Event; rank?: number }) {
             ? "Cancelado"
             : !upcoming(e,now)
               ? "Encerrado"
+              : e.sold_out
+              ? "Ingressos esgotados"
               : e.is_free
               ? "Entrada gratuita"
               : e.price || "Evento pago"}
