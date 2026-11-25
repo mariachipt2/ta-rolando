@@ -9,6 +9,7 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { LazyMotion, domAnimation, m, useMotionValue, useReducedMotion, useSpring } from "motion/react";
 import {
   Search,
+  Umbrella,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
@@ -346,6 +347,7 @@ export function Discover({
             >
               ✦ Gratuitos
             </button>
+            <Link href="/cobertos" className="rain-shortcut"><Umbrella size={16}/> Tá chovendo?</Link>
             {hideNightlife && <button className="active" aria-pressed="true" onClick={() => updateNightlife(false)}>
               Bares e baladas ocultos <X size={15} aria-hidden="true" />
             </button>}

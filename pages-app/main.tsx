@@ -1,3 +1,4 @@
+import {CoveredEvents} from '@/components/covered-events';
 import {EnvironmentBadge} from '@/components/environment-badge';
 import { ArtistAgenda, EventArtists } from '@/components/artist-agenda';
 import { AgendaSpecialPage } from '@/components/agenda-special-page';
@@ -262,6 +263,7 @@ function App() {
         : path === '/programacao' ? 'Minha programação | Tá Rolando'
         : path === '/programacao-compartilhada' ? 'Programação compartilhada | Tá Rolando'
         : path === '/organizadores' ? 'Organizadores | Tá Rolando'
+        : path === '/cobertos' ? 'Tá chovendo? Locais cobertos | Tá Rolando'
         : path === '/fim-de-semana' ? 'Resumo do fim de semana | Tá Rolando'
         : path === '/linha-do-tempo'
           ? 'Calendário de eventos | Tá Rolando'
@@ -338,6 +340,8 @@ function App() {
           <ArtistAgenda key={revision} events={data?.events||[]} error={data?.error} slug={path.startsWith('/artista/') ? decodeURIComponent(path.slice('/artista/'.length)) : undefined}/>
         ) : path === '/especial' ? (
           <AgendaSpecialPage key={revision} events={data?.events||[]} error={data?.error} selection={Object.fromEntries(new URLSearchParams(location.hash.split('?')[1]||''))}/>
+        ) : path === '/cobertos' ? (
+          <CoveredEvents events={data?.events||[]} error={data?.error}/>
         ) : path === '/fim-de-semana' ? (
           <WeekendSummary key={revision} events={data?.events||[]} error={data?.error} initialStart={new URLSearchParams(location.hash.split('?')[1]||'').get('inicio')}/>
         ) : path === '/linha-do-tempo' ? (
