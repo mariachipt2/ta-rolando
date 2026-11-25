@@ -26,6 +26,7 @@ import {forChildren,isNightlifeCategory} from '@/lib/event-discovery';
 import { CategoryIcon } from "./category-icon";
 import { PosterZoom } from "./poster-zoom";
 import { DailyAgendaPreview } from "./daily-agenda-preview";
+import {RolePicker} from './role-picker';
 
 const nightlifePreference = "tr:hide-nightlife";
 
@@ -432,6 +433,7 @@ export function Discover({
         </div>
         <HomeSpotlight events={spotlight} />
       </section>
+      <div className="shell role-picker-home"><RolePicker events={future} categories={categories} error={error}/></div>
       <div id="explorar">
         {error&&<p className="shell notice" role="alert">Não conseguimos consultar os eventos agora. Recarregue a página em alguns instantes.</p>}
         {active&&<div className="shell agenda-filter-summary"><p role="status">{filtered.length} {filtered.length===1?'evento encontrado':'eventos encontrados'} com os filtros selecionados.</p><button className="clear" onClick={clear}><X size={15}/> Limpar filtros</button></div>}
